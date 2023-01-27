@@ -1,0 +1,569 @@
+---
+title: "Teradata SQL translation"
+output:
+  html_document:
+    toc: true 
+    toc_depth: 3
+    number_sections: false
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Teradata SQL translation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
+library(knitr)
+library(dbplyr)
+library(dplyr)
+library(tdplyr)
+
+opts <- list(db = FALSE, machine = FALSE, driver = FALSE)
+options(td.db_desc.output = opts)
+
+# Reading Vantage cluster details from td_config.cfg
+config_file <- system.file("extdata", "td_config.cfg", package = "tdplyr")
+config_df <- read.csv(config_file, sep = ":", stringsAsFactors = FALSE, header = TRUE)
+config_list <- unlist(lapply(config_df$value, function(x) {trimws(x)}))
+
+con <- td_create_context(host = config_list[1], uid = config_list[2], pwd = config_list[3], dType = "native")
+
+try(db_drop_table(con, 'landmass'), silent = TRUE)
+
+landmass <- row.names(as.data.frame(islands))
+DBI::dbWriteTable(con, 'landmass', as.data.frame(islands), row.names = TRUE)
+```
+
+
+An important feature that `dbplyr` provides is the ability to take expressions in R and map them to corresponding expressions in SQL. The dplyr verbs rely on this mapping to generate the correct query. See the [verbs](verbs.html) vignette for more information on using the verbs.
+
+See [Teradata&reg; Database SQL Functions, Operators, Expressions, and Predicates manual](http://info.teradata.com/) for more information on the SQL functions and operators that Teradata supports.
+
+
+This vignette is largely a reference for supported mappings. The tables below show the most commonly used mappings. The `R expressions` column shows default values of functions when mapped to the SQL equivalent. The `SQL` column shows examples of the translated expressions from the `R expressions` column.
+
+# SQL Translation 
+R expressions get converted to SQL whenever used with a verb on a remote tbl. The translated SQL column expressions are used in various clauses depending on the verb. Internally, `sql_translate_env` is being called to dictate how some expression such as a comparison operator or function should be translated into SQL. 
+
+Functions not explicitly in the map are translated to sql literally. This allows you to use functions defined on the SQL Engine, such as UDFs. 
+```{r}
+df <- tbl(con, 'landmass')
+translate_sql(my_udf(col1, col2) + 1L)
+df %>% mutate(udf = my_udf(row_names) + 1L) %>% show_query()
+```
+
+This also implies that mapped functions are case-sensitive when being translated. Identifiers in R are case sensitive. There is a difference between `mean` and `MEAN`. The latter is a defined function in base R, while the former is undefined. So `mean` is mapped as expected but `MEAN` is not.
+
+```{r, warning=FALSE}
+translate_sql(mean(x), MEAN(y), con = dbplyr::simulate_teradata())
+
+df %>% 
+  mutate(x = mean(islands), y = MEAN(islands)) %>%
+  show_query()
+```
+
+However, if a function is not mapped and since SQL is case insensitive, specifying the function with different cases in R are all equivalent:
+```{r}
+translate_sql(avg(x), AVG(x), aVg(x), con = dbplyr::simulate_teradata())
+df %>% 
+  group_by(row_names) %>% 
+  summarize(x = avg(islands), y = AVG(islands), z = aVg(islands)) %>%
+  show_query()
+```
+
+To suppress this behaviour, and force errors immediately when dplyr doesn't know how to translate a function it encounters, set the `dplyr.strict_sql` option to `TRUE`. For more information, see the SQL translation vignette in dbplyr. 
+
+You can use `translate_sql` to see how an expression gets translated from R to SQL. Use a `Teradata` connection object or `dbplyr::simulate_teradata()` in the `con` parameter to get tdplyr specific mappings. Read the [connection](connection.html) vignette for more details about the `Teradata` connection.
+
+## Math operators and Math functions
+```{r, echo = FALSE, results='asis'}
+ops <- c('+', '-', '/', '*', '%%', '%/%', '^')
+exps <- c('x + y', 'x - y', 'x / y', 'x * y', 'x %% y', 'x %/% y', 'x ^ y')
+sqls <- c(translate_sql(x + y, con = con), 
+          translate_sql(x - y, con = con), 
+          translate_sql(x / y, con = con), 
+          translate_sql(x * y, con = con),
+          translate_sql(x %% y, con = con),
+          translate_sql(x %/% y, con = con),
+          translate_sql(x ^ y, con = con)
+          )
+
+math_ops <- data.frame(ops, exps, sqls)
+colnames(math_ops) <- c('R operators', 'R expressions', 'SQL')
+
+kable(math_ops, caption = 'Math Operators')
+
+ops <- c('abs', 
+         'acos', 
+         'acosh', 
+         'asin', 
+         'asinh', 
+         'atan', 
+         'atan2',
+         'atanh', 
+         'ceil',
+         'cos',
+         'cosh',
+         'cot',
+         'coth',
+         'degrees',
+         'exp',
+         'floor',
+         'ln',
+         'log',
+         'log10',
+         'radians',
+         'round',
+         'sign',
+         'sin',
+         'sinh',
+         'sqrt',
+         'tan')
+
+exps <- c('abs(x)', 
+         'acos(x)', 
+         'acosh(x)', 
+         'asin(x)', 
+         'asinh(x)', 
+         'atan(x)', 
+         'atan2(y, x)',
+         'atanh(x)', 
+         'ceil(x)',
+         'cos(x)',
+         'cosh(x)',
+         'cot(x)',
+         'coth(x)',
+         'degrees(x)',
+         'exp(x)',
+         'floor(x)',
+         'ln(x)',
+         'log(x, base = exp(1))',
+         'log10(x)',
+         'radians(x)',
+         'round(x, digits = 0L)',
+         'sign(x)',
+         'sin(x)',
+         'sinh(x)',
+         'sqrt(x)',
+         'tan(x)')
+
+sqls <- c(translate_sql(abs(x), con = con), 
+          translate_sql(acos(x), con = con), 
+          translate_sql(acosh(x), con = con), 
+          translate_sql(asin(x), con = con),
+          translate_sql(asinh(x), con = con),
+          translate_sql(atan(x), con = con),
+          translate_sql(atan2(y, x), con = con),
+          translate_sql(atanh(x), con = con),
+          translate_sql(ceil(x), con = con),
+          translate_sql(cos(x), con = con),
+          translate_sql(cosh(x), con = con),
+          translate_sql(cot(x), con = con),
+          translate_sql(coth(x), con = con),
+          translate_sql(degrees(x), con = con),
+          translate_sql(exp(x), con = con),
+          translate_sql(floor(x), con = con),
+          translate_sql(ln(x), con = con),
+          translate_sql(log(x, y), con = con),
+          translate_sql(log10(x), con = con),
+          translate_sql(radians(x), con = con),
+          translate_sql(round(x), con = con),
+          translate_sql(sign(x), con = con),
+          translate_sql(sin(x), con = con),
+          translate_sql(sinh(x), con = con),
+          translate_sql(sqrt(x), con = con),
+          translate_sql(tan(x), con = con))
+
+math_fns <- data.frame(ops, exps, sqls)
+colnames(math_fns) <- c('R operators', 'R expressions', 'SQL')
+
+kable(math_fns, caption = 'Math Functions')
+```
+
+## Logical and Comparison operators
+```{r, echo = FALSE, results='asis'}
+ops <- c('!', '&', '&&', '|', '||', 'xor', 'if', 'if_else')
+exps <- c('! x', 
+          'x & y', 'x && y', 
+          'x | y', 'x || y', 
+          'xor(x, y)', 
+          '`if`(cond, true, false = NULL)', 'if_else(cond, true, false)')
+sqls <- c(translate_sql(! x, con = con), 
+          translate_sql(x & y, con = con), 
+          translate_sql(x && y, con = con), 
+          translate_sql(x | y, con = con),
+          translate_sql(x || y, con = con),
+          translate_sql(xor(x,  y), con = con),
+          translate_sql(`if`(cond,  true), con = con),
+          translate_sql(if_else(cond,  true, false), con = con))
+logical_ops <- data.frame(ops, exps, sqls)
+colnames(logical_ops) <- c('R operators', 'R expressions', 'SQL')
+
+kable(logical_ops, caption = 'Logical Operators')
+```
+
+```{r, echo = FALSE, results='asis'}
+ops <- c('<', '<=', '>', '>=', '==', '!=', 'is.null', 'is.na')
+exps <- c('x < y', 'x <= y', 
+          'x > y', 'x >= y', 'x == y', 'x != y', 
+          'is.null(x)', 'is.na(x)')
+sqls <- c(translate_sql(x < y, con = con), 
+          translate_sql(x <= y, con = con), 
+          translate_sql(x > y, con = con), 
+          translate_sql(x >= y, con = con),
+          translate_sql(x == y, con = con),
+          translate_sql(x != y, con = con),
+          translate_sql(is.null(x), con = con),
+          translate_sql(is.na(x), con = con))
+comparison_ops <- data.frame(ops, exps, sqls)
+colnames(comparison_ops) <- c('R operators', 'R expressions', 'SQL')
+
+kable(comparison_ops, caption = 'Comparison Operators')
+```
+
+## Conversion functions
+```{r, echo = FALSE, results='asis'}
+ops <- c('as.integer', 'as.numeric', 'as.double', 'as.character', 'as', 'as.Date')
+exps <- c('as.integer(x)', 
+          'as.numeric(x, precision = 5L, scale = 0L)', 
+          'as.double(x)',
+          'as.character(x, n = NULL, charset = NULL)',
+          'as(x, \'y\')',
+          'as.Date(x, format)')
+sqls <- c(translate_sql(as.integer(x), con = con), 
+          translate_sql(as.numeric(x), con = con), 
+          translate_sql(as.double(x), con = con),
+          translate_sql(as.character(x), con = con), 
+          translate_sql(as(x, 'y'), con = con),
+          translate_sql(as.Date(x, format="YYYY-MM-DD"), con = con))
+
+cast <- data.frame(ops, exps, sqls)
+colnames(cast) <- c('R operators', 'R expressions', 'SQL')
+
+kable(cast, caption = 'Conversion functions')
+```
+
+### Notes
+- `as.character` uses the default value of `Sys.getenv('TD_VARCHAR_COLUMN_SIZE')`
+ for `n`. The `charset` parameter takes a string representation of the character set to cast the expressions (e.g 'LATIN', 'UNICODE').
+
+- The `format` parameter of the function `as.Date` should be in the same format as that of the character column that is to be casted to Date type. For example, if the column has a character value "19851205" and to cast it to Date type, the input to `format` parameter should be 'YYYYMMDD'.
+
+- See the Data Type Conversions chapter and Data Type Conversion Functions chapter from [Teradata Vantage&trade; Data Types and Literals](https://docs.teradata.com/reader/~_sY_PYVxZzTnqKq45UXkQ/GZ7b65Hk0RjINb9z_aj7UQ/) for more information.
+
+## Character functions
+```{r, echo = FALSE, results='asis', strip.white= FALSE}
+ops <- c('tolower', 'toupper', 'nchar',
+         'str_length', 'substr', 'substring',
+         'grep', 'str_extract', 'sub', 'gsub',
+         'str_replace', 'paste', 'paste0', 'str_join', 
+         'strsplit', 'str_locate', 'str_trim','str_replace_all',
+         'str_detect')
+
+exps <- c('tolower(x)', 'toupper(x)', 'nchar(x)',
+          'str_length(x)', 'substr(x, start , stop = NULL)',
+          'substring(x, start, stop = NULL)', 
+          'grep(pattern, x, ignore.case = FALSE)',
+          'str_extract(string, pattern)', 
+          'sub(pattern, replacement, x, ignore.case = FALSE)', 
+          'gsub(pattern, replacement, x, ignore.case = FALSE)', 
+          'str_replace(string, pattern, replacement)', 
+          'paste(..., sep = \'\\  \')', 
+          'paste0(...)', 
+          'str_join(..., sep = \'\\   \')',
+          'strsplit(x, split = \'\\   \', tokennum = 1L)',
+          'str_locate(string, pattern, return_opt = 0L)',
+          'str_trim(string, side = c("both", "left", "right"))',
+          'str_replace_all(string, pattern, replacement)',
+          'str_detect(string, pattern)')
+          
+markdown_whitespace <- '\\\\n \\\\t\\\\r\\\\v\\\\f'
+sqls <- c(translate_sql(tolower(x), con = con), 
+          translate_sql(toupper(x), con = con), 
+          translate_sql(nchar(x), con = con),
+          translate_sql(str_length(x), con = con),
+          translate_sql(substr(x, start, stop = NULL), con = con),
+          translate_sql(substring(x, start, stop = NULL), con = con),
+          translate_sql(grep(pattern, x, ignore.case = FALSE), con = con),
+          translate_sql(str_extract(string, pattern), con = con),
+          translate_sql(sub(pattern, replacement, x, ignore.case = FALSE), con = con),
+          translate_sql(gsub(pattern, replacement, x, ignore.case = FALSE), con = con),
+          translate_sql(str_replace(string, pattern, replacement), con = con),
+          translate_sql(paste(c1, c2, c3, sep = "\\ "), con = con),
+          translate_sql(paste0(c1, c2, c3), con = con),
+          translate_sql(str_join(c1, c2, c3, sep = "\\ "), con = con),
+          translate_sql(strsplit(x, split = '\\ ', tokennum = 1L), con = con),
+          translate_sql(str_locate(string, pattern, return_opt = 0L), con = con),
+          # kable is not showing the whitespace string in the output when str_trim is translated
+          translate_sql(RTRIM(LTRIM(string, !!! markdown_whitespace), !!! markdown_whitespace)),
+          # "manually" add the str_trim above as a workaround
+          translate_sql(str_replace_all(string, pattern, replacement), con = con),
+          translate_sql(str_detect(string, pattern), con = con)
+          )
+
+char_ops <- data.frame(ops, exps, sqls)
+colnames(char_ops) <- c('R operators', 'R expressions', 'SQL')
+kable(char_ops, caption = 'Character Functions', escape = TRUE)
+```
+
+### Notes
+- Any casting done by these functions is done implicitly. To explicitly cast column expressions, see the Conversion Functions.
+
+- `str_locate` maps to `REGEXP_INSTR`. You can control whether the beginning or ending index is returned by setting `return_opt` to 0 or 1 respectively. When `return_opt` is 1, `REGEXP_INSTR` returns a value similar to `str_locate`, which is the position before the character following the occurrence of the match.
+
+- `str_split` maps to `STRTOK`. You can provide which token to retrieve after the split using the `tokennum` parameter.
+
+- `grep` maps to `REGEXP_SUBSTR`. This is like using `grep(pattern, x, ignore.case, value = TRUE)` in R except that the substring matching the pattern is returned instead of the full string. Consider this example (Note that `sort` removes `NA`):
+```{r}
+head(landmass)
+
+# base R grep
+grep('^A', landmass, value = TRUE) %>% sort
+
+# sql translated grep
+df %>% transmute(x = grep('^A', row_names)) %>% pull(x) %>% sort
+
+# to specify the full string, specify it in the pattern
+df %>% transmute(x = grep('^A.+', row_names)) %>% pull(x) %>% sort
+
+# or use filter (Using arrange to order the output by the column 'row_names')
+df %>% select(row_names) %>% filter(!is.na(grep('^A', row_names))) %>% arrange(row_names)
+```
+
+- When concatenating using `paste`, `paste0`, or `str_join` there may be extra spaces due to implicit casting of types and character set differences.
+
+- The `str_replace_all` parameter maps to the `OREPLACE` string operator in SQL. Using this parameter is similar to using the `gsub()` R function without the `ignore.case` parameter.
+
+- The `str_detect` parameter maps to the `INSTR` string operator in SQL. This parameter provides the pattern to be detected in the string.
+
+- See the String Operators and Functions chapter from [Teradata Vantage&trade; SQL Functions, Expressions, and Predicates manual](https://docs.teradata.com/reader/756LNiPSFdY~4JcCCcR5Cw/5nyfztBE7gDQVCVU2MFTnA) for more information.
+
+## Aggregate Functions
+```{r, echo = FALSE, results='asis'}
+ops <- c('mean',
+         'max',
+         'min',
+         'sum',
+         'var',
+         'varp',
+         'sd',
+         'sdp',
+         'n', 
+         'n_distinct',
+         'median')
+
+exps <- c('mean(x, na.rm = FALSE)',
+          'max(x, na.rm = FALSE)',
+          'min(x, na.rm = FALSE)',
+          'sum(x, na.rm = FALSE)',
+          'var(x, na.rm = FALSE)',
+          'varp(x, na.rm = FALSE)',
+          'sd(x, na.rm = FALSE)',
+          'sdp(x, na.rm = FALSE)',
+          'n(x)',
+          'n_distinct(x)',
+          'median(x)')
+
+sqls <- c(translate_sql(mean(x, na.rm = TRUE), con = con, window = FALSE),
+          translate_sql(max(x, na.rm = TRUE), con = con, window = FALSE), 
+          translate_sql(min(x, na.rm = TRUE), con = con, window = FALSE), 
+          translate_sql(sum(x, na.rm = TRUE), con = con, window = FALSE),
+          translate_sql(var(x, na.rm = TRUE), con = con, window = FALSE),
+          translate_sql(varp(x, na.rm = TRUE), con = con, window = FALSE),
+          translate_sql(sd(x, na.rm = TRUE), con = con, window = FALSE),
+          translate_sql(sdp(x, na.rm = TRUE), con = con, window = FALSE),
+          translate_sql(n(x), con = con, window = FALSE),
+          translate_sql(n_distinct(x), con = con, window = FALSE),
+          translate_sql(median(x), con = con, window = FALSE))
+
+ops <- data.frame(ops, exps, sqls)
+colnames(ops) <- c('R operators', 'R expressions', 'SQL')
+
+kable(ops, caption = 'Aggregate functions')
+```
+
+### Notes
+- The `distinct()` function can be used to specify whether the aggregate function should be called with the `DISTINCT` option (e.g. `mutate(distinct_sum = sum(distinct(x)))`)
+
+- See the Aggregate Functions chapter from [Teradata&reg; Database SQL Functions, Operators, Expressions, and Predicates manual](http://info.teradata.com/) for more information.
+
+## Window Functions
+Note the following restrictions for window functions according to the [Teradata&reg; Database SQL Functions, Operators, Expressions, and Predicates manual](http://info.teradata.com/) (Ordered Analytical/Window Aggregate Functions):
+
+- The DISTINCT clause is not permitted in window aggregate functions.
+- Ordered analytical functions are not permitted in:
+    - Subqueries
+    - WHERE clauses
+    - SELECT AND CONSUME statements
+- Ordered analytical functions are permitted in the following database query objects:
+    - Views
+    - Macros
+    - Derived tables
+    - INSERT ... SELECT
+- The sort order that you specify in the window specification defines the sort order of the rows over which the function is applied; it does not define the ordering of the results. To order the results, use an ORDER BY phrase in the SELECT statement
+
+- Teradata does not allow ORDER BY in subqueries. This implies that the `arrange` verb should be used as the last verb. See the Arrange section in [verbs](verbs.html#arrange) for more information.
+
+```{r, echo = FALSE, results='asis'}
+ops <- c('row_number',
+         'rank',
+         'dense_rank',
+         'percent_rank',
+         'cume_dist',
+         'first',
+         'last', 
+         'lag', 
+         'lead',
+         'ntile')
+
+exps <- c('row_number(x)',
+          'rank(x)',
+          'dense_rank(x)',
+          'percent_rank(x)',
+          'cume_dist(x)',
+          'first(x, order_by = NULL, ignore_nulls = FALSE)',
+          'last(x, order_by = NULL, ignore_nulls = FALSE)',
+          'lag(x, n = 1L, default = NA, order_by = NULL, ignore_nulls = FALSE)',
+          'lead(x, n = 1L, default = NA, order_by = NULL, ignore_nulls = FALSE)',
+          'ntile(100, order_by = NULL)')
+
+sqls <- c(translate_sql(row_number(x), con = con), 
+          translate_sql(rank(x), con = con), 
+          translate_sql(dense_rank(x), con = con), 
+          translate_sql(percent_rank(x), con = con),
+          translate_sql(cume_dist(x), con = con),
+          translate_sql(first(x, order_by = x, ignore_nulls = FALSE), con = con),
+          translate_sql(last(x, order_by = x, ignore_nulls = FALSE), con = con),
+          translate_sql(lag(x, n = 1L, 
+                            default = NA, order_by = x, ignore_nulls = FALSE), con = con),
+          translate_sql(lead(x, n = 1L, 
+                            default = NA, order_by = x, ignore_nulls = FALSE), con = con),
+          translate_sql(ntile(100, order_by = x), con = con)
+          )
+
+ops <- data.frame(ops, exps, sqls)
+colnames(ops) <- c('R operators', 'R expressions', 'SQL')
+
+kable(ops, caption = 'Window functions')
+```
+
+```{r, echo = FALSE, results='asis', warning=FALSE}
+ops <- c('mean', 
+         'sum', 
+         'min', 
+         'max', 
+         'n',
+         'var',
+         'varp',
+         'sd',
+         'sdp',
+         'cumsum',
+         'cummin',
+         'cummax',
+         'cummean')
+
+exps <- c('mean(x, na.rm = FALSE)',
+          'sum(x, na.rm = FALSE)',
+          'min(x, na.rm = FALSE)',
+          'max(x, na.rm = FALSE)',
+          'n(x)',
+          'var(x, na.rm = FALSE)',
+          'varp(x, na.rm = FALSE)',
+          'sd(x, na.rm = FALSE)',
+          'sdp(x, na.rm = FALSE)',
+          'cumsum(x)',
+          'cummin(x)',
+          'cummax(x)',
+          'cummean(x)')
+
+sqls <- c(translate_sql(mean(x, na.rm = TRUE), con = con), 
+          translate_sql(sum(x, na.rm = TRUE), con = con), 
+          translate_sql(min(x, na.rm = TRUE), con = con), 
+          translate_sql(max(x, na.rm = TRUE), con = con),
+          translate_sql(n(x), con = con),
+          translate_sql(var(x, na.rm = TRUE), con = con),
+          translate_sql(varp(x, na.rm = TRUE), con = con),
+          translate_sql(sd(x, na.rm = TRUE), con = con),
+          translate_sql(sdp(x, na.rm = TRUE), con = con),
+          translate_sql(cumsum(x), con = con),
+          translate_sql(cummin(x), con = con),
+          translate_sql(cummax(x), con = con),
+          translate_sql(cummean(x), con = con)
+          )
+
+ops <- data.frame(ops, exps, sqls)
+colnames(ops) <- c('R operators', 'R expressions', 'SQL')
+kable(ops, caption = 'Window Aggregate functions')
+```
+
+### Notes
+- See `help(window_order)` for information on specifying the ORDER BY clause for the `OVER()` clause. Alternatively, you can specify it using `order_by()`, or in the `order_by` parameter of the function (if it has one):
+
+```{r, echo = TRUE, eval = FALSE}
+# equivalent ways of specifying the order by clause in the window specification
+tbl %>% mutate(order_by(x, first(x)))
+
+tbl %>% mutate(first(x, order_by = x))
+
+tbl %>% window_order(x) %>% mutate(first(x))
+```
+
+- You can specify the ROWS clause in `OVER()` using `window_frame()`. See `help(window_frame)` for details.
+- Use `group_by` to set the column expressions for the PARTITION BY clause in the window specification.
+- The `n` parameter for `ntile` must be numeric. Results may differ if `n` is passed as an integer or a double due to Teradata's implicit casting.
+- It is a dplyr convention to use `summarize` for aggregate functions only. Using non-aggregate window functions with `summarize` may not return expected results. Use `mutate` (or `transmute`) instead. See the `Window functions` vignette in the `dplyr` package.
+
+
+## Bit functions
+```{r, echo = FALSE, results='asis'}
+
+ops <- c('bitwNot', 'bitwAnd', 'bitwOr', 
+         'bitwXor', 'bitwShiftL', 'bitwShiftR',
+         'bitnot' ,'bitand', 'bitor', 
+         'bitxor', 'shiftleft', 'shiftright')
+
+exps <- c('bitwNot(a)',
+          'bitwAnd(a, b)',
+          'bitwOr(a, b)',
+          'bitwXor(a, b)',
+          'bitwShiftL(a, n)',
+          'bitwShiftR(a, n)',
+          'bitnot(a)',
+          'bitand(a, b)',
+          'bitor(a, b)',
+          'bitxor(a, b)',
+          'shiftleft(a, n)',
+          'shiftright(a, n)')
+
+sqls <- c(translate_sql(bitwNot(a), con = con), 
+          translate_sql(bitwAnd(a, b), con = con), 
+          translate_sql(bitwOr(a, b), con = con),
+          translate_sql(bitwXor(a, b), con = con), 
+          translate_sql(bitwShiftL(a, n), con = con),
+          translate_sql(bitwShiftR(a, n), con = con),
+          translate_sql(bitnot(a), con = con), 
+          translate_sql(bitand(a, b), con = con), 
+          translate_sql(bitor(a, b), con = con),
+          translate_sql(bitxor(a, b), con = con), 
+          translate_sql(shiftleft(a, n), con = con),
+          translate_sql(shiftright(a, n), con = con))
+
+cast <- data.frame(ops, exps, sqls)
+colnames(cast) <- c('R operators', 'R expressions', 'SQL')
+
+kable(cast, caption = 'Bit functions')
+```
+
+### Notes
+- The `n` parameter is a non-negative integer vector of values up to 31 for the bit functions in base R. However, in the SQL Engine, the scope of the shift operation is bounded by the size of `a`. Specifying a shift that is outside the range of `a` results in an SQL error.
+- See the Bit/Byte Manipulation Functions chapter from [Teradata&reg; Database SQL Functions, Operators, Expressions, and Predicates manual](http://info.teradata.com/) for more information.
+
+```{r, echo=FALSE, include=FALSE}
+db_drop_table(con, 'landmass')
+td_remove_context()
+```

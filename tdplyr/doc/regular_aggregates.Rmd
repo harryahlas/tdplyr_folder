@@ -1,0 +1,690 @@
+---
+title: "Regular Aggregates"
+output:
+  html_document:
+    toc: true 
+    toc_depth: 3
+    number_sections: false
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Regular Aggregates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
+```
+
+## Introduction to Regular Aggregates
+The regular aggregate functions help perform aggregate operations on non-time series data. The goal of this vignette is to provide introductory examples to get the user familiar with regular aggregate functions. 
+
+Each aggregate function has a section in this vignette. Each section can be read in isolation, except where references are made to other sections or other vignettes. Each section also has a subsection called "Things to Note" for good practices and specific behavior to consider when using the aggregate functions with Teradata Vantage.
+```{r create_connection, echo=FALSE, include=FALSE}
+library(dplyr)
+library(DBI)
+library(tdplyr)
+
+# Reading Vantage cluster details from td_config.cfg
+config_file <- system.file("extdata", "td_config.cfg", package = "tdplyr")
+config_df <- read.csv(config_file, sep = ":", stringsAsFactors = FALSE, header = TRUE)
+config_list <- unlist(lapply(config_df$value, function(x) {trimws(x)}))
+
+con <- td_create_context(host = config_list[1], uid = config_list[2], pwd = config_list[3], dType = "native")
+
+```
+Once the connection is established using **td_create_context**, you can load the example table `ocean_buoys_seq` and create respective tibble using the following statements:
+```{r create_tbl_objects, results = "hide", warning=FALSE, message = FALSE}
+loadExampleData("time_series_example", "ocean_buoys_seq")
+# Create tbl_teradata objects.
+df_seq <- tbl(con, "ocean_buoys_seq")
+```
+
+### Median : median()
+The aggregate function `median` returns the median of all values in each group. The function returns the average of the two middle values if the argument `value.expression` contains an even number of values. `median` uses one argument named `value.expression`, which specifies the column for which median is to be computed.
+```{r median_runnable}
+# Calculate the median value of the 'temperature' column grouped by 'buoyid' column.
+df_median <- df_seq %>% group_by(buoyid) %>% summarise(median_temp = median(temperature))
+
+# Print the results.
+df_median %>% arrange(buoyid)
+
+# Calculate the median value of the 'temperature' column without any grouping.
+df_median <- df_seq %>% summarise(median_temp = median(temperature))
+
+# Print the results.
+df_median
+```
+#### Notes
+- The column containing median values is of NUMERIC data type.
+- NULLs/NAs are not included in the result computation.
+- `median` is valid only for numeric data.
+- Use of `distinct` to exclude duplicates is not allowed for `median` function. This will throw an error as shown in the example 1 below. However, duplicate values can be excluded in the computation for time series aggregate function `ts.median`. For more information on time series aggregation function `ts.median`, please refer to Time Series Aggregates vignettes.
+- Teradata recommends to strictly use the function `median(value.expression)` for regular aggregate operation with/without grouping.
+- The function `median` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example 2 below.
+```{r median_not_runnable, eval=FALSE}
+# Example 1
+
+# Using 'distinct()' to calculate median on distinct temperature values.
+df_median <- df_seq %>% group_by(buoyid) %>% summarise(median_temp = median(distinct(temperature)))
+
+# Print the results.
+# This throws an error "Illegal use of DISTINCT Aggregate Expressions."
+df_median
+
+# Example 2
+
+# Incorrect usage of median() with mutate and filter.
+df_median <- df_seq %>% mutate(median_t = median(temperature))
+df_median <- df_seq %>% filter(temperature <= median(temperature))
+```
+
+### Kurtosis : kurtosis()
+The aggregate function `kurtosis` measures the tailedness of the probability distribution of a column. Kurtosis is the fourth moment of the distribution of the standardized (z) values. It is a measure of the outlier (rare, extreme observation) character of the distribution as compared to the normal (Gaussian) distribution.
+
+*   The normal distribution has a kurtosis of 0.
+*   Positive kurtosis indicates that the distribution is more outlier-prone (deviation from the mean) than the normal distribution.
+*   Negative kurtosis indicates that the distribution is less outlier-prone (deviation from the mean) than the normal distribution.
+
+`kurtosis` uses one argument named `value.expression`, which specifies the column for which kurtosis is to be computed. Use `kurtosis(distinct(column_name))` to exclude duplicate rows while calculating kurtosis.
+
+```{r kurtosis_runnable}
+# Calculate the kurtosis value of the 'temperature' column grouped by 'buoyid' column.
+df_kurtosis <- df_seq %>% group_by(buoyid) %>% summarise(kurtosis_temp = kurtosis(temperature))
+
+# Print the results.
+df_kurtosis %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_kurtosis <- df_seq %>% group_by(buoyid) %>% summarise(kurtosis_temp = kurtosis(distinct(temperature)))
+
+# Print the results.
+df_kurtosis %>% arrange(buoyid)
+
+# Calculate the kurtosis value of the 'temperature' column without any grouping.
+df_kurtosis <- df_seq %>% summarise(kurtosis_temp = kurtosis(temperature))
+
+# Print the results.
+df_kurtosis
+
+# Exclude duplicates in the same aggregate operation above.
+df_kurtosis <- df_seq %>% summarise(kurtosis_temp = kurtosis(distinct(temperature)))
+
+# Print the results.
+df_kurtosis
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- The time series aggregate function `ts.kurtosis` can also be used with regular aggregate operation i.e., the functions `ts.kurtosis` and `kurtosis` can be used interchangeably. For more information on time series aggregation function `ts.kurtosis`, please refer to Time Series Aggregates vignette. However, Teradata recommends to strictly use `kurtosis` for regular aggregate operation.
+- Following conditions will produce NULL result:
+  - Fewer than three non-NULL data points in the data used for the computation.
+  - Standard deviation for a column is equal to 0.
+- `kurtosis` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r kurtosis_not_runnable, eval=FALSE}
+# Incorrect usage of kurtosis() with mutate and filter.
+df_kurtosis <- df_seq %>% mutate(kurtosis_t = kurtosis(temperature))
+df_kurtosis <- df_seq %>% filter(temperature <= kurtosis(temperature))
+```
+
+### Skew : skew()
+The aggregate function `skew` measures the skewness of the distribution of a column. Skewness is the third moment of a distribution. It is a measure of the asymmetry of the distribution about its mean compared to the normal (Gaussian) distribution.
+
+*   The normal distribution has a skewness of 0.
+*   Positive skewness indicates the distribution having an asymmetric tail extending toward more positive values.
+*   Negative skewness indicates the distribution having an asymmetric tail extending toward more negative values.
+
+`skew` uses one argument named `value.expression`, which specifies the column for which skewness is to be computed. Use `skew(distinct(column_name))` to exclude duplicate rows while calculating skew.
+
+```{r skew_runnable}
+# Calculate the skewness of the 'temperature' column grouped by 'buoyid' column.
+df_skew <- df_seq %>% group_by(buoyid) %>% summarise(skew_temp = skew(temperature))
+
+# Print the results.
+df_skew %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_skew <- df_seq %>% group_by(buoyid) %>% summarise(skew_temp = skew(distinct(temperature)))
+
+# Print the results.
+df_skew %>% arrange(buoyid)
+
+# Calculate the skewness of the 'temperature' column without any grouping.
+df_skew <- df_seq %>% summarise(skew_temp = skew(temperature))
+
+# Print the results.
+df_skew
+
+# Exclude duplicates in the same aggregate operation above.
+df_skew <- df_seq %>% summarise(skew_temp = skew(distinct(temperature)))
+
+# Print the results.
+df_skew
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- The time series aggregate function `ts.skew` can also be used with regular aggregate operation i.e., the functions `ts.skew` and `skew` can be used interchangeably. For more information on time series aggregation function `ts.skew`, please refer to Time Series Aggregates vignette. However, Teradata recommends to strictly use `skew` for regular aggregate operation.
+- Following conditions will produce NULL result:
+  - Fewer than three non-NULL data points in the data used for the computation.
+  - Standard deviation for a column is equal to 0.
+- `skew` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r skew_not_runnable, eval=FALSE}
+# Incorrect usage of skew() with mutate and filter.
+df_skew <- df_seq %>% mutate(skew_t = skew(temperature))
+df_skew <- df_seq %>% filter(temperature <= skew(temperature))
+```
+
+### Sum : sum()
+The aggregate function `sum` returns the sum of values in the column. For more information on `sum` aggregate function, please refer to Teradata SQL translation vignette. Use `sum(distinct(column_name))` to exclude duplicate rows while calculating sum.
+
+```{r sum_group}
+# Calculate the sum of the values in the 'temperature' column grouped by 'buoyid' column.
+# Please note that the output of the function remains the same (excludes NULL/NA values in computation) irrespective of the argument 'na.rm' set to TRUE. Warning 'Missing values are always removed in SQL.' will be suppressed if this is set to TRUE, otherwise the warning is raised.
+df_sum <- df_seq %>% group_by(buoyid) %>% summarise(sum_temp = sum(temperature, na.rm = TRUE))
+
+# Print the results.
+df_sum %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_sum <- df_seq %>% group_by(buoyid) %>% summarise(sum_temp = sum(distinct(temperature)))
+
+# Print the results.
+df_sum %>% arrange(buoyid)
+
+# Calculate the sum of the values in the 'temperature' column without any grouping.
+df_sum <- df_seq %>% summarise(sum_temp = sum(temperature))
+
+# Print the results.
+df_sum
+
+# Exclude duplicates in the same aggregate operation above.
+df_sum <- df_seq %>% summarise(sum_temp = sum(distinct(temperature)))
+
+# Print the results.
+df_sum
+```
+
+The function `sum` can be used as window aggregates using dplyr verbs like `mutate`, `filter`.
+```{r sum_window}
+# Create a new column 'sum_t' which holds the sum of values in the 'temperature' column.
+df_sum <- df_seq %>% mutate(sum_t = sum(temperature))
+
+# Print the query.
+df_sum %>% show_query()
+
+# Print the results.
+df_sum %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with temperature values less than one-hundredth of the sum of values in the 'temperature' column.
+df_sum <- df_seq %>% filter(temperature < sum(temperature)/100)
+
+# Print the results.
+df_sum
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `sum`, but not time series aggregate `ts.sum`, for regular aggregate operations and window aggregate operations.
+- The use of `distinct` is not permitted in window aggregate functions.
+
+### Sample Standard Deviation : sd()
+The aggregate function `sd` returns the sample standard deviation of values of the column. The standard deviation is the second moment of a distribution. For more information on `sd` aggregate function, please refer to Teradata SQL translation vignette. Use `sd(distinct(column_name))` to exclude duplicate rows while calculating sample standard deviation.
+
+```{r stddev_samp_group}
+# Calculate the sample standard deviation values of the 'temperature' column grouped by 'buoyid' column.
+# Please note that the output of the function remains the same (excludes NULL/NA values in computation) irrespective of the argument 'na.rm' set to TRUE. Warning 'Missing values are always removed in SQL.' will be suppressed if this is set to TRUE, otherwise the warning is raised.
+df_sd <- df_seq %>% group_by(buoyid) %>% summarise(sd_temp = sd(temperature, na.rm = TRUE))
+
+# Print the results.
+df_sd %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_sd <- df_seq %>% group_by(buoyid) %>% summarise(sd_temp = sd(distinct(temperature)))
+
+# Print the results.
+df_sd %>% arrange(buoyid)
+
+# Calculate the sample standard deviation of the values in the 'temperature' column without any grouping.
+df_sd <- df_seq %>% summarise(sd_temp = sd(temperature))
+
+# Print the results.
+df_sd
+
+# Exclude duplicates in the same aggregate operation above.
+df_sd <- df_seq %>% summarise(sd_temp = sd(distinct(temperature)))
+
+# Print the results.
+df_sd
+```
+
+The function `sd` can be used as window aggregates using dplyr verbs like `mutate`, `filter`.
+```{r stddev_samp_window}
+# Create a new column 'sd_t' which holds the sample standard deviation of the values in the 'temperature' column.
+df_sd <- df_seq %>% mutate(sd_t = sd(temperature))
+
+# Print the query.
+df_sd %>% show_query()
+
+# Print the results.
+df_sd %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with temperature values less than the sample standard deviation of the values in the 'temperature' column.
+df_sd <- df_seq %>% filter(temperature < sd(temperature))
+
+# Print the results.
+df_sd
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `sd` for regular aggregate and window operations, instead of time series aggregate function `ts.sd`.
+- When there are fewer than two non-NULL data points in the sample used for the computation, `sd` returns NULL/NA.
+- Division by zero results in NULL/NA value rather than an error.
+- If data represents only a sample of the entire population for the column, Teradata recommends to use `sd` to calculate sample standard deviation instead of `sdp` which calculates population standard deviation. As the sample size increases, the values for `sd` and `sdp` approach the same number.
+- The use of `distinct` is not permitted in window aggregate functions.
+
+### Population Standard Deviation : sdp()
+The aggregate function `sdp` returns the population standard deviation of values of the column. The standard deviation is the second moment of a distribution. For more information on `sdp` aggregate function, please refer to Teradata SQL translation vignette. Use `sdp(distinct(column_name))` to exclude duplicate rows while calculating population standard deviation.
+
+```{r stddev_pop_group}
+# Calculate the population standard deviation values of the 'temperature' column grouped by 'buoyid' column.
+# Please note that the output of the function remains the same (excludes NULL/NA values in computation) irrespective of the argument 'na.rm' set to TRUE. Warning 'Missing values are always removed in SQL.' will be suppressed if this is set to TRUE, otherwise the warning is raised.
+df_sdp <- df_seq %>% group_by(buoyid) %>% summarise(sdp_temp = sdp(temperature, na.rm = TRUE))
+
+# Print the results.
+df_sdp %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_sdp <- df_seq %>% group_by(buoyid) %>% summarise(sdp_temp = sdp(distinct(temperature)))
+
+# Print the results.
+df_sdp %>% arrange(buoyid)
+
+# Calculate the population standard deviation of the values in the 'temperature' column without any grouping.
+df_sdp <- df_seq %>% summarise(sdp_temp = sdp(temperature))
+
+# Print the results.
+df_sdp
+
+# Exclude duplicates in the same aggregate operation above.
+df_sdp <- df_seq %>% summarise(sdp_temp = sdp(distinct(temperature)))
+
+# Print the results.
+df_sdp
+```
+
+The function `sdp` can be used as window aggregates using dplyr verbs like `mutate`, `filter`.
+```{r stddev_pop_window}
+# Create a new column 'sd_t' which holds the population standard deviation of the values in the 'temperature' column.
+df_sdp <- df_seq %>% mutate(sd_t = sdp(temperature))
+
+# Print the query.
+df_sdp %>% show_query()
+
+# Print the results.
+df_sdp %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with temperature values less than the population standard deviation of the values in the 'temperature' column.
+df_sdp <- df_seq %>% filter(temperature < sdp(temperature))
+
+# Print the results.
+df_sdp
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `sdp` for regular aggregate and window operations, instead of time series aggregate function `ts.sdp`.
+- When there are fewer than two non-NULL data points in the population used for the computation, `sdp` returns NULL/NA.
+- Division by zero results in NULL/NA value rather than an error.
+- `sdp` can only be used if data represents entire population. Otherwise, Teradata recommends to use `sd` to calculate sample standard deviation.
+- The use of `distinct` is not permitted in window aggregate functions.
+
+### Minimum : min()
+The aggregate function `min` returns the minimum value in the column. For more information on `min` aggregate function, please refer to Teradata SQL translation vignette. Use `min(distinct(column_name))` to exclude duplicate rows while calculating minimum value.
+
+```{r min_group}
+# Calculate the minimum value in the 'temperature' column grouped by 'buoyid' column.
+# Please note that the output of the function remains the same (excludes NULL/NA values in computation) irrespective of the argument 'na.rm' set to TRUE. Warning 'Missing values are always removed in SQL.' will be suppressed if this is set to TRUE, otherwise the warning is raised.
+df_min <- df_seq %>% group_by(buoyid) %>% summarise(min_temp = min(temperature, na.rm = TRUE))
+
+# Print the results.
+df_min %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_min <- df_seq %>% group_by(buoyid) %>% summarise(min_temp = min(distinct(temperature)))
+
+# Print the results.
+df_min %>% arrange(buoyid)
+
+# Calculate the minimum value in the 'temperature' column without any grouping.
+df_min <- df_seq %>% summarise(min_temp = min(temperature))
+
+# Print the results.
+df_min
+
+# Exclude duplicates in the same aggregate operation above.
+df_min <- df_seq %>% summarise(min_temp = min(distinct(temperature)))
+
+# Print the results.
+df_min
+```
+
+The function `min` can be used as window aggregates using dplyr verbs like `mutate`, `filter`.
+```{r min_window}
+# Create a new column 'min_t' which holds the minimum value in the 'temperature' column.
+df_min <- df_seq %>% mutate(min_t = min(temperature))
+
+# Print the query.
+df_min %>% show_query()
+
+# Print the results.
+df_min %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with one-tenth of temperature values greater than or equal to the minimum value in 'temperature' column.
+df_min <- df_seq %>% filter(temperature/10 >= min(temperature))
+
+# Print the results.
+df_min
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `min`, but not time series aggregate `ts.min`, for regular aggregate operations and window aggregate operations.
+- The use of `distinct` is not permitted in window aggregate functions.
+
+### Maximum : max()
+The aggregate function `max` returns the maximum value in the column. For more information on `max` aggregate function, please refer to Teradata SQL translation vignette. Use `max(distinct(column_name))` to exclude duplicate rows while calculating maximum value.
+
+```{r max_group}
+# Calculate the maximum value in the 'temperature' column grouped by 'buoyid' column.
+# Please note that the output of the function remains the same (excludes NULL/NA values in computation) irrespective of the argument 'na.rm' set to TRUE. Warning 'Missing values are always removed in SQL.' will be suppressed if this is set to TRUE, otherwise the warning is raised.
+df_max <- df_seq %>% group_by(buoyid) %>% summarise(max_temp = max(temperature, na.rm = TRUE))
+
+# Print the results.
+df_max %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_max <- df_seq %>% group_by(buoyid) %>% summarise(max_temp = max(distinct(temperature)))
+
+# Print the results.
+df_max %>% arrange(buoyid)
+
+# Calculate the maximum value in the 'temperature' column without any grouping.
+df_max <- df_seq %>% summarise(max_temp = max(temperature))
+
+# Print the results.
+df_max
+
+# Exclude duplicates in the same aggregate operation above.
+df_max <- df_seq %>% summarise(max_temp = max(distinct(temperature)))
+
+# Print the results.
+df_max
+```
+
+The function `max` can be used as window aggregates using dplyr verbs like `mutate`, `filter`.
+```{r max_window}
+# Create a new column 'max_t' which holds the maximum value in the 'temperature' column.
+df_max <- df_seq %>% mutate(max_t = max(temperature))
+
+# Print the query.
+df_max %>% show_query()
+
+# Print the results.
+df_max %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with temperature values less than or equal to one-tenth of the maximum value in 'temperature' column.
+df_max <- df_seq %>% filter(temperature <= max(temperature)/10)
+
+# Print the results.
+df_max
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `max`, but not time series aggregate `ts.max`, for regular aggregate operations and window aggregate operations.
+- The use of `distinct` is not permitted in window aggregate functions.
+
+### Sample Variance : var()
+The aggregate function `var` returns the sample variance of values of the column. The variance of a sample is a measure of dispersion from the mean of that sample. It is the square of the sample standard deviation. For more information on `var` aggregate function, please refer to Teradata SQL translation vignette. Use `var(distinct(column_name))` to exclude duplicate rows while calculating sample variance.
+
+```{r var_samp_group}
+# Calculate the sample variance of the 'temperature' column grouped by 'buoyid' column.
+# Please note that the output of the function remains the same (excludes NULL/NA values in computation) irrespective of the argument 'na.rm' set to TRUE. Warning 'Missing values are always removed in SQL.' will be suppressed if this is set to TRUE, otherwise the warning is raised.
+df_var <- df_seq %>% group_by(buoyid) %>% summarise(var_temp = var(temperature, na.rm = TRUE))
+
+# Print the results.
+df_var %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_var <- df_seq %>% group_by(buoyid) %>% summarise(var_temp = var(distinct(temperature)))
+
+# Print the results.
+df_var %>% arrange(buoyid)
+
+# Calculate the sample variance of the values in the 'temperature' column without any grouping.
+df_var <- df_seq %>% summarise(var_temp = var(temperature))
+
+# Print the results.
+df_var
+
+# Exclude duplicates in the same aggregate operation above.
+df_var <- df_seq %>% summarise(var_temp = var(distinct(temperature)))
+
+# Print the results.
+df_var
+```
+
+The function `var` can be used as window aggregates using dplyr verbs like `mutate`, `filter`.
+```{r var_samp_window}
+# Create a new column 'var_t' which holds the sample variance of the values in the 'temperature' column.
+df_var <- df_seq %>% mutate(var_t = var(temperature))
+
+# Print the query.
+df_var %>% show_query()
+
+# Print the results.
+df_var %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with temperature values less than one-tenth of the sample variance of the values in the 'temperature' column.
+df_var <- df_seq %>% filter(temperature < var(temperature)/10)
+
+# Print the results.
+df_var
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `var` for regular aggregate and window operations, instead of time series aggregate function `ts.var`.
+- When there are fewer than two non-NULL data points in the sample used for the computation, `var` returns NULL/NA.
+- Division by zero results in NULL/NA value rather than an error.
+- If data represents only a sample of the entire population for the column, Teradata recommends to use `var` to calculate sample variance instead of `varp` which calculates population variance. As the sample size increases, the values for `var` and `varp` approach the same number.
+- The use of `distinct` is not permitted in window aggregate functions.
+
+### Population Variance : varp()
+The aggregate function `varp` returns the population variance of values of the column. The variance of a population is a measure of dispersion from the mean of that population. For more information on `varp` aggregate function, please refer to Teradata SQL translation vignette. Use `varp(distinct(column_name))` to exclude duplicate rows while calculating population variance.
+
+```{r var_pop_group}
+# Calculate the population variance of the 'temperature' column grouped by 'buoyid' column.
+# Please note that the output of the function remains the same (excludes NULL/NA values in computation) irrespective of the argument 'na.rm' set to TRUE. Warning 'Missing values are always removed in SQL.' will be suppressed if this is set to TRUE, otherwise the warning is raised.
+df_varp <- df_seq %>% group_by(buoyid) %>% summarise(varp_temp = varp(temperature, na.rm = TRUE))
+
+# Print the results.
+df_varp %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_varp <- df_seq %>% group_by(buoyid) %>% summarise(varp_temp = varp(distinct(temperature)))
+
+# Print the results.
+df_varp %>% arrange(buoyid)
+
+# Calculate the population variance of the values in the 'temperature' column without any grouping.
+df_varp <- df_seq %>% summarise(varp_temp = varp(temperature))
+
+# Print the results.
+df_varp
+
+# Exclude duplicates in the same aggregate operation above.
+df_varp <- df_seq %>% summarise(varp_temp = varp(distinct(temperature)))
+
+# Print the results.
+df_varp
+```
+
+The function `varp` can be used as window aggregates using dplyr verbs like `mutate`, `filter`.
+```{r var_pop_window}
+# Create a new column 'var_t' which holds the population variance of the values in the 'temperature' column.
+df_varp <- df_seq %>% mutate(var_t = varp(temperature))
+
+# Print the query.
+df_varp %>% show_query()
+
+# Print the results.
+df_varp %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with temperature values less than one-tenth of the population variance of the values in the 'temperature' column.
+df_varp <- df_seq %>% filter(temperature < varp(temperature)/10)
+
+# Print the results.
+df_varp
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `varp` for regular aggregate and window operations, instead of time series aggregate function `ts.varp`.
+- When there are fewer than two non-NULL data points in the population used for the computation, `varp` returns NULL/NA.
+- Division by zero results in NULL/NA value rather than an error.
+- `varp` can only be used if data represents entire population. Otherwise, Teradata recommends to use `var` to calculate sample variance.
+- The use of `distinct` is not permitted in window aggregate functions.
+
+### Average : mean()
+The aggregate function `mean` returns the average value in the column. For more information on `mean` aggregate function, please refer to Teradata SQL translation vignette. Use `mean(distinct(column_name))` to exclude duplicate rows while calculating average.
+
+```{r avg_group}
+# Calculate the average value in the 'temperature' column grouped by 'buoyid' column.
+# Please note that the output of the function remains the same (excludes NULL/NA values in computation) irrespective of the argument 'na.rm' set to TRUE. Warning 'Missing values are always removed in SQL.' will be suppressed if this is set to TRUE, otherwise the warning is raised.
+df_avg <- df_seq %>% group_by(buoyid) %>% summarise(avg_temp = mean(temperature, na.rm = TRUE))
+
+# Print the results.
+df_avg %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_avg <- df_seq %>% group_by(buoyid) %>% summarise(avg_temp = mean(distinct(temperature)))
+
+# Print the results.
+df_avg %>% arrange(buoyid)
+
+# Calculate the average value in the 'temperature' column without any grouping.
+df_avg <- df_seq %>% summarise(avg_temp = mean(temperature))
+
+# Print the results.
+df_avg
+
+# Exclude duplicates in the same aggregate operation above.
+df_avg <- df_seq %>% summarise(avg_temp = mean(distinct(temperature)))
+
+# Print the results.
+df_avg
+```
+
+The function `mean` can be used as window aggregates using dplyr verbs like `mutate`, `filter`.
+```{r avg_window}
+# Create a new column 'avg_t' which holds the average value in the 'temperature' column.
+df_avg <- df_seq %>% mutate(avg_t = mean(temperature))
+
+# Print the query.
+df_avg %>% show_query()
+
+# Print the results.
+df_avg %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with temperature values less than one-fifth of the average value in 'temperature' column.
+df_avg <- df_seq %>% filter(temperature < mean(temperature)/5)
+
+# Print the results.
+df_avg
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `mean`, but not time series aggregate `ts.mean`, for regular aggregate operations and window aggregate operations.
+- The use of `distinct` is not permitted in window aggregate functions.
+
+### Count : n() and n_distinct()
+The aggregate function `n` returns the total number of qualified rows in the column. `n` uses one argument named `x`, which specifies the column for which total number of rows is to be computed. For more information on `n` aggregate function, please refer to Teradata SQL translation vignette. Use `n(distinct(column_name))` to exclude duplicate rows while calculating the number of rows. Another way of accessing distinct rows is `n_distinct(column_name)`.
+
+```{r count_group}
+# Calculate the number of rows in the 'temperature' column grouped by 'buoyid' column.
+df_count <- df_seq %>% group_by(buoyid) %>% summarise(count_temp = n(temperature))
+
+# Print the results.
+df_count %>% arrange(buoyid)
+
+# Exclude duplicates in the same aggregate operation above.
+df_count <- df_seq %>% group_by(buoyid) %>% summarise(count_temp = n(distinct(temperature)))
+
+# Print the results.
+df_count %>% arrange(buoyid)
+
+# Another way of excluding duplicates in the same aggregate operation above.
+df_count <- df_seq %>% group_by(buoyid) %>% summarise(count_temp = n_distinct(temperature))
+
+# Print the results.
+df_count %>% arrange(buoyid)
+
+# Calculate the number of rows in the table grouped by 'buoyid' column.
+# Note that the argument is not provided for the function `n()`.
+df_count <- df_seq %>% group_by(buoyid) %>% summarise(count_temp = n())
+
+# Print the results.
+df_count %>% arrange(buoyid)
+
+# Calculate the number of rows in the 'temperature' column without any grouping.
+df_count <- df_seq %>% summarise(count_temp = n(temperature))
+
+# Print the results.
+df_count
+
+# Exclude duplicates in the same aggregate operation above.
+df_count <- df_seq %>% summarise(count_temp = n(distinct(temperature)))
+
+# Print the results.
+df_count
+
+# Calculate the number of rows in the table without any grouping.
+# Note that the argument is not provided for the function `n()`.
+df_count <- df_seq %>% summarise(count_temp = n())
+
+# Print the results.
+df_count
+```
+
+The function `n` can be used as window aggregates using dplyr verbs like `mutate`, `filter`. However, the `n_distinct` aggregate function cannot be used with 
+```{r count_window}
+# Create a new column 'count_t' which holds the number of rows in the 'temperature' column.
+df_count <- df_seq %>% mutate(count_t = n(temperature))
+
+# Print the query.
+df_count %>% show_query()
+
+# Print the results.
+df_count %>% select(TD_TIMECODE, TD_SEQNO, buoyid, count_t) %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Create a new column 'count_t' which holds the number of rows in the table.
+# Note that the argument is not provided for the function `n()`.
+df_count <- df_seq %>% mutate(count_t = n())
+
+# Print the query.
+df_count %>% show_query()
+
+# Print the results.
+df_count %>% select(TD_TIMECODE, TD_SEQNO, buoyid, count_t) %>% arrange(TD_TIMECODE, TD_SEQNO)
+
+# Filter the rows with temperature values less than the number of rows in 'temperature' column.
+df_count <- df_seq %>% filter(temperature < n(temperature))
+
+# Print the results.
+df_count %>% arrange(TD_TIMECODE, TD_SEQNO)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- `n` and `n_distinct` are valid on all columns with any data type.
+- Teradata recommends to strictly use `n`, but not time series aggregate `ts.n`, for regular aggregate operations and window aggregate operations.
+- The use of `distinct` is not permitted in window aggregate functions i.e., `n(distinct(column_name))` and `n_distinct(column_name)` cannot be used as window aggregate operations.

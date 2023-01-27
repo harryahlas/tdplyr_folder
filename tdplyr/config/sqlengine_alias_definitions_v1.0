@@ -1,0 +1,11 @@
+functionName:aliasName
+attribution:Attribution
+decisionforestpredict:DecisionForestPredict
+decisiontreepredict:DecisionTreePredict
+glmpredict:GLMPredict
+naivebayespredict:NaiveBayesPredict
+naivebayestextclassifierpredict:NaiveBayesTextClassifierPredict
+npath:NPath
+script:Script
+sessionize:Sessionize
+svmsparsepredict:SVMSparsePredict

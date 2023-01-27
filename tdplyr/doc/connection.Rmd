@@ -1,0 +1,212 @@
+---
+title: "Connection and Database Management"
+output:
+  html_document:
+    toc: true 
+    toc_depth: 3
+    number_sections: false
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Connection and Database Management}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
+```
+
+## Connection overview
+Connecting to Tereadata Vantage can be performed using the `td_create_context` function or the `DBI::dbConnect` function. Once the connection is established, a `context` must be initialized. The results of tdplyr analytic functions are stored as nonperistent tables in the SQL Engine database. The context allows the user specify a database to store these nonpersistent tables. The process of initializing a context can either be performed using the `td_create_context` function or the `td_set_context` function.
+
+The `td_remove_context` function can be used to disconnect the connection and remove the context. Removing the context triggers the removal of all nonpersistent work tables, a process also known as garbage collection.
+
+### Supported drivers
+TeradataNative Driver (>= 16.20.0.18)
+
+Teradata ODBC driver (>= 16.20) - Use of tdplyr with Teradata ODBC Driver will be deprecated.
+
+## Use td_create_context to connect and initialize the context
+The function `td_create_context` establishes the connection and initializes the context. There are two ways of creating connection. 
+```{r, results = "hide", warning = FALSE, message = FALSE}
+library(tdplyr)
+```
+
+1. Create context using  Teradata ODBC Driver
+```{r odbc, results = 'hide', eval=FALSE}
+con <- td_create_context("TeradataDSN")
+```
+
+
+2. Create context using Teradata SQL driver for R
+```{r, echo=FALSE, include=FALSE}
+# Reading Vantage cluster details from td_config.cfg
+config_file <- system.file("extdata", "td_config.cfg", package = "tdplyr")
+config_df <- read.csv(config_file, sep = ":", stringsAsFactors = FALSE, header = TRUE)
+config_list <- unlist(lapply(config_df$value, function(x) {trimws(x)}))
+host_name <- config_list[1]
+user_name <- config_list[2]
+password  <- config_list[3]
+```
+
+```{r native, results = 'hide'}
+# host_name = Fully qualified domain name or IP address of the Teradata Vantage System.
+# user_name = UserId for the connection.
+# password  = Password for the connection.
+con <- td_create_context(host = host_name, uid = user_name, pwd = password, dType = "native")
+```
+
+The class of the connection object is same for both the drivers.
+```{r}
+class(con)[1] # The connection object is an object of class: "Teradata"
+```
+
+### Use td_get_context to retrieve attributes of the current context
+
+The `td_get_context` function returns a named list of attributes in the current context.
+
+```{r}
+names(td_get_context())
+```
+
+The connection object in the current context can also be retrieved using the `td_get_context` function.
+```{r}
+con <- td_get_context()$connection
+```
+
+### Use td_remove_context to disconnect the connection and remove the context
+The function `td_remove_context` can be used to disconnect the connection and remove the context. Removing the context triggers the removal of all nonpersistent work tables, a process also known as garbage collection.
+```{r}
+td_remove_context()
+```
+
+### Specify a temporary database to store tables created by analytic functions
+Analytic functions need to create temporary database objects (table / view) for processing data. The database where these objects are created can be specified using the `temp.database` argument in the `td_create_context` function. If the `temp.database` argument is not specified, then the default database of the connection is used.
+
+1. Specifying temporary database using Teradata ODBC driver.
+```{r, eval=FALSE}
+td_create_context("TeradataDSN", temp.database = "DATABASE_1")
+```
+
+2. Specifying temporary database using Teradata SQL driver for R.
+```{r}
+con <- td_create_context(host = host_name, uid = user_name, pwd = password, dType = "native", temp.database = "DATABASE_1")
+td_get_context()$temp.database
+```
+
+```{r}
+td_remove_context()
+```
+
+## Use td_set_context to initialize the context
+If a connection is established using the `DBI::dbConnect` function, then use the `td_set_context` function to initialize the context.
+
+1. Set context using Teradata ODBC driver.
+```{r, eval=FALSE}
+con <- DBI::dbConnect(odbc::odbc(), dsn = "TeradataDSN")
+td_set_context(con)
+```
+
+2. Set context using Teradata SQL driver for R.
+```{r, eval=TRUE}
+con <- DBI::dbConnect(tdplyr::NativeDriver(), host = host_name, uid = user_name, pwd = password, dType = "native")
+td_set_context(con)
+```
+
+If the `temp.database` argument is not specified in the `td_set_context` function, then the default database of the supplied connection object is used as the temporary database.
+
+The function `td_set_context` can also be used to change the temporary database of the current context.
+
+```{r}
+td_set_context(con, "DATABASE_1")
+td_get_context()$temp.database
+```
+
+```{r, echo=FALSE}
+td_remove_context()
+```
+
+
+### Change the temporary database of an existing context
+The temporary database in the current context can be changed using the `td_set_context` function without having to creating a new context.
+
+1. Changing temporary database using Teradata ODBC driver.
+```{r, eval=FALSE}
+td_create_context("TeradataDSN", temp.database = "DATABASE_1")
+
+# Change the temporary database in the current context
+td_set_context(td_get_context()$connection, "DATABASE_2")
+```
+
+2. Changing temporary database using Teradata SQL driver for R.
+```{r}
+con <- td_create_context(host = host_name, uid = user_name, pwd = password, dType = "native", temp.database = "DATABASE_1")
+td_get_context()$temp.database
+
+# Change the temporary database in the current context
+td_set_context(td_get_context()$connection, "DATABASE_2")
+td_get_context()$temp.database
+```
+
+
+## Database management functions
+List ODBC data source names configured in your system.
+```{r, results = "hide"}
+odbc::odbcListDataSources()
+```
+
+View connection related information.
+```{r, results = "hide"}
+con <- td_get_context()$connection
+DBI::dbGetInfo(con)
+```
+Alternatively, use the `db_desc` function to view the connection related information.
+```{r, results = "hide"}
+dplyr::db_desc(con)
+```
+
+The output of the `db_desc` function can be changed using the `td.db_desc.output` option. Set a named list containing `db`, `driver`, and `machine` to display the Advanced SQL Engine version, client driver version and the server machine name respectively.
+```{r}
+options(td.db_desc.output = list(db = TRUE, driver = TRUE, machine = FALSE))
+dplyr::db_desc(con)
+```
+
+View only the volatile tables active in the given connection.
+```{r}
+# create a volatile table using the copy_to function
+dplyr::copy_to(con, data.frame(col1 = c(1:3)), "volatile_table_1", temporary = TRUE)
+# View all volatile tables active in the given connection
+volatile_tables <- DBI::dbGetQuery(con, "help volatile table")
+volatile_tables$"Table SQL Name"
+```
+
+View column names for a given table.
+```{r, results = "hide"}
+DBI::dbListFields(con, volatile_tables$"Table SQL Name")
+```
+
+Execute a SQL query and retrieve the result in an R native data frame.
+```{r}
+df <- DBI::dbGetQuery(con, "select database;")
+df
+```
+
+```{r}
+td_remove_context()
+```
+
+View all tables in the default database of the current context.
+Note: This command also lists all the volatile (or temporary) tables active in the given connection. dbListTables is supported with ODBC connection only.
+
+```{r , results = 'hide', eval=FALSE}
+con1 <- td_create_context(dsn = "TeradataDSN")
+tables <- DBI::dbListTables(con1, schema = td_get_context()$default.database, table_name = "%")
+tables
+```
+
+
+

@@ -1,0 +1,787 @@
+---
+title: "Introduction to dplyr verbs"
+output:
+  html_document:
+    toc: true 
+    toc_depth: 3
+    number_sections: false
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Introduction to dplyr verbs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
+```
+
+The "verbs" are functions in dplyr for creating and processing SELECT statements. The goal of this vignette is to provide introductory examples to get the user familiar with the API. It does not aim to be an exhaustive account of usage for each verb. For more information like the return value, arguments, and other useful details, use `help()` on the verb.
+
+Each verb in this vignette has a section. Each section can be read in isolation, except where refrences are made to other sections or other vignettes. Beginners should start with the Select and Rename followed by Filter. Each section also has a subsection called "Things to Note" for good practices and specific behavior to consider when using the verb with Teradata Vantage.
+
+## Select and Rename
+Use the verb `select` to specify which columns to select from the table. For this example, we use the mtcars data frame that has been written to the database. In the code example below, we create a `tbl` to represent the mtcars table in the database. You can pipe the `tbl` to `select` using the `magrittr` pipe symbol (`%>%`).
+
+Each verb has a parameter called `.data` that expects a `tbl`. The `tbl` is referred to as "remote" when it represents a table in a database. Otherwise the `tbl` is "local", which refers to an in-memory dataframe-like object such as `tibble::tibble`. The pipe simply passes the results of the previous pipeline into the parameter of the next function.
+
+```{r, echo=FALSE, include=FALSE}
+library(dplyr)
+library(DBI)
+library(odbc)
+library(tdplyr)
+
+# Reading Vantage cluster details from td_config.cfg
+config_file <- system.file("extdata", "td_config.cfg", package = "tdplyr")
+config_df <- read.csv(config_file, sep = ":", stringsAsFactors = FALSE, header = TRUE)
+config_list <- unlist(lapply(config_df$value, function(x) {trimws(x)}))
+
+con <- td_create_context(host = config_list[1], uid = config_list[2], pwd = config_list[3], dType = "native")
+
+try(db_drop_table(con, 'mtcars'), silent = TRUE)
+try(db_drop_table(con, 'table1'), silent = TRUE)
+try(db_drop_table(con, 'CO2'), silent = TRUE)
+
+DBI::dbWriteTable(con, 'mtcars', mtcars, row.names = TRUE)
+DBI::dbWriteTable(con, 'CO2', as.data.frame(CO2), row.names = TRUE)
+
+temp <- data.frame(idx = 1:200,val = c(1:100, rep(NA_real_, 100)))
+DBI::dbWriteTable(con, 'table1', temp, row.names = TRUE)
+
+opts <- list(db = FALSE, machine = FALSE, driver = FALSE)
+options(td.db_desc.output = opts)
+```
+```{r}
+t <- tbl(con, 'mtcars')
+t %>% select(row_names, mpg) %>% arrange(row_names)
+```
+
+The output is a `tbl` that represents the columns in the `select` verb. There are many ways to specify which columns to select. The example below shows equivalent queries.
+```{r, eval = FALSE}
+t %>% select('row_names', 'mpg') %>% arrange(row_names) # as strings
+t %>% select(c('row_names', 'mpg')) %>% arrange(row_names) # as a collection
+t %>% select(1, 2) %>% arrange(row_names)          # by column position (note that indexing starts at 1) 
+t %>% select(row_names:mpg) %>% arrange(row_names) # as a range of columns
+t %>% select(.data$row_names, .data$mpg) %>% arrange(row_names) # using the .data pronoun
+t %>% select(-(3:12)) %>% arrange(row_names) # all columns except 3 thru 12
+t %>% select(-(cyl:carb)) %>% arrange(row_names) # all columns except cyl thru carb
+```
+
+To rename columns in a remote tbl, use `select` or `rename`. Unlike the `select` verb, the `rename` verb returns all the columns even if they are not specified. Renaming is done by assigning an alias to the column name. This does not rename the columns in the underlying table but merely creates the SELECT query using AS aliases.
+
+```{r}
+results <- t %>% rename(column_1 = row_names, miles_per_gallon = mpg)
+show_query(results)
+```
+
+When using `select` to rename columns, you can specify a named vector.
+```{r}
+new_col_names_vec <- c(a=1, b=2, c=3)
+results <- t %>% select(new_col_names_vec)
+show_query(results)
+```
+
+In addition to specifying columns by name or position, you can use the following helper functions to select columns. Currently there are the functions:`starts_with`, `ends_with`, `contains`, `matches`, `one_of`, `num_range`, and `everything`. To see a description of each function, use `help` on any of the functions. Note that you can use `-` to negate the helper function and select columns that do not satisfy the helper function.
+```{r}
+t %>% select(starts_with('c')) %>% arrange(row_names)
+t %>% select(-starts_with('c')) %>% arrange(row_names)
+```
+
+When multiple helper functions are provided, the result shows all columns with at least one of the helper functions satisfied.
+```{r}
+t %>% select(starts_with('c'), ends_with('s')) %>% arrange(row_names)
+```
+
+### Scoped Variants
+In addition to `select` and `rename`, there are variants of these verbs called "scoped variants". You can use them to choose which columns to select or rename based on functions you can provide.
+
+Suppose we want to rename all the columns. We can use the `select_all`/`rename_all` scoped variants to supply a function to the `.funs` parameter. This function is optional for `select_all` but mandatory for `rename_all`. Otherwise, both functions behave the same way.
+```{r}
+t %>% select_all(toupper) %>% arrange(row_names)
+```
+In this example, the built-in function `toupper` was applied to each column name. In addition to using built-in functions, we can supply our own. The function takes the name of a column as a character vector and returns a modified character vector. The renaming function, `my_renaming_fn`, simply calls `toupper` on a substring of each column name. 
+
+```{r}
+my_renaming_fn <- function(col){
+    first <- substr(col, 1, 2)
+    second <- substr(col, 3, nchar(col))
+    paste0(toupper(first), second)
+}
+t %>% select_all(my_renaming_fn) %>% arrange(ROw_names)
+```
+
+Previously, it was shown how to rename using `select`. You can group columns to rename under a single alias which gives column names of the form "alias[n]" where n is the number of columns under that alias. This is useful for renaming column names as a function of their position.
+```{r}
+my_letters <- function(x){
+    idx <- as.integer(substr(x, 2, nchar(x)))
+    letters[idx]
+}
+t %>% select(v = everything()) %>% select_all(my_letters) %>% arrange(a)
+```
+
+In this example, the first `select` in the pipeline groups all the columns under an alias with prefix "v". So the intermediate table looks like this: 
+
+```{r}
+t %>% select(v = everything())  %>% arrange(v1)
+```
+
+Then `select_all` is called with a custom function, `my_letters`, to get the number of the column name and uses it to index into `letters`.
+
+`select_at` and `rename_at` work similarly to `select_all` and `rename_all` except you can provide helper functions or a column of integer positions in the `.vars` parameter to select which columns to apply the renaming function to.
+
+Lastly, `select_if` and `rename_if` are used to rename or select columns based on a given predicate. 
+`select_if` does not require a renaming function but `rename_if` does. Both require predicates. The predicate can be a logical vector or a function -- in which case the predicate takes a vector of the values from the column and returns TRUE or FALSE. If TRUE is returned, then that column is renamed, otherwise it is not. 
+
+```{r}
+is_whole <- function(x) all(floor(x) == x)
+is_integerish <- function(x) is.numeric(x) && is_whole(x)
+t %>% rename_if(is_integerish, toupper)  %>% arrange(row_names)
+```
+In this example, we apply the predicate `is_integerish` to each column in `t`. Any column that is numeric and satisfies `is_whole` (essentially a column of integers or doubles with no fractional part) is renamed.
+
+`select_if` drops columns that do not satisfy the predicate. It applies a renaming function (if supplied) to the remaining columns that are kept.
+```{r}
+t %>% select_if(is_integerish, toupper) %>% arrange(HP, CYL, VS, AM, GEAR, CARB)
+```
+
+### Notes
+- `rename_if`/`select_if` applies the predicate on a subset of 100 values for each column before generating the SQL for the SELECT statement. This can prevent the renaming function from being applied if the predicate needs to look at more than 100 values of a column. This value is currently not adjustable.
+
+- Selecting columns by name is case-sensitive.
+
+- You can only supply one renaming function to `.funs` but it can call other functions.
+
+## Filter
+The `filter` verb is used for filtering rows in a tbl. In the remote tbl case, it takes R expressions and translates them into a SQL SELECT statement with an equivalent WHERE clause. The `%in%` expression in the example below gets mapped to the SQL `IN` operator.
+
+```{r}
+t %>% filter(row_names %in% c('Valiant', 'Merc 280C')) %>% arrange(row_names)
+```
+```{r}
+t %>% filter(row_names %in% c('Valiant', 'Merc 280C')) %>% show_query()
+```
+
+Boolean operators such as `&` and `|` are supported as well as comparison operators such as `==`, `>`, `!=`, etc. `filter` can take multiple expressions separated by a comma, intersecting each expression with AND.
+
+```{r}
+# basic expressions
+
+# & AND
+show_query(t %>% filter(mpg > 35 & hp > 90))
+
+# | OR
+show_query(t %>% filter(cyl < 6 | wt < 2.5 ))
+
+# != <>
+show_query(t %>% filter(vs != am))
+
+# multiple expressions
+res <- t %>% filter(mpg > 25, hp > 90)
+show_query(res)
+```
+
+In each of the examples above, the `filter` uses the column names from remote tbl `t`. Unlike `select` and `rename`, using strings or numeric literals to refer to column names does not work because they are translated as literals in the SQL WHERE clause.
+```{r}
+# get rows with strings representing col names
+show_query(t %>% filter('vs' == 'am'))
+tally(t %>% filter('vs' == 'am'))
+
+# get rows with integers representing col positions
+show_query(t %>% filter(9L == 10L))
+tally(t %>% filter(9L == 10L))
+
+# now tally the actual columns
+tally(t %>% filter(vs == am))
+```
+
+An environment in tdplyr is used to map a function or operator in an R expression to an equivalent SQL function or operator. When no mapping exists, the function or operator is translated literally. This includes scenarios where you define a function in R and try to use it in `filter`. The function doesn't get evaluated, but is translated as is. 
+
+```{r}
+# use a non-mapped function
+t %>% filter(my_function(mpg, cyl, hp, gear) > 0L) %>% show_query()
+
+plus_one <- function(x){ x + 1 }
+t %>% filter(plus_one(4) < cyl) %>% show_query()
+```
+
+For more details on mapping from R expressions to SQL see the vignette on SQL translation.
+
+Lastly, in R, integer literals end in L. Otherwise they are treated as doubles. This makes a difference in the translated predicate expression.
+```{r}
+t %>% filter(mpg > 35) %>% show_query
+# vs.
+t %>% filter(mpg > 35L) %>% show_query
+```
+This can be a subtle bug in SQL if the function expects an integer column or literal but receives a double instead. 
+
+All syntax rules for Teradata apply once the query is formed and sent to the database.
+
+### Scoped Variants
+Similar to the scoped variants for `select` there are functions `filter_if`, `filter_at`, and `filter_all`. These are useful for building predicates in the WHERE clause based on groups of columns. Let us look at some examples.
+
+`filter_if` uses a predicate function similar to `select_if` and `rename_if`. The predicate is given a vector of values from a column and returns TRUE or FALSE based on those vector values.
+
+```{r}
+# filter based on columns of chr type
+res <- t %>% filter_if(is.character, all_vars(. %in% c('Merc 230', 'Mazda RX4', 'Porsche 914-2')))
+```
+The predicate `is.character` is a built-in function in base R. Only columns that have character data are selected. The `.` refers to the selected column. In this case, our table only has one column that is selected since `row_names` is the only column with character data. Only `row_names` gets used in the `%in%` expression in the WHERE clause.
+```{r}
+show_query(res)
+```
+When there are multiple columns that satisfy the predicate, the resulting WHERE clause depends on whether `any_vars` or `all_vars` is used. If `any_vars` is used, the predicate expressions applied to the selected columns are unioned with `|`. If `all_vars` is used, the predicate expressions applied to the selected columns are intersected with `&`.
+```{r}
+# any_vars
+t %>% filter_if(is.numeric, any_vars(floor(.) == ceil(.))) %>% show_query()
+
+# all_vars
+t %>% filter_if(is.numeric, all_vars(floor(.) == ceil(.))) %>% show_query()
+```
+
+Thus the scoped `filter` variants are used in conjunction with the `.` pronoun, `any_vars()` and `all_vars()` to construct the WHERE clause. The functions `any_vars` and `all_vars` are used even if there is only one selected column. If we try executing without these functions in our first example for `filter_if`, we get an error.
+```{r, error= TRUE}
+# no any_vars() or all_vars() used
+t %>% filter_if(is.character, . %in% c('Merc 230', 'Mazda RX4', 'Porsche 914-2'))
+```
+
+The `filter_at` function is similar to `select_at`. You use `any_vars` and `all_vars` based on columns selected using `vars()`, which allows you to use the select helper functions.
+```{r}
+# predicate applied to columns ending with p
+res <- t %>% filter_at(vars(ends_with('p')), any_vars(floor(.) > 30L))
+show_query(res)
+```
+
+Lastly, `filter_all` uses `any_vars` and `all_vars` on all the columns in the tbl. In the example below, we exclude the `row_names` column since we are applying functions that expect numeric input.
+```{r}
+# AND/OR predicates over all columns
+t %>% select(-row_names) %>% filter_all(any_vars(ceil(.) == .)) %>% show_query()
+t %>% select(-row_names) %>% filter_all(all_vars(floor(.) == .)) %>% show_query()
+```
+
+### Notes
+- `filter_if` applies the predicate on a subset of 100 values for each column before generating the SQL for the SELECT statement. This can prevent the predicate expressions from being applied on some columns if the predicate needs to look at more than 100 values of a column. This value is currently not adjustable.
+- In R, integer literals end in L. Otherwise they are doubles. This makes a difference in the predicate expression.
+- Using strings or numeric literals to refer to columns do not work in `filter`. Use the `.` pronoun instead.
+- For details on the R expression to SQL mapping, see the SQL translation vignette.
+- For details on using the verbs inside functions in R, see the vignette on programming with dplyr in the dplyr package.
+
+## Mutate and Transmute
+
+Use the verb `mutate` to create a remote tbl with column expressions based on existing columns or scalars. `mutate` and `transmute` take column expressions in R and translate them into equivalent column expressions in SQL. In the example below we define two new columns `mpg2` and `disp/cyl`.
+```{r}
+res <- t %>% select(row_names:hp) %>% mutate(mpg2 = mpg / hp, disp / cyl)
+res %>% arrange(row_names)
+```
+
+`transmute` is similar to `mutate` except it keeps the column expressions given and drops all others. 
+```{r}
+res <- t %>% transmute(mpg2 = mpg / hp, disp / cyl)
+res  %>% arrange(mpg2, `disp/cyl`)
+```
+
+There are many functions in dplyr that can be used with in-memory local tbl objects and also with remote tbl objects. When used with remote tbls, the function must be used in an appropriate verb. In the following example, the dplyr `case_when` function is used with formulas that determine the level values of the new ranking column on the basis of the values of the mpg variable.
+```{r}
+res <- t %>% select(mpg:hp) %>% 
+       mutate(ranking = case_when(
+          mpg > 30 ~ 'high',
+          mpg <= 30 & mpg > 20 ~ 'medium',
+          mpg <= 20 ~ 'low'
+))
+res %>% arrange(mpg, cyl, disp, hp, ranking)
+```
+
+When used with the mutate verb, the `case_when` function is not evaluated in-memory but is translated into an equivalent SQL CASE WHEN statement. Rendering the query, we see the equivalent translation. See `help(case_when)` for more information.
+```{r}
+res %>% show_query
+```
+
+### Scoped Variants
+The scoped variants for `mutate` are `mutate_if`, `mutate_at`, and `mutate_all`. There are similar functions for `transmute`. These functions have similar semantics to the scoped variants of the other verbs.
+
+`mutate_if` and `transmute_if` apply functions to columns selected based on a predicate. The predicate is a function that takes a column as input and returns TRUE or FALSE based on values in the column. The `funs()` function is needed to specify the functions to apply.
+
+```{r}
+res <- t %>% select(row_names, mpg, hp) %>% mutate_if(is.numeric, funs(power, log), 2L)
+res %>% arrange(row_names)
+```
+The predicate `is.numeric` selects numeric columns. Since `mpg` and `hp` are the only numeric columns passed to `mutate_if`, those are the only columns that the `power` and `log` functions are applied to. 
+
+The first argument to functions passed in `funs()` is always the column. Any additional arguments given in `...` are supplied in the order given to all the functions. See the `mutate_at` example below for passing different arguments to different functions.
+
+In the example above, the integer `2L` is passed as an argument to both the `power` and the `log` functions. In Teradata, the SQL `log` function computes the base-10 logarithm and requires only one parameter. However, when mapped by dplyr, `log` is translated into a function with an optional second parameter that specifies the logarithm base.
+
+```{r}
+res %>% show_query
+```
+
+`transmute_if` works similarly but only keeps the column expressions mutated under the predicate.
+```{r}
+res <- t %>% select(row_names, mpg, hp) %>% transmute_if(is.numeric, funs(power, log), 2L)
+res %>% arrange(mpg_power, hp_power, mpg_log, hp_log)
+```
+
+You can use the dot pronoun `.` to reference the selected columns in any of the scoped variants. Similar to the other `if` scoped variants, you can pass a custom predicate.
+```{r}
+# table with some NULL values
+t1 <- tbl(con, 'table1')
+t1 %>% arrange(row_names)
+
+has_na <- function(x) any(is.na(x))
+res <- t1 %>% mutate_if(has_na, funs(if_else(is.na(.), 0L, floor(.))))
+
+res %>% arrange(row_names)
+```
+This example selects columns that have NULL values and replaces them with `0L` or the floor of the non-NULL value. The `if_else` function is mapped into a CASE WHEN expression on columns that have NULL.
+
+```{r}
+res %>% show_query
+```
+
+`mutate_at` and `transmute_at` select columns using `vars()` along with the select helper functions (`starts_with`, `contains`, `ends_with`, etc.). Functions given in `funs()` are applied to matching columns specified in `vars()`. In the example below, we mutate columns whose name ends with 'p'. We apply a CASE WHEN expression using the `if_else` function in dplyr. See `help(if_else)` for more information.
+```{r}
+res <- t %>% mutate_at(vars(ends_with('p')), funs(if_else(. / 2 <= 100L, power(., 3L), log(., 2L))))
+res %>% arrange(row_names)
+
+res %>% show_query
+```
+In the example above, only a single function is used in `funs()`. Thus only the columns that end with 'p' get replaced with the new expression. When multiple functions are specified in `funs()`, the resulting tbl's columns are renamed to avoid ambiguity. In addition, the original columns are retained. In contrast, when using `transmute_at` the original columns are dropped.
+
+```{r}
+res <- t %>% mutate_at(vars(ends_with('p')), funs(power(., 3L), log(., 2L)))
+colnames(res) 
+
+res %>% show_query
+```
+
+Lastly, `mutate_all` and `transmute_all` apply functions to all columns in the remote tbl. The only difference is in which columns are kept in the resulting table.
+```{r}
+t %>% select(mpg, hp) %>% mutate_all(funs(. * 2, . / 2)) %>% arrange(mpg, hp)
+
+t %>% select(mpg, hp) %>% transmute_all(funs(. * 2, . / 2)) %>% arrange(`mpg_*`, `hp_*`)
+```
+
+Use aliases to differentiate the expressions in `funs()`, otherwise the expressions may not be captured because the aliases are overridden.
+```{r}
+t %>% select(mpg, hp) %>% mutate_all(funs(. / 2, . / 3)) %>% arrange(mpg, hp)
+```
+In the example above, the columns `mpg` and `hp` are divided by 2 and 3. We expect four new expressions but only see two new ones. The column expressions where `mpg` is divided by 2 and `hp` is divided by 2 are not seen in the output because no alias is given to differentiate from the column expressions where `mpg` is divided by 3 and `hp` is divided by 3.
+
+The example below uses aliases to differentiate the column expressions.
+
+```{r}
+t %>% select(mpg, hp) %>% mutate_all(funs(a = . / 2, b = . / 3)) %>% arrange(mpg, hp)
+```
+
+### Notes
+- `mutate_if` and `transmute_if` scoped variants apply the predicate on a subset of 100 values for each column before generating the SQL for the SELECT statement. This can prevent the mutated expressions from being applied on some columns if the predicate needs to look at more than 100 values of a column. This value is currently not adjustable.
+- These verbs use the expression in quotes if no alias is given. Try to alias whenever possible so that column names are understandable and so columns don't get lost because of the same alias.
+- Use show_query or sql_render to see the underlying query.
+- See the vignette on SQL translation for more details on mapping from R expressions to SQL.
+
+## Arrange
+The `arrange` verb orders rows in a tbl. When used with a remote tbl, it creates an ORDER BY clause. You can reference columns in the ORDER BY clause by using integers to reference by position, a column's name or alias, or functions of columns.
+
+```{r}
+t %>% arrange(row_names)
+```
+
+By default, columns are sorted in ascending order. To sort in descending order, use `desc()` on the column.
+
+```{r}
+t %>% arrange(desc(row_names))
+```
+
+You can sort multiple columns in descending or ascending order.
+```{r}
+res <- t %>% select(cyl, mpg) %>% arrange(cyl, desc(mpg))
+res
+
+res %>% show_query
+```
+
+Equivalently in Teradata, columns can be specified by integer position. 
+```{r}
+res <- t %>% arrange(1L, desc(2L))
+res
+
+res %>% show_query
+```
+
+Remember to specify an integer literal, not a double. Otherwise, you get the wrong results.
+```{r}
+t %>% arrange(1)
+
+t %>% arrange(1) %>% show_query
+```
+
+Avoid specifying column names as strings. Otherwise, they are translated as string literals for the ORDER BY clause.
+```{r}
+t %>% arrange('row_names')
+
+t %>% arrange('row_names') %>% show_query
+```
+When composing verbs together, SELECT statements may get placed into subqueries. An important thing to remember is that Teradata does not allow ORDER BY clauses in subqueries. `arrange` and its scoped variants should be placed last in the pipeline to avoid this problem.
+```{r, error=TRUE}
+# arrange before filter
+t %>% select(row_names, mpg) %>% arrange(mpg, row_names) %>% filter(mpg > 20)
+```
+```{r}
+# arrange last in pipeline
+t %>% select(row_names, mpg) %>% filter(mpg > 20) %>% arrange(mpg, row_names)
+```
+
+Avoid using `arrange` when you need to use `pull` to retrieve data. `pull` wraps the query in a subquery.
+```{r, error=TRUE}
+t %>% arrange(mpg) %>% pull(mpg)
+```
+
+If you need to retrieve data, you can try casting to a data.frame.
+```{r}
+df <- t %>% select(mpg) %>% arrange(mpg) %>% as.data.frame
+head(df)
+```
+
+### Scoped Variants
+The `arrange` verb has `arrange_if`, `arrange_at`, and `arrange_all` scoped variants. These create an ORDER BY clause using columns based on certain selection criteria.
+
+`arrange_if` uses a predicate function to select columns based on a column's values. You can use built-in R predicates or write your own.
+
+```{r}
+res <- t %>% arrange_if(is.numeric)
+res %>% show_query
+
+res
+```
+In the example above, all columns that have a numeric type are placed in the ORDER BY clause. Also, if there are aliases in the tbl, then `arrange` uses them.
+```{r}
+res <- t %>% 
+      select(my_mpg = mpg, my_cyl = cyl, hp) %>% 
+      arrange_if(is.numeric)
+res %>% show_query
+
+res
+```
+
+You can use `funs()` with the `arrange` scoped variants to apply functions over selected columns. Passing functions to the `.funs` parameter is optional for the `arrange` scoped variants.
+
+When aliases are used, it is unecessary to use `funs()` when you are trying to order by grouped expressions. We use the CO2 tbl to demonstrate this.
+```{r}
+c2 <- tbl(con, 'CO2')
+c2 %>% arrange(row_names)
+```
+
+The expression below groups by the Plant column and summarizes by taking the average on the uptake column. There is no need to call `arrange_if` with `funs(avg)` since the column is already there.
+```{r}
+res <- c2 %>% 
+  group_by(Plant) %>% 
+  summarize(avg_uptake = avg(uptake)) %>% 
+  arrange_if(is.numeric)
+res %>% show_query
+
+res
+```
+
+The next scoped variant is `arrange_at`. This function is used with the `vars()` function to specify column names with select helper functions such as `starts_with`, `ends_with`, etc. See `help(select_helpers)` for more info.
+
+```{r}
+res <- c2 %>% arrange_at(vars(contains('t')))
+res %>% show_query
+
+res
+```
+
+Lastly, `arrange_all` uses all the columns in the input tbl to create the ORDER BY clause.
+```{r}
+res <- c2 %>% 
+  group_by(type, Plant) %>% 
+  summarize(avg(uptake)) %>% 
+  arrange_all()
+
+res %>% show_query
+
+res
+```
+
+### Notes
+- Teradata does not support ORDER BY in subqueries. This almost always means to place the `arrange` verb and related scoped variants at the end of the pipeline.
+- Using `pull` on a remote tbl that is Ordered By causes an error. Try `pull`ing without `arrange` instead or casting using `as.data.frame`. Performance may suffer if there are many rows being `pull`ed or casted into a data.frame.
+- Teradata allows referencing columns by integer position. You can specify columns in `arrange` with integer literals. In R, integer literals end with 'L'.
+- The ORDER by clause expects column expressions. Don't reference column names as character vectors (strings) when using `arrange`, otherwise, the wrong results may be returned.
+- The `arrange_if` scoped variant applies the predicate on a subset of 100 values for each column before generating the SQL for the SELECT statement. This can prevent some columns being used in the ORDER BY if the predicate needs to look at more than 100 values of a column. This value is currently not adjustable.
+- For details on the R expression to SQL mapping, see the SQL translation vignette.
+
+## Group By and Summarize
+
+The `group_by` verb creates column expressions in the GROUP BY clause. The `summarize` verb creates expressions in the select list using aggregate functions. `summarize` applies the functions to each group when used with `group_by`. The `group_by` and `summarize` verbs are used together to process aggregate queries.
+
+The functions used in `summarize` and `group_by` get translated from R expressions to Teradata SQL. For more details on supported mappings from R expressions to SQL, see the vignette on [SQL translation](sql-translation.Rmd).
+
+
+### Group By
+Using `group_by` doesn't build the GROUP BY clause right away.
+```{r}
+t %>% group_by(hp, disp) %>% show_query
+```
+
+However, it does set the columns or column expressions used in the grouping set. These can be accessed with `group_vars()`.
+```{r}
+t %>% group_by(hp, disp) %>% group_vars()
+```
+
+The GROUP BY clause is built when `summarize` is called. 
+```{r, warning = FALSE}
+res <- t %>% 
+  group_by(hp, disp) %>% 
+  summarize(mean(hp), mean(disp), count = n())
+
+res %>% show_query()
+```
+
+`group_by` can be called with column expressions. This is similar to calling `mutate` before `group_by`.
+
+```{r}
+res <- t %>% 
+       select(row_names, mpg:am) %>%
+       group_by(sizes = case_when(
+                   hp > 2 * mean(hp, na.rm = TRUE)  ~ "large",
+                   hp <= 2 * mean(hp, na.rm = TRUE) & hp >= mean(hp, na.rm = TRUE) ~ "medium",
+                   hp < mean(hp, na.rm = TRUE) ~ "small"))
+res %>% arrange(row_names)
+```
+
+The example above creates a new column called `sizes` using the `case_when` function. Notice that the `sizes` column is used in the grouping set. You can print a grouped tbl to see the output of `group_vars()` provided in the `Groups` section of the header.
+
+```{r}
+res %>% group_vars()
+```
+
+The `na.rm` arguments in the `mean` functions are set to TRUE to silence a warning. The warning is a reminder that any missing values encountered in aggregate functions are not included in the computation. Here is the resulting query:
+
+```{r}
+res %>% show_query()
+```
+
+### Summarize
+`summarize` populates the SELECT list with aggregate functions to use against the column expressions specified in `group_by`.
+
+Continuing from the previous section, with the `sizes` column now in the grouping set, we can summarize each group.
+```{r}
+summary <- res %>% summarize(mean = mean(hp, na.rm = TRUE), 
+                             sd = sd(hp, na.rm = TRUE), 
+                             min = min(hp, na.rm = TRUE), 
+                             max = max(hp, na.rm = TRUE), 
+                             count = n())
+summary %>% show_query()
+
+summary %>% arrange(sizes)
+```
+
+Aggregate functions return one value per group. If you use an aggregate function in the select list, then either all columns in the select list must be referenced by aggregate functions or their column names must appear in the GROUP BY clause. 
+
+You can use `summarize` without a `group_by` as well. Columns not referenced are dropped in the result.
+
+```{r}
+t %>% 
+  summarize(hp_mean = mean(hp, na.rm = TRUE), 
+                hp_sd = sd(hp, na.rm =TRUE), 
+                hp_max = max(hp, na.rm = TRUE), 
+                hp_min = min(hp, na.rm = TRUE), 
+                hp_n = n()) %>% 
+  show_query
+```
+
+A single row is returned with the output of each function.
+```{r}
+t %>% summarize(hp_mean = mean(hp, na.rm = TRUE), 
+                hp_sd = sd(hp, na.rm = TRUE), 
+                hp_max = max(hp, na.rm = TRUE), 
+                hp_min = min(hp, na.rm = TRUE), 
+                hp_n = n())
+```
+
+#### Multi-level grouping and ungroup()
+You can group on multiple column expressions by specifying them in `group_by`.
+
+```{r}
+multi <- res %>% group_by(sizes, cyl)
+multi %>% group_vars()
+```
+
+Note that calling `group_by` twice overrides the previous group.
+```{r}
+res %>%
+  group_by(sizes) %>%
+  group_by(cyl) %>%
+  group_vars()
+
+multi %>%
+  group_by(vs) %>%
+  group_vars()
+```
+
+Calling `summarize` peels off one level of the grouping. In the example below, the unnesting is done at the outermost level with the `cyl` column.
+```{r}
+unnest <- multi %>% summarize(mean_mpg = mean(mpg, na.rm = TRUE))
+unnest %>% arrange(sizes, cyl)
+```
+
+Leaving the grouping may cause unexpected results when passed to a function that does not support grouped operations. For example, `pull` may not return the results you expect. See the next section on grouped versus ungrouped operations for more details.
+
+```{r}
+unnest %>% pull(mean_mpg)
+```
+
+You can use `ungroup()` or call `summarize()` the appropriate number of times to remove the grouping.
+
+```{r}
+# get the correct mean values
+unnest %>% ungroup %>% pull(mean_mpg)
+
+# summarize further by calling sum
+ungrouped <- unnest %>% summarize(sum_of_mean_mp = sum(mean_mpg, na.rm = TRUE))
+ungrouped %>% arrange(sizes)
+```
+
+#### Grouped vs Ungrouped operations
+A grouped operation is when a verb is applied on a grouped tbl set by `group_by()`. This allows the verbs to compute per group of rows. See the Introduction to dplyr vignette (`vignette('dplyr', package = 'dplyr')`) for more details. Quoting from the Grouped operations section:
+
+Grouping affects the behavior of verbs as follows:
+
+  + grouped select() is the same as ungrouped select(), except that grouping variables are always retained.
+  
+  + grouped arrange() is the same as ungrouped; unless you set .by_group = TRUE, in which case it orders first by the grouping variables
+  
+  + mutate() and filter() are most useful in conjunction with window functions (like rank(), or min(x) == x). They are described in detail in vignette("window-functions").
+  
+  + sample_n() and sample_frac() sample the specified number/fraction of rows in each group.
+  
+  + summarise() computes the summary for each group.
+
+An important difference when using `mutate` instead of `summarize` in a grouped operation is that `mutate` leaves the result grouped. This can be useful when using window functions in `mutate`. `group_by` sets the column expressions for the PARTITION BY clause in the window specification.
+
+In the example below, `mutate` is called with window functions specifying a PARTITION BY on the `sizes` column. Notice the absence of a GROUP BY clause.
+```{r}
+res %>% mutate(mean = mean(hp, na.rm = TRUE), 
+               sd = sd(hp, na.rm = TRUE), 
+               min = min(hp, na.rm = TRUE), 
+               max = max(hp, na.rm = TRUE), 
+               count = n()) %>% 
+  show_query()
+
+res %>% mutate(mean = mean(hp, na.rm = TRUE), 
+               sd = sd(hp, na.rm = TRUE), 
+               min = min(hp, na.rm = TRUE), 
+               max = max(hp, na.rm = TRUE), 
+               count = n()) %>% arrange(row_names)
+```
+
+In contrast, using `summarize` computes the summary for each group into a single row. In the example below, `summary` is defined similarly to the `mutate` expression above except that `summarize` is used instead.
+```{r}
+summary %>% show_query()
+summary %>% arrange(sizes)
+```
+
+Since `mutate` (and the other verbs besides `summarize`) does not ungroup by a level, it is generally best practice to `ungroup()` the grouping set unless you would like to keep chaining grouped operations. Otherwise, you may get unexpected results when applying functions that do not support grouped operations.
+
+### Scoped Variants
+The scoped variants allow a programmatic way to select columns or column expressions to use in `summarize` or `group_by`. There are scoped variants for both `group_by` and `summarize`. `group_by_all`, `group_by_at`, and `group_by_if` are the `group_by` scoped variants. `summarize_all`, `summarize_at`, and `summarize_if` are the `summarize` scoped variants.
+
+The `group_by_all` scoped variant takes all columns in the input and uses them in the grouping set.
+
+```{r}
+t %>% group_by_all() %>% group_vars()
+```
+Note that Teradata has a limit of 64 columns in the grouping set.
+
+You can also group by column expressions. For example, you can use `as.integer()` to cast the `drat` and `wt` columns into the integer type before using them in the grouping set:
+```{r}
+t %>% group_by_at(vars(contains('t')), funs(as.integer)) %>% show_query
+```
+
+The `group_by_at` scoped variant uses `vars()` to specify columns that match their names. See `help(select_helpers)` for more information on the functions you can use in `vars()`. 
+
+The `funs()` function allows you to provide a list of functions to apply on columns that are specified in `vars()`. These functions are translated from R expressions into SQL.
+
+You should alias the column expressions in `funs()` to keep the original columns separate from the mutated expressions:
+```{r}
+# no alias
+t %>% group_by_at(vars(contains('t')), funs(as.integer)) %>% arrange(row_names)
+
+#aliased
+t %>% select(drat:am) %>% 
+      group_by_at(vars(contains('t')), funs(as_int = as.integer)) %>% arrange(drat, wt, qsec)
+```
+
+The `group_by_if` scoped variant uses a predicate over the columns to select which ones to use. The predicate returns TRUE or FALSE based on a subset of data from each column. 
+
+```{r}
+t %>% group_by_if(is.numeric) %>% group_vars()
+```
+
+You can provide your own predicate to `group_by_if`. The first parameter to the predicate is the column as a vector of values. The function is called on each column in the input. It should return TRUE or FALSE based on the values given.
+
+Once grouped, the `summarize` verb or it's scoped variants can be used. Next are some examples using the tbl grouped on the `sizes` column defined earlier in this section.
+
+`summarize_all` applies each function in `funs()` to all of the columns in the input. The `row_names` column is excluded since it is non-numeric.
+```{r}
+res %>% select(-row_names) %>% summarize_all(funs(mean, max, min), na.rm = TRUE) %>% arrange(sizes)
+```
+
+`summarize_at` uses the `vars()` function similarly to `group_by_at`. In this case, it applies the functions in `funs()` to each column ending in "t". Columns `drat` and `wt` are selected.
+```{r}
+res %>% summarize_at(vars(ends_with('t')), funs(mean, max, min), na.rm = TRUE) %>% arrange(sizes)
+```
+
+`summarize_if` applies a predicate to each of the columns and selects the columns where the predicate returns TRUE. In this case, the `is_whole` function is defined to select columns that are essentially integers.
+```{r}
+is_whole <- function(col){ is.numeric(col) && all(floor(col) == col) }
+res %>% summarize_if(is_whole, funs(mean, max, min), na.rm = TRUE) %>% arrange(sizes)
+```
+
+The `summarize` scoped variants can also be used without grouping. For example, you can get some summary statistics for columns in the remote tbl:
+```{r}
+res <- t %>% select(mpg:disp) %>% 
+             summarize_all(funs(
+                    mean(., na.rm = TRUE), 
+                    sd(., na.rm = TRUE),
+                    max(., na.rm = TRUE), 
+                    min(., na.rm = TRUE)))
+res
+```
+
+The `summarize` verb may output many columns. You can use `select` along with the select_helper functions to make the results more organized.
+
+```{r}
+means <- res %>% select(contains('mean'))
+means
+
+sds   <- res %>% select(dplyr::matches('sd$')) 
+sds
+
+maxs  <- res %>% select(ends_with('max'))
+maxs
+
+mins  <- res %>% select(ends_with('min'))
+mins
+```
+
+### Notes
+- `summarize_if` and `group_by_if` scoped variants apply the predicate on a subset of 100 values for each column before generating the SQL for the SELECT statement. This can prevent the column expressions from being used in the query if the predicate needs to look at more than 100 values of a column. This value is currently not adjustable.
+- `summarize` and `summarise` are aliases so you can use either spelling.
+- The maximum number of columns you can specify in the GROUP BY clause is 64.
+- Aggregates (with the exception of COUNT(*)) ignore nulls in all computations.
+- These verbs use the expression in quotes if no alias is given. Try to alias column expressions whenever possible so that column names are understandable.
+- Using an aggregate function over an empty group ( a group with 0 rows or all NA values ) returns NA as the result for that group (with the exception of `COUNT` which returns 0). This may differ from the corresponding base R function. For example `sum` in base R returns 0 on an empty group but `SUM` in Teradata returns NA.
+- Remember to `ungroup()` when using functions or verbs that do not need a grouped tbl in their input.
+- See the vignette on SQL translation for more details on mapping from R expressions to SQL.
+
+```{r, echo=FALSE, include=FALSE}
+db_drop_table(con, 'mtcars')
+db_drop_table(con, 'table1')
+db_drop_table(con, 'CO2')
+td_remove_context()
+```

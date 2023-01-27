@@ -1,0 +1,106 @@
+---
+title: "Set Operations"
+output:
+  html_document:
+    toc: true 
+    toc_depth: 3
+    number_sections: false
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Set Operations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
+library(knitr)
+```
+# Introduction to Set Operations
+The goal of this vignette is to get the user familiar with the usage of objects of class "tbl_teradata" in the following set operations provided by the dbplyr package:
+
+- `union` (equivalent to Teradata's UNION)
+- `union-all` (equivalent to Teradata's UNION-ALL)
+- `intersect` (equivalent to Teradata's INTERSECT)
+- `setdiff` (equivalent to Teradata's MINUS and EXCEPT)
+
+Each set operation has a section in this vignette. Each section can be read in isolation, except where references are made to other sections or other vignettes.
+
+#### Notes
+- dbplyr does not provide set operations equivalent to INTERSECT ALL and MINUS/EXCEPT ALL.
+
+
+```{r create_connection, echo=FALSE, include=FALSE}
+library(dplyr)
+library(dbplyr)
+library(DBI)
+library(tdplyr)
+
+# Reading Vantage cluster details from td_config.cfg
+config_file <- system.file("extdata", "td_config.cfg", package = "tdplyr")
+config_df <- read.csv(config_file, sep = ":", stringsAsFactors = FALSE, header = TRUE)
+config_list <- unlist(lapply(config_df$value, function(x) {trimws(x)}))
+
+con <- td_create_context(host = config_list[1], uid = config_list[2], pwd = config_list[3], dType = "native")
+
+```
+Once the connection is established using **td_create_context**, you can load the data 
+`mtcars` and then copy into the tables using **copy_to** and create respective objects(s) of class "tbl_teradata" using the
+following statements:
+
+```{r create_tbls, message=FALSE, warning=FALSE, results="hide"}
+first <- mtcars[1:20, ]
+second <- mtcars[10:32, ]
+
+# Copy into a remote data source
+df_first <- copy_to(con, first, name = "mtcars_first", row.names = TRUE)
+df_second <- copy_to(con, second, name = "mtcars_second", row.names = TRUE)
+```
+
+```{r Print the data using **head** function}
+# Print data.frame instead of tbl_teradata to display all rows.
+print(as.data.frame(df_first))
+
+# Print data.frame instead of tbl_teradata to display all rows.
+print(as.data.frame(df_second))
+```
+
+## Union operation
+`union` function combines two or more objects of class "tbl_teradata" into a single result tbl_teradata.
+```{r union}
+df_union <- df_first %>% union(df_second)
+
+# Print data.frame instead of tbl_teradata to display full results.
+print(as.data.frame(df_union))
+```
+
+## Union_all operation
+`union_all` function combines two or more objects of class "tbl_teradata" into a single result tbl_teradata without removing duplicate rows.
+```{r union_all}
+df_union_all <- df_first %>% union_all(df_second)
+
+# Print data.frame instead of tbl_teradata to display full results.
+print(as.data.frame(df_union_all))
+```
+
+## Intersect operation
+`intersect` function returns the data that exist in both the objects of class "tbl_teradata".
+```{r intersect}
+df_intersect <- df_first %>% intersect(df_second)
+
+# Print data.frame instead of tbl_teradata to display full results.
+print(as.data.frame(df_intersect))
+```
+
+## Setdiff operation
+`setdiff` function returns difference of two objects of class "tbl_teradata".
+```{r setdiff}
+df_setdiff <- df_first %>% setdiff(df_second)
+
+# Print data.frame instead of tbl_teradata to display full results.
+print(as.data.frame(df_setdiff))
+```

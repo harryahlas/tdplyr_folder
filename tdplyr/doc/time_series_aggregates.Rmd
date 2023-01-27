@@ -1,0 +1,954 @@
+---
+title: "Time Series Aggregates"
+output:
+  html_document:
+    toc: true 
+    toc_depth: 3
+    number_sections: false
+    theme: united
+vignette: >
+  %\VignetteIndexEntry{Time Series Aggregates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
+library(knitr)
+```
+# Introduction to Time Series Aggregates
+The Time Series(TS) aggregate functions help perform aggregate operations on time series data. The goal of this vignette is to provide introductory examples to get the user familiar with the group_by_time API and other TS aggregate functions. 
+
+Each time series aggregate function has a section in this vignette. Each section can be read in isolation, except where references are made to other sections or other vignettes. Each section also has a subsection called "Things to Note" for good practices and specific behavior to consider when using the aggregate functions with Teradata Vantage.
+```{r load_lib_create_connection, echo=FALSE, include=FALSE}
+library(dplyr)
+library(DBI)
+library(tdplyr)
+
+# Reading Vantage cluster details from td_config.cfg
+config_file <- system.file("extdata", "td_config.cfg", package = "tdplyr")
+config_df <- read.csv(config_file, sep = ":", stringsAsFactors = FALSE, header = TRUE)
+config_list <- unlist(lapply(config_df$value, function(x) {trimws(x)}))
+
+con <- td_create_context(host = config_list[1], uid = config_list[2], pwd = config_list[3], dType = "native")
+
+```
+Once the connection is established using **td_create_context**, you can load the example tables `ocean_buoys_seq`, `ocean_buoys_nonseq`, `ocean_buoys_nonpti`, `package_tracking_pti` and `package_tracking_nonpti` and create respective tibbles using the following statements:
+```{r create_tbls, message=FALSE, warning=FALSE, results="hide"}
+loadExampleData("time_series_example", "ocean_buoys_seq", "ocean_buoys_nonseq", "ocean_buoys_nonpti", "package_tracking_pti", "package_tracking_nonpti")
+# Create tbl_teradata objects.
+df_seq <- tbl(con, "ocean_buoys_seq")
+df_nonseq <- tbl(con, "ocean_buoys_nonseq")
+df_nonpti <- tbl(con, "ocean_buoys_nonpti")
+df_pack_pti <- tbl(con, "package_tracking_pti")
+df_pack_nonpti <- tbl(con, "package_tracking_nonpti")
+```
+## group_by_time API
+Every time series aggregation must be preceded with grouping by time using the API `group_by_time`. For more information on the API, one can use `help(group_by_time)` or `?group_by_time` in R console. Here, we provide different usages of `group_by_time`.
+```{r group_by_time}
+# Grouping the sequenced PTI tables based on time with timebucket duration of 30 minutes and the column 'buoyid'. Note the use of shorthand notation for timebucket duration.
+df_seq_grp <- df_seq %>% 
+  group_by_time(timebucket.duration = "30m", value.expression = "buoyid")
+
+# Grouping the non-PTI tables based on time with timebucket duration of 1 minute and filling the missing timebuckets with previous values. Note the use of formal notation for timebucket duration and timecode.column argument (mandatory for non-PTI table).
+df_nonpti_grp <- df_nonpti %>% 
+  group_by_time(timebucket.duration = "MINUTES(1)", timecode.column = "TIMECODE", fill = "PREV")
+
+# Grouping the non-PTI tables based on time with timebucket duration of 1 Calendar Year with fill = 10000 (some numeric constant)
+df_nonseq_grp <- df_nonseq %>% 
+  group_by_time(timebucket.duration = "CAL_YEARS(1)", fill = 10000)
+```
+
+## Aggregate Functions
+### Mode : ts.mode()
+The aggregate function `ts.mode` returns the mode of all values in each group. In the event of a tie between two or more values, a row per result is returned. `ts.mode` uses the argument `value.expression` to specify the column for which mode is to be computed.
+```{r mode_runnable}
+# Calculate the mode of the 'temperature' column of sequenced PTI table.
+df_seq_mode <- df_seq_grp %>% summarise(mode_temp = ts.mode(temperature))
+
+# Print the results.
+df_seq_mode %>% arrange(TIMECODE_RANGE, buoyid, mode_temp)
+
+# Calculate the mode of the 'temperature' column of non-sequenced PTI table.
+df_nonseq_mode <- df_nonseq_grp %>% summarise(mode_temp = ts.mode(temperature))
+
+# Print the results.
+df_nonseq_mode %>% arrange(TIMECODE_RANGE, mode_temp)
+
+# Calculate the mode of the 'temperature' column of non-PTI table.
+df_nonpti_mode <- df_nonpti_grp %>% summarise(mode_temp = ts.mode(temperature))
+
+# Print the results.
+df_nonpti_mode %>% arrange(TIMECODE_RANGE, mode_temp)
+```
+#### Notes
+- The data type of the column containing mode values is same as that of the column for which mode is to be computed.
+- NULLs/NAs are not included in the result computation.
+- `ts.mode` is valid only for numeric data.
+- `ts.mode` must be used with `group_by_time()`.
+- Use of `distinct` is not allowed for `ts.mode` function.
+
+### Bottom : ts.bottom()
+The aggregate function `ts.bottom` returns the smallest number.of.values in the value.expression for each group, with or without ties. `ts.bottom` uses three arguments:
+
+*   `value.expression` which specifies the column from which bottom values are to be returned.
+*   `number.of.values` which specifies the integer value representing the number of values to return.
+*   `with.ties` which specifies a flag to decide whether to run bottom function with ties or not. Default value is FALSE.
+```{r bottom_runnable}
+# Get the smallest 2 values of the 'temperature' column for each group without ties of sequenced PTI table.
+df_seq_bottom <- df_seq_grp %>% summarise(bottom_temp = ts.bottom(temperature, 2))
+
+# Print the results.
+df_seq_bottom %>% arrange(TIMECODE_RANGE, buoyid, bottom_temp)
+
+# Get the smallest 4 values of the 'temperature' column for each group with ties of non-sequenced PTI table.
+df_nonseq_bottom <- df_nonseq_grp %>% summarise(bottom_temp = ts.bottom(temperature, 4, TRUE))
+
+# Print the results.
+df_nonseq_bottom %>% arrange(TIMECODE_RANGE, bottom_temp)
+
+# Get the smallest 2 values of the 'temperature' column for each group with ties of non-PTI table.
+df_nonpti_bottom <- df_nonpti_grp %>% summarise(bottom_temp = ts.bottom(temperature, 2, TRUE))
+
+# Print the results.
+df_nonpti_bottom %>% arrange(TIMECODE_RANGE, bottom_temp)
+```
+#### Notes
+- The data type of the column containing bottom values is same as that of the column for which bottom is to be computed.
+- NULLs/NAs are not included in the result computation.
+- `ts.bottom` is valid only for numeric data.
+- `ts.bottom` must be used with `group_by_time()`.
+- `ts.bottom` with ties implies that the rows returned include the specified number of rows in the ordered set for each timebucket. It includes any rows where the sort key value is the same as the sort key value in the last row that satisfies the specified number or percentage of rows. If this clause is omitted and ties are found, the earliest value in terms of timecode is returned.
+- Use of `distinct` is not allowed for `ts.bottom` function.
+
+### Top : ts.top()
+The aggregate function `ts.top` returns the largest number.of.values in the value.expression for each group, with or without ties. `ts.top` uses three arguments:
+
+*   `value.expression` which specifies the column from which top values are to be returned.
+*   `number.of.values` which specifies the integer value representing the number of values to return.
+*   `with.ties` which specifies a flag to decide whether to run top function with ties or not. Default value is FALSE.
+```{r top_runnable}
+# Get the largest 2 values of the 'temperature' column for each group without ties of sequenced PTI table.
+df_seq_top <- df_seq_grp %>% summarise(top_temp = ts.top(temperature, 2))
+
+# Print the results.
+df_seq_top %>% arrange(TIMECODE_RANGE, buoyid, top_temp)
+
+# Get the largest 4 values of the 'temperature' column for each group with ties of non-sequenced PTI table.
+df_nonseq_top <- df_nonseq_grp %>% summarise(top_temp = ts.top(temperature, 4, TRUE))
+
+# Print the results.
+df_nonseq_top %>% arrange(TIMECODE_RANGE, top_temp)
+
+# Get the largest 2 values of the 'temperature' column for each group with ties of non-PTI table.
+df_nonpti_top <- df_nonpti_grp %>% summarise(top_temp = ts.top(temperature, 2, TRUE))
+
+# Print the results.
+df_nonpti_top %>% arrange(TIMECODE_RANGE, top_temp)
+```
+#### Notes
+- The data type of the column containing top values is same as that of the column for which top is to be computed.
+- NULLs/NAs are not included in the result computation.
+- `ts.top` is valid only for numeric data.
+- `ts.top` must be used with `group_by_time()`.
+- `ts.top` with ties implies that the rows returned include the specified number of rows in the ordered set for each timebucket. It includes any rows where the sort key value is the same as the sort key value in the last row that satisfies the specified number or percentage of rows. If this clause is omitted and ties are found, the earliest value in terms of timecode is returned.
+- Use of `distinct` is not allowed for `ts.top` function.
+
+### Median : ts.median()
+The aggregate function `ts.median` returns the median of all values in each group. The function returns the average of the two middle values if the argument `value.expression` contains an even number of values. `ts.median` uses two arguments:
+
+*   `value.expression` specifies the column for which median is to be computed.
+*   `use.distinct` specifies whether to exclude duplicates specified by value.expression from the computation. Default value is FALSE. By default, all non-null values in the column specified in value.expression, including duplicates, are considered in the computation. If `use.distinct = TRUE`, then all duplicate values are excluded in the computation.
+```{r median_runnable}
+# Calculate the median of the 'temperature' column of sequenced PTI table.
+df_seq_median <- df_seq_grp %>% summarise(median_temp = ts.median(temperature))
+
+# Print the results.
+df_seq_median %>% arrange(TIMECODE_RANGE, buoyid, median_temp)
+
+# Calculate the median of the 'temperature' column of non-sequenced PTI table, excluding the duplicates in the computation.
+df_nonseq_median <- df_nonseq_grp %>% summarise(median_temp = ts.median(temperature, TRUE))
+
+# Another way of excluding duplicates for median.
+df_nonseq_median <- df_nonseq_grp %>% summarise(median_temp = ts.median(distinct(temperature)))
+
+# Print the results.
+df_nonseq_median %>% arrange(TIMECODE_RANGE, median_temp)
+
+# Calculate the median of the 'temperature' column of non-PTI table.
+df_nonpti_median <- df_nonpti_grp %>% summarise(median_temp = ts.median(temperature))
+
+# Print the results.
+df_nonpti_median %>% arrange(TIMECODE_RANGE, median_temp)
+```
+#### Notes
+- The column containing median values is of NUMERIC data type.
+- NULLs/NAs are not included in the result computation.
+- `ts.median` is valid only for numeric data.
+- The use of `use.distinct = TRUE` is valid only when the function `ts.median` is used with `group_by_time`. The function `ts.median` can be used as regular aggregate operation only when the argument `use.distinct` takes `FALSE`. Otherwise, an error is thrown. However, Teradata recommends to strictly use `ts.median` function only for time series aggregate operations.
+- The function `ts.median` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+```{r median_not_runnable, eval=FALSE}
+# Incorrect usage of ts.median() with mutate and filter
+df_median <- df_seq %>% mutate(median_t = ts.median(temperature))
+df_median <- df_seq %>% filter(temperature <= ts.median(temperature))
+```
+
+### First : ts.first()
+The aggregate function `ts.first` returns the oldest value, determined by timecode, for each group. In the event of a tie, such as simultaneous timecode values for a particular group, all tied results are returned. If a sequence number is present with the data, it can break a tie, assuming it is unique across identical timecode values. `ts.first` uses the argument `value.expression` to specify the column for which oldest value of the group is to be returned.
+```{r first_runnable}
+# Get the oldest value of the 'temperature' column of sequenced PTI table.
+df_seq_first <- df_seq_grp %>% summarise(first_temp = ts.first(temperature))
+
+# Print the results.
+df_seq_first %>% arrange(TIMECODE_RANGE, buoyid, first_temp)
+
+# Get the oldest value of the 'temperature' column of non-sequenced PTI table.
+df_nonseq_first <- df_nonseq_grp %>% summarise(first_temp = ts.first(temperature))
+
+# Print the results.
+df_nonseq_first %>% arrange(TIMECODE_RANGE, first_temp)
+
+# Get the oldest value of the 'temperature' column of non-PTI table.
+df_nonpti_first <- df_nonpti_grp %>% summarise(first_temp = ts.first(temperature))
+
+# Print the results.
+df_nonpti_first %>% arrange(TIMECODE_RANGE, first_temp)
+```
+#### Notes
+- The data type of the column containing oldest values is same as that of the column for which oldest value of the group is to be returned.
+- NULLs/NAs are not included in the result computation.
+- `ts.first` is valid only for numeric data.
+- `ts.first` must be used with `group_by_time()`.
+- Use of `distinct` is not allowed for `ts.first` function.
+
+### Last : ts.last()
+The aggregate function `ts.last` returns the newest value, determined by timecode, for each group. In the event of a tie, such as simultaneous timecode values for a particular group, all tied results are returned. If a sequence number is present with the data, it can break a tie, assuming it is unique across identical timecode values. `ts.last` uses the argument `value.expression` to specify the column for which newest value of the group is to be returned.
+```{r last_runnable}
+# Get the newest value of the 'temperature' column of sequenced PTI table.
+df_seq_last <- df_seq_grp %>% summarise(last_temp = ts.last(temperature))
+
+# Print the results.
+df_seq_last %>% arrange(TIMECODE_RANGE, buoyid, last_temp)
+
+# Get the newest value of the 'temperature' column of non-sequenced PTI table.
+df_nonseq_last <- df_nonseq_grp %>% summarise(last_temp = ts.last(temperature))
+
+# Print the results.
+df_nonseq_last %>% arrange(TIMECODE_RANGE, last_temp)
+
+# Get the newest value of the 'temperature' column of non-PTI table.
+df_nonpti_last <- df_nonpti_grp %>% summarise(last_temp = ts.last(temperature))
+
+# Print the results.
+df_nonpti_last %>% arrange(TIMECODE_RANGE, last_temp)
+```
+#### Notes
+- The data type of the column containing newest values is same as that of the column for which newest value of the group is to be returned.
+- NULLs/NAs are not included in the result computation.
+- `ts.last` is valid only for numeric data.
+- Use of `distinct` is not allowed for `ts.last` function.
+- `ts.last` must be used with `group_by_time()`. When `ts.last()` is used with `group_by` but not `group_by_time`, `ts.last()` throws different exceptions because LAST is also a function which can operate on Period data types, unlike `ts.first()` which throws an exception "Time Series Aggregate function invoked without an appropriate GROUP BY TIME clause". The following are such invalid use cases of `ts.last()` function:
+```{r last_not_runnable, eval = FALSE}
+# Invalid example 1: Using ts.last() on `group_by` with aggregate column not as grouping column.
+df1 <- df_seq %>% group_by(buoyid) %>% summarise(temp = ts.last(temperature))
+
+# Note that this will not print the result but throws an exception - "Selected non-aggregate values must be part of the associated group.". This is because the aggregate operation "LAST" (considered here) is the Period data type function.
+df1
+
+# Invalid example 2: Using ts.last() on `group_by` with aggregate column as one of the grouping columns.
+df2 <- df %>% group_by(buoyid, temperature) %>% summarise(temp = ts.last(temperature))
+
+# Note that this will not print the result but throws an exception - "Invalid argument for the LAST function. The argument must have a Period data type.". This is because the aggregate operation "LAST" (considered here) is the Period data type function.
+df2
+```
+
+### Median Absolute Deviation : ts.mad()
+The aggregate function `ts.mad` returns the median of the set of values defined as the absolute value of the difference between each value and the median of all values in each group. `ts.mad` uses two arguments:
+
+*   `value.expression` which specifies the column from which top values are to be returned.
+*   `multiplier` which specifies a literal numeric constant. If this argument is NULL, default multipler 1.4826 is used for MAD computation.
+
+Formula for computing MAD is as follows:
+
+    MAD = b * Mi(|Xi - Mj(Xj)|)
+    
+    Where,
+      b       = A numeric constant. Default value is 1.4826.
+      Mj(Xj)  = Median of the original set of values.
+      Xi      = The original set of values.
+      Mi      = Median of absolute value of the difference between each value in Xi and the Median calculated in Mj(Xj).
+        
+```{r mad_runnable}
+# Calculate the MAD value of the 'temperature' column of sequenced PTI table.
+df_seq_mad <- df_seq_grp %>% summarise(mad_temp = ts.mad(temperature))
+
+# Print the results.
+df_seq_mad %>% arrange(TIMECODE_RANGE, buoyid, mad_temp)
+
+# Calculate the MAD value of the 'temperature' column of non-sequenced PTI table.
+df_nonseq_mad <- df_nonseq_grp %>% summarise(mad_temp = ts.mad(temperature, 2))
+
+# Print the results.
+df_nonseq_mad %>% arrange(TIMECODE_RANGE, mad_temp)
+
+# Calculate the MAD value of the 'temperature' column of non-PTI table.
+df_nonpti_mad <- df_nonpti_grp %>% summarise(mad_temp = ts.mad(temperature, 5))
+
+# Print the results.
+df_nonpti_mad %>% arrange(TIMECODE_RANGE, mad_temp)
+```
+#### Notes
+- The column containing MAD values is of NUMERIC data type.
+- NULLs/NAs are not included in the result computation.
+- `ts.mad` is valid only for numeric data.
+- `ts.mad` must be used with `group_by_time()`.
+- Use of `distinct` is not allowed for `ts.mad` function.
+
+### Percentile : ts.percentile()
+The aggregate function `ts.percentile` returns the value which represents the desired percentile from each group. `ts.percentile` uses three arguments:
+
+*   `value.expression` specifies the column for which percentile value is to be computed.
+*   `percentile` specifies the float value that represents the desired percentile.
+*   `interpolation.type` specifies the type of interpolation to interpolate the result value when the desired result lies between two data points. Permitted values are LINEAR, LOW, HIGH, NEAREST and MIDPOINT.
+
+The result value is determined by the desired index (`di`) in an ordered list of values. The following equation is for the `di`:
+
+    di = (number of values in group - 1) * percentile/100
+    
+When `di` is a whole number, that value is the returned result. The `di` can also be between two data points, `i` and `j`, where `i < j`. In this case, the result is interpolated according to one of the following schemes:
+
+*   Linear interpolation: When the argument `interpolation.type` is set to LINEAR, the result value is computed using the equation `result = i + (j - i) * (di/100) MOD 1`.
+*   Low value interpolation: When the argument `interpolation.type` is set to LOW, the result value is equal to `i`.
+*   High value interpolation: When the argument `interpolation.type` is set to HIGH, the result value is equal to `j`.
+*   Nearest value interpolation: When the argument `interpolation.type` is set to NEAREST, the result value is `i` if `(di / 100) MOD 1 <= 0.5`; Otherwise, it is `j`.
+*   Midpoint value interpolation: When the argument `interpolation.type` is set to MIDPOINT, the result value is equal to `(i + j) / 2`.
+
+Use `percentile(distinct(column_name), ...)` to exclude duplicate rows while calculating percentile values.
+
+```{r percentile_runnable}
+# Calculate the 25th percentile of the 'temperature' column of sequenced PTI table. When the desired result value lies between two data points, linear interpolation is used as it is the default interpolation scheme.
+df_seq_percentile <- df_seq_grp %>% summarise(percent_temp = ts.percentile(temperature, 25))
+
+# Print the results.
+df_seq_percentile %>% arrange(TIMECODE_RANGE, buoyid, percent_temp)
+
+# Calculate the 50th percentile of the 'temperature' column of non-sequenced PTI table. When the desired result value lies between two data points, nearest value interpolation is used.
+df_nonseq_percentile <- df_nonseq_grp %>% summarise(percent_temp = ts.percentile(temperature, 50, "NEAREST"))
+
+# Print the results.
+df_nonseq_percentile %>% arrange(TIMECODE_RANGE, percent_temp)
+
+# Calculate the 75th percentile of the distinct values in the 'temperature' column of non-PTI table. When the desired result value lies between two data points, low value interpolation is used.
+df_nonpti_percentile <- df_nonpti_grp %>% summarise(percent_temp = ts.percentile(distinct(temperature), 75, "LOW"))
+
+# Print the results.
+df_nonpti_percentile %>% arrange(TIMECODE_RANGE, percent_temp)
+```
+#### Notes
+- The column containing percentile values is of NUMERIC data type.
+- NULLs/NAs are not included in the result computation.
+- `ts.percentile` is valid only for numeric data.
+- `ts.percentile` must be used with `group_by_time()`.
+
+### Delta_t : ts.delta_t()
+The aggregate function `ts.delta_t` calculates the time difference, or DELTA_T, between a starting and an ending event. The calculation is performed against a time-ordered time series data set. `ts.delta_t` uses two arguments:
+
+*   `start.condition` specifies any supported filtering condition that defines the start of the time period for which you are searching.
+*   `end.condition` specifies any supported filtering condition that defines the end of the time period for which you are searching.
+```{r delta_t_runnable}
+# Example 1: Measures the time between minimum and maximum observed temperatures every 30 minutes between 8:00 AM and 10:30 AM on each buoy of a nonsequenced PTI table.
+
+# Filter the data and grab all rows between timestamp '2014-01-06 08:00:00' and '2014-01-06 10:30:00'.
+df_filter <- df_nonseq %>% filter(TD_TIMECODE >= "2014-01-06 08:00:00" && TD_TIMECODE < "2014-01-06 10:30:00")
+
+# Get the minimum and maximum temperature within time range of 30 minutes.
+df_min_max_temp <- df_filter %>% group_by_time("30m", value.expression = "buoyid", timecode.column = "TD_TIMECODE") %>% 
+                                 summarise(min_t = min(temperature, na.rm = TRUE), max_t = max(temperature, na.rm = TRUE))
+
+# Join the tbl_teradata 'df_min_max_temp' with original tbl_teradata 'df_nonseq'.
+df_join <- inner_join(df_nonseq, df_min_max_temp, by = "buoyid")
+
+# Execute 'ts.delta_t' after grouping the joined tbl_teradata into time buckets of 1 day.
+df_grp1 <- df_join %>% group_by_time(timebucket.duration = "DAYS(1)", value.expression = "buoyid", timecode.column = "TD_TIMECODE")
+df_out <- df_grp1 %>% summarise(delta_val = ts.delta_t(temperature == min_t, temperature == max_t))
+
+# Print the results.
+df_out %>% arrange(TIMECODE_RANGE, buoyid)
+
+# Using strings to arguments 'start.condition' and 'end.condition'. This will give the same output as that of 'df_out'.
+df_out1 <- df_grp1 %>% summarise(delta_val = ts.delta_t(start.condition = "temperature = min_t", end.condition = "temperature = max_t"))
+
+# Print the results.
+df_out1 %>% arrange(TIMECODE_RANGE, buoyid)
+
+# Example 2: Finding Time Elapsed between Shipping and Receiving an Item. Input data used for this example contains information about parcels sent by a delivery service.
+
+# Case 1: Using tbl_teradata on PTI Table and showcasing usage of unbounded time in grouping.
+
+# Execute group_by_time() using unbounded time for timebucket.duration.
+df_grp <- df_pack_pti %>% group_by_time(timebucket.duration = "*", value.expression = "parcel_number")
+
+# Execute 'ts.delta_t', with start and end conditions specified as strings.
+df_out <- df_grp %>% summarise(delta_t = ts.delta_t("Status LIKE 'picked%up%customer'", "Status LIKE 'delivered%customer'"))
+
+# Print the results.
+df_out %>% arrange(TIMECODE_RANGE, parcel_number)
+
+# Case 2: Using tbl_teradata on Non-PTI Table and showcasing usage of unbounded time in grouping.
+
+# Execute group_by_time() using unbounded time for timebucket.duration.
+df_grp <- df_pack_nonpti %>% group_by_time(timebucket.duration = "*", value.expression = "parcel_number", timecode.column = "clock_time")
+
+# Execute 'ts.delta_t', with start and end conditions specified as strings.
+df_out <- df_grp %>% summarise(delta_t = ts.delta_t("Status LIKE 'picked%up%customer'", "Status LIKE 'delivered%customer'"))
+
+# Print the results.
+df_out %>% arrange(TIMECODE_RANGE, parcel_number)
+```
+#### Notes
+- This is the only Time Series Aggregate function that works with timebucket_duration as "*" in `group_by_time()`, i.e., unbounded time.
+- When using `group_by_time()` with unbounded time, the following rules apply to the system virtual columns:
+  - `$TD_GROUP_BY_TIME`: Always has a value of 1, since there is only one timebucket.
+  - `$TD_TIMECODE_RANGE`: Composed of the first and last timecode values read for the group.
+- The `ts.delta_t` function cannot be combined with any other functions.
+- The data being evaluated in the filtering conditions (for example, the minimum and maximum temperature observations) must belong to the timecode value present in the same row of data. This is the expected behavior. However, this assumption can be violated when joining multiple tables together. It is possible to construct a query where the result of a join causes specific data points (for example, a temperature reading) to be present in a data row with a timecode that is not indicative of when that data point occurred. In such a scenario, it is highly likely that the results are not as expected, or are misleading. Vantage does not detect these types of queries, so one must make sure to preserve the correlation between data points and timecodes.
+- Function returns a column of PERIOD(TIMESTAMP WITH TIME ZONE) type (SQL datatype) composed of the start and end timecode, i.e., timecode column used for aggregation of each start-end pair.
+- One result is returned per complete start-end pair found within the GROUP BY TIME window. The start-end pair process is as follows:
+  - If the current source data meets the start condition, the current timecode is saved as the start time.
+  - If the current source data meets the end condition, and a saved start timecode already exists, the start timecode is saved with the end timecode encountered as a result pair.
+- The processing algorithm implies that multiple results may be found in each group.
+- If no start-end pair is encountered, no result row is returned.
+- Any result of `ts.delta_t` which has a delta less than 1 microsecond (including a delta of 0, in the case of a result which comes from a single point in time) is automatically rounded to 1 microsecond. This is strictly enforced to match Period data type semantics in Vantage which dictate that a starting and ending bound of a Period type may not be equivalent. The smallest granularity supported in Vantage is the microsecond, so these results are rounded accordingly.
+- `ts.delta_t` must be used with `group_by_time()`.
+
+### Kurtosis : ts.kurtosis()
+The aggregate function `ts.kurtosis` measures the tailedness of the probability distribution of a column in each group. Kurtosis is the fourth moment of the distribution of the standardized (z) values. It is a measure of the outlier (rare, extreme observation) character of the distribution as compared to the normal (Gaussian) distribution.
+
+*   The normal distribution has a kurtosis of 0.
+*   Positive kurtosis indicates that the distribution is more outlier-prone (deviation from the mean) than the normal distribution.
+*   Negative kurtosis indicates that the distribution is less outlier-prone (deviation from the mean) than the normal distribution.
+
+`ts.kurtosis` uses the argument `value.expression` to specify the column for which kurtosis is to be computed. Use `ts.kurtosis(distinct(column_name))` to exclude duplicate rows while calculating kurtosis values.
+
+```{r kurtosis_runnable}
+# Calculate the Kurtosis of the 'temperature' column of sequenced PTI table.
+df_seq_kurtosis <- df_seq_grp %>% summarise(kurtosis_temp = ts.kurtosis(temperature))
+
+# Print the results.
+df_seq_kurtosis %>% arrange(TIMECODE_RANGE, buoyid, kurtosis_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_kurtosis <- df_seq_grp %>% summarise(kurtosis_temp = ts.kurtosis(distinct(temperature)))
+
+# Print the results.
+df_seq_kurtosis %>% arrange(TIMECODE_RANGE, buoyid, kurtosis_temp)
+
+# Calculate the Kurtosis of the 'temperature' column of non-sequenced PTI table.
+df_nonseq_kurtosis <- df_nonseq_grp %>% summarise(kurtosis_temp = ts.kurtosis(temperature))
+
+# Print the results.
+df_nonseq_kurtosis %>% arrange(TIMECODE_RANGE, kurtosis_temp)
+
+# Calculate the Kurtosis of the 'temperature' column of non-PTI table.
+df_nonpti_kurtosis <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(kurtosis_temp = ts.kurtosis(temperature))
+
+# Print the results.
+df_nonpti_kurtosis %>% arrange(TIMECODE_RANGE, kurtosis_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.kurtosis` for time series aggregate operations, instead of regular aggregate function `kurtosis`.
+- Following conditions will produce NULL result:
+  - Fewer than three non-NULL data points in the data used for the computation.
+  - Standard deviation for a column is equal to 0.
+- `ts.kurtosis` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+```{r kurtosis_not_runnable, eval=FALSE}
+# Incorrect usage of ts.kurtosis() with mutate and filter.
+df_kurtosis <- df_seq %>% mutate(kurtosis_t = ts.kurtosis(temperature))
+df_kurtosis <- df_seq %>% filter(temperature <= ts.kurtosis(temperature))
+```
+
+### Skew : ts.skew()
+The aggregate function `ts.skew` measures the skewness of the distribution of a column. Skewness is the third moment of a distribution. It is a measure of the asymmetry of the distribution about its mean compared to the normal (Gaussian) distribution.
+
+*   The normal distribution has a skewness of 0.
+*   Positive skewness indicates the distribution having an asymmetric tail extending toward more positive values.
+*   Negative skewness indicates the distribution having an asymmetric tail extending toward more negative values.
+
+`ts.skew` uses the argument `value.expression` to specify the column for which skew is to be computed. Use `ts.skew(distinct(column_name))` to exclude duplicate rows while calculating skew values.
+
+```{r skew_runnable}
+# Calculate the skewness of the 'temperature' column of sequenced PTI table.
+df_seq_skew <- df_seq_grp %>% summarise(skew_temp = ts.skew(temperature))
+
+# Print the results.
+df_seq_skew %>% arrange(TIMECODE_RANGE, buoyid, skew_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_skew <- df_seq_grp %>% summarise(skew_temp = ts.skew(distinct(temperature)))
+
+# Print the results.
+df_seq_skew %>% arrange(TIMECODE_RANGE, buoyid, skew_temp)
+
+# Calculate the skewness of the 'temperature' column of non-sequenced PTI table.
+df_nonseq_skew <- df_nonseq_grp %>% summarise(skew_temp = ts.skew(temperature))
+
+# Print the results.
+df_nonseq_skew %>% arrange(TIMECODE_RANGE, skew_temp)
+
+# Calculate the skewness of the 'temperature' column of non-PTI table.
+df_nonpti_skew <- df_nonpti_grp %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(skew_temp = ts.skew(temperature))
+
+# Print the results.
+df_nonpti_skew %>% arrange(TIMECODE_RANGE, skew_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- - Teradata recommends to strictly use `ts.skew` for time series aggregate operations, instead of regular aggregate function `skew`.
+- Following conditions will produce NULL result:
+  - Fewer than three non-NULLl data points in the data used for the computation.
+  - Standard deviation for a column is equal to 0.
+- `ts.skew` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+```{r skew_not_runnable, eval=FALSE}
+# Incorrect usage of ts.skew() with mutate and filter.
+df_skew <- df_seq %>% mutate(skew_t = ts.skew(temperature))
+df_skew <- df_seq %>% filter(temperature <= ts.skew(temperature))
+```
+
+### Sum : ts.sum()
+The aggregate function `ts.sum` returns the sum of values in the column grouped by time. `ts.sum` uses the argument `value.expression` to specify the column for which sum is to be computed. Use `ts.sum(distinct(column_name))` to exclude duplicate rows while calculating sum.
+
+```{r sum_runnable}
+# Calculate the sum of the values in the 'temperature' column of sequenced PTI table.
+df_seq_sum <- df_seq_grp %>% summarise(sum_temp = ts.sum(temperature))
+
+# Print the results.
+df_seq_sum %>% arrange(TIMECODE_RANGE, buoyid, sum_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_sum <- df_seq_grp %>% summarise(sum_temp = ts.sum(distinct(temperature)))
+
+# Print the results.
+df_seq_sum %>% arrange(TIMECODE_RANGE, buoyid, sum_temp)
+
+# Calculate the sum of the values in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_sum <- df_nonseq_grp %>% summarise(sum_temp = ts.sum(temperature))
+
+# Print the results.
+df_nonseq_sum %>% arrange(TIMECODE_RANGE, sum_temp)
+
+# Calculate the sum of the values in the 'temperature' column of non-PTI table.
+df_nonpti_sum <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(sum_temp = ts.sum(temperature))
+
+# Print the results.
+df_nonpti_sum %>% arrange(TIMECODE_RANGE, sum_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.sum` for time series aggregate operations, instead of regular aggregate function `sum`.
+- `ts.sum` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r sum_not_runnable, eval=FALSE}
+# Incorrect usage of ts.sum() with mutate and filter.
+df_sum <- df_seq %>% mutate(sum_t = ts.sum(temperature))
+df_sum <- df_seq %>% filter(temperature <= ts.sum(temperature))
+```
+
+### Sample Standard Deviation : ts.sd()
+The aggregate function `ts.sd` returns the sample standard deviation of values of the column grouped by time. The standard deviation is the second moment of a distribution. `ts.sd` uses the argument `value.expression` to specify the column for which sample standard deviation is to be computed. Use `ts.sd(distinct(column_name))` to exclude duplicate rows while calculating sample standard deviation.
+
+```{r stddev_samp_runnable}
+# Calculate the sample standard deviation in the 'temperature' column of sequenced PTI table.
+df_seq_sd <- df_seq_grp %>% summarise(sd_temp = ts.sd(temperature))
+
+# Print the results.
+df_seq_sd %>% arrange(TIMECODE_RANGE, buoyid, sd_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_sd <- df_seq_grp %>% summarise(sd_temp = ts.sd(distinct(temperature)))
+
+# Print the results.
+df_seq_sd %>% arrange(TIMECODE_RANGE, buoyid, sd_temp)
+
+# Calculate the sample standard deviation in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_sd <- df_nonseq_grp %>% summarise(sd_temp = ts.sd(temperature))
+
+# Print the results.
+df_nonseq_sd %>% arrange(TIMECODE_RANGE, sd_temp)
+
+# Calculate the sample standard deviation in the 'temperature' column of non-PTI table.
+df_nonpti_sd <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(sd_temp = ts.sd(temperature))
+
+# Print the results.
+df_nonpti_sd %>% arrange(TIMECODE_RANGE, sd_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.sd` for time series aggregate operations, instead of regular aggregate function `sd`.
+- When there are fewer than two non-NULL data points in the sample used for the computation, `ts.sd` returns NULL/NA.
+- Division by zero results in NULL/NA value rather than an error.
+- If data represents only a sample of the entire population for the column, Teradata recommends to use `ts.sd` to calculate sample standard deviation instead of `ts.sdp` which calculates population standard deviation. As the sample size increases, the values for `ts.sd` and `ts.sdp` approach the same number.
+- `ts.sd` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r stddev_samp_not_runnable, eval=FALSE}
+# Incorrect usage of ts.sd() with mutate and filter.
+df_sd <- df_seq %>% mutate(sd_t = ts.sd(temperature))
+df_sd <- df_seq %>% filter(temperature <= ts.sd(temperature))
+```
+
+### Population Standard Deviation : ts.sdp()
+The aggregate function `ts.sdp` returns the population standard deviation of values of the column grouped by time. The standard deviation is the second moment of a distribution. `ts.sdp` uses the argument `value.expression` to specify the column for which population standard deviation is to be computed. Use `ts.sdp(distinct(column_name))` to exclude duplicate rows while calculating population standard deviation.
+
+```{r stddev_pop_runnable}
+# Calculate the population standard deviation in the 'temperature' column of sequenced PTI table.
+df_seq_sdp <- df_seq_grp %>% summarise(sdp_temp = ts.sdp(temperature))
+
+# Print the results.
+df_seq_sdp %>% arrange(TIMECODE_RANGE, buoyid, sdp_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_sdp <- df_seq_grp %>% summarise(sdp_temp = ts.sdp(distinct(temperature)))
+
+# Print the results.
+df_seq_sdp %>% arrange(TIMECODE_RANGE, buoyid, sdp_temp)
+
+# Calculate the population standard deviation in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_sdp <- df_nonseq_grp %>% summarise(sdp_temp = ts.sdp(temperature))
+
+# Print the results.
+df_nonseq_sdp %>% arrange(TIMECODE_RANGE, sdp_temp)
+
+# Calculate the population standard deviation in the 'temperature' column of non-PTI table.
+df_nonpti_sdp <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(sdp_temp = ts.sdp(temperature))
+
+# Print the results.
+df_nonpti_sdp %>% arrange(TIMECODE_RANGE, sdp_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.sdp` for time series aggregate operations, instead of regular aggregate function `sdp`.
+- When there are fewer than two non-NULL data points in the population used for the computation, `ts.sdp` returns NULL/NA.
+- Division by zero results in NULL/NA value rather than an error.
+- `ts.sdp` can only be used if data represents entire population. Otherwise, Teradata recommends to use `ts.sd` to calculate sample standard deviation.
+- `ts.sdp` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r stddev_pop_not_runnable, eval=FALSE}
+# Incorrect usage of ts.sdp() with mutate and filter.
+df_sdp <- df_seq %>% mutate(sdp_t = ts.sdp(temperature))
+df_sdp <- df_seq %>% filter(temperature <= ts.sdp(temperature))
+```
+
+### Minimum : ts.min()
+The aggregate function `ts.min` returns the minimum value in the column grouped by time. `ts.min` uses the argument `value.expression` to specify the column for which minimum value is to be computed. Use `ts.min(distinct(column_name))` to exclude duplicate rows while calculating minimum value.
+
+```{r min_runnable}
+# Calculate the minimum value in the 'temperature' column of sequenced PTI table.
+df_seq_min <- df_seq_grp %>% summarise(min_temp = ts.min(temperature))
+
+# Print the results.
+df_seq_min %>% arrange(TIMECODE_RANGE, buoyid, min_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_min <- df_seq_grp %>% summarise(min_temp = ts.min(distinct(temperature)))
+
+# Print the results.
+df_seq_min %>% arrange(TIMECODE_RANGE, buoyid, min_temp)
+
+# Calculate the minimum value in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_min <- df_nonseq_grp %>% summarise(min_temp = ts.min(temperature))
+
+# Print the results.
+df_nonseq_min %>% arrange(TIMECODE_RANGE, min_temp)
+
+# Calculate the minimum value in the 'temperature' column of non-PTI table.
+df_nonpti_min <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(min_temp = ts.min(temperature))
+
+# Print the results.
+df_nonpti_min %>% arrange(TIMECODE_RANGE, min_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.min` for time series aggregate operations, instead of regular aggregate function `min`.
+- `ts.min` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r min_not_runnable, eval=FALSE}
+# Incorrect usage of ts.min() with mutate and filter.
+df_min <- df_seq %>% mutate(min_t = ts.min(temperature))
+df_min <- df_seq %>% filter(temperature <= ts.min(temperature))
+```
+
+### Maximum : ts.max()
+The aggregate function `ts.max` returns the maximum value in the column grouped by time. `ts.max` uses the argument `value.expression` to specify the column for which maximum value is to be computed. Use `ts.max(distinct(column_name))` to exclude duplicate rows while calculating maximum value.
+```{r max_runnable}
+# Calculate the maximum value in the 'temperature' column of sequenced PTI table.
+df_seq_max <- df_seq_grp %>% summarise(max_temp = ts.max(temperature))
+
+# Print the results.
+df_seq_max %>% arrange(TIMECODE_RANGE, buoyid, max_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_max <- df_seq_grp %>% summarise(max_temp = ts.max(distinct(temperature)))
+
+# Print the results.
+df_seq_max %>% arrange(TIMECODE_RANGE, buoyid, max_temp)
+
+# Calculate the maximum value in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_max <- df_nonseq_grp %>% summarise(max_temp = ts.max(temperature))
+
+# Print the results.
+df_nonseq_max %>% arrange(TIMECODE_RANGE, max_temp)
+
+# Calculate the maximum value in the 'temperature' column of non-PTI table.
+df_nonpti_max <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(max_temp = ts.max(temperature))
+
+# Print the results.
+df_nonpti_max %>% arrange(TIMECODE_RANGE, max_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.max` for time series aggregate operations, instead of regular aggregate function `max`.
+- `ts.max` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+```{r max_not_runnable, eval=FALSE}
+# Incorrect usage of ts.max() with mutate and filter.
+df_max <- df_seq %>% mutate(max_t = ts.max(temperature))
+df_max <- df_seq %>% filter(temperature <= ts.max(temperature))
+```
+
+### Sample Variance : ts.var()
+The aggregate function `ts.var` returns the sample variance of values of the column grouped by time. The variance of a sample is a measure of dispersion from the mean of that sample. It is the square of the sample standard deviation. `ts.var` uses the argument `value.expression` to specify the column for which sample variance is to be computed. Use `ts.var(distinct(column_name))` to exclude duplicate rows while calculating sample variance.
+
+```{r var_samp_runnable}
+# Calculate the sample variance of values in the 'temperature' column of sequenced PTI table.
+df_seq_var <- df_seq_grp %>% summarise(var_temp = ts.var(temperature))
+
+# Print the results.
+df_seq_var %>% arrange(TIMECODE_RANGE, buoyid, var_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_var <- df_seq_grp %>% summarise(var_temp = ts.var(distinct(temperature)))
+
+# Print the results.
+df_seq_var %>% arrange(TIMECODE_RANGE, buoyid, var_temp)
+
+# Calculate the sample variance of values in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_var <- df_nonseq_grp %>% summarise(var_temp = ts.var(temperature))
+
+# Print the results.
+df_nonseq_var %>% arrange(TIMECODE_RANGE, var_temp)
+
+# Calculate the sample variance of values in the 'temperature' column of non-PTI table.
+df_nonpti_var <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(var_temp = ts.var(temperature))
+
+# Print the results.
+df_nonpti_var %>% arrange(TIMECODE_RANGE, var_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.var` for time series aggregate operations, instead of regular aggregate function `var`.
+- When there are fewer than two non-NULL data points in the sample used for the computation, `ts.var` returns NULL/NA.
+- Division by zero results in NULL/NA value rather than an error.
+- If data represents only a sample of the entire population for the column, Teradata recommends to use `ts.var` to calculate sample variance instead of `ts.varp` which calculates population variance. As the sample size increases, the values for `ts.var` and `ts.varp` approach the same number.
+- `ts.var` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r var_samp_not_runnable, eval=FALSE}
+# Incorrect usage of ts.var() with mutate and filter.
+df_var <- df_seq %>% mutate(var_t = ts.var(temperature))
+df_var <- df_seq %>% filter(temperature <= ts.var(temperature))
+```
+
+### Population Variance : ts.varp()
+The aggregate function `ts.varp` returns the population variance of values of the column grouped by time. The variance of a population is a measure of dispersion from the mean of that population. `ts.varp` uses the argument `value.expression` to specify the column for which population variance is to be computed. Use `ts.varp(distinct(column_name))` to exclude duplicate rows while calculating population variance.
+
+```{r var_pop_runnable}
+# Calculate the population variance of values in the 'temperature' column of sequenced PTI table.
+df_seq_varp <- df_seq_grp %>% summarise(varp_temp = ts.varp(temperature))
+
+# Print the results.
+df_seq_varp %>% arrange(TIMECODE_RANGE, buoyid, varp_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_varp <- df_seq_grp %>% summarise(varp_temp = ts.varp(distinct(temperature)))
+
+# Print the results.
+df_seq_varp %>% arrange(TIMECODE_RANGE, buoyid, varp_temp)
+
+# Calculate the population variance of values in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_varp <- df_nonseq_grp %>% summarise(varp_temp = ts.varp(temperature))
+
+# Print the results.
+df_nonseq_varp %>% arrange(TIMECODE_RANGE, varp_temp)
+
+# Calculate the population variance of values in the 'temperature' column of non-PTI table.
+df_nonpti_varp <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(varp_temp = ts.varp(temperature))
+
+# Print the results.
+df_nonpti_varp %>% arrange(TIMECODE_RANGE, varp_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.varp` for time series aggregate operations, instead of regular aggregate function `varp`.
+- When there are fewer than two non-NULL data points in the population used for the computation, `ts.varp` returns NULL/NA.
+- Division by zero results in NULL value rather than an error.
+- `ts.varp` can only be used if data represents entire population. Otherwise, Teradata recommends to use `ts.var` to calculate sample variance.
+- `ts.varp` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r var_pop_not_runnable, eval=FALSE}
+# Incorrect usage of ts.varp() with mutate and filter.
+df_varp <- df_seq %>% mutate(varp_t = ts.varp(temperature))
+df_varp <- df_seq %>% filter(temperature <= ts.varp(temperature))
+```
+
+### Average : ts.mean()
+The aggregate function `ts.mean` returns the average value in the column grouped by time. `ts.mean` uses the argument `value.expression` to specify the column for which average value is to be computed. Use `ts.mean(distinct(column_name))` to exclude duplicate rows while calculating average.
+```{r avg_runnable}
+# Calculate the average value in the 'temperature' column of sequenced PTI table.
+df_seq_avg <- df_seq_grp %>% summarise(avg_temp = ts.mean(temperature))
+
+# Print the results.
+df_seq_avg %>% arrange(TIMECODE_RANGE, buoyid, avg_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_avg <- df_seq_grp %>% summarise(avg_temp = ts.mean(distinct(temperature)))
+
+# Print the results.
+df_seq_avg %>% arrange(TIMECODE_RANGE, buoyid, avg_temp)
+
+# Calculate the average value in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_avg <- df_nonseq_grp %>% summarise(avg_temp = ts.mean(temperature))
+
+# Print the results.
+df_nonseq_avg %>% arrange(TIMECODE_RANGE, avg_temp)
+
+# Calculate the average value in the 'temperature' column of non-PTI table.
+df_nonpti_avg <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE")  %>% summarise(avg_temp = ts.mean(temperature))
+
+# Print the results.
+df_nonpti_avg %>% arrange(TIMECODE_RANGE, avg_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- Teradata recommends to strictly use `ts.mean` for time series aggregate operations, instead of regular aggregate function `mean`.
+- `ts.mean` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+```{r avg_not_runnable, eval=FALSE}
+# Incorrect usage of ts.mean() with mutate and filter.
+df_avg <- df_seq %>% mutate(avg_t = ts.mean(temperature))
+df_avg <- df_seq %>% filter(temperature <= ts.mean(temperature))
+```
+
+### Count : ts.n()
+The aggregate function `ts.n` returns the total number of qualified rows in the column grouped by time. `ts.n` uses the argument `value.expression` to specify the column for which count is to be computed. The function returns the number of rows per group when the argument takes `*`, which is the default value of the function. Use `ts.n(distinct(column_name))` to exclude duplicate rows while calculating the number of rows.
+
+```{r count_runnable}
+# Calculate the number of rows in the 'temperature' column of sequenced PTI table.
+df_seq_count <- df_seq_grp %>% summarise(count_temp = ts.n(temperature))
+
+# Print the results.
+df_seq_count %>% arrange(TIMECODE_RANGE, buoyid, count_temp)
+
+# Exclude duplicates in the same aggregate operation above.
+df_seq_count <- df_seq_grp %>% summarise(count_temp = ts.n(distinct(temperature)))
+
+# Print the results.
+df_seq_count %>% arrange(TIMECODE_RANGE, buoyid, count_temp)
+
+# Calculate the number of rows in the sequenced PTI table. 
+# Note that the argument is not provided for the function `ts.n()`.
+df_seq_count <- df_seq_grp %>% summarise(count_temp = ts.n())
+
+# Print the results.
+df_seq_count %>% arrange(TIMECODE_RANGE, buoyid, count_temp)
+
+
+# Calculate the number of rows in the 'temperature' column of non-sequenced PTI table.
+df_nonseq_count <- df_nonseq_grp %>% summarise(count_temp = ts.n(temperature))
+
+# Print the results.
+df_nonseq_count %>% arrange(TIMECODE_RANGE, count_temp)
+
+# Calculate the number of rows in the 'temperature' column of non-PTI table.
+df_nonpti_count <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(count_temp = ts.n(temperature))
+
+# Print the results.
+df_nonpti_count %>% arrange(TIMECODE_RANGE, count_temp)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- `ts.n` is valid on all columns with any data type.
+- Teradata recommends to strictly use `ts.n` for time series aggregate operations, instead of regular aggregate function `n`.
+- `ts.n` cannot be used with dplyr verbs like `mutate`, `filter` as shown in the example below.
+
+```{r count_not_runnable, eval=FALSE}
+# Incorrect usage of ts.n() with mutate and filter.
+df_count <- df_seq %>% mutate(count_t = ts.n(temperature))
+df_count <- df_seq %>% filter(temperature <= ts.n(temperature))
+```
+
+### Describe : ts.describe()
+The aggregate function `ts.describe` returns the column statistics of the values in each group. By default, the function calulates maximum, minimum, average, sample standard deviation, median, mode, 25th percentile, 50th percentile and 75th percentile values of the column. `ts.describe` uses the argument `value.expression` to specify the column for which the statistics are to be calculated. Use `ts.describe(distinct(column_name))` to exclude duplicate rows while calculating statistics. 
+
+Unlike other aggregate functions, `ts.describe` generates multiple columns. The column name provided in argument `summarise` will not be used as the resultant column name. The resultant column names are as follows:
+```{r, echo = FALSE, results='asis'}
+without_distinct <- c("Maximum(column_name)", "Miniumum(column_name)",
+                      "Average(column_name)", "STDDEV_SAMP(column_name)",
+                      "MEDIAN(column_name)", "MODE(column_name)",
+                      "PERCENTILE(column_name, 25, LINEAR))",
+                      "PERCENTILE(column_name, 50, LINEAR))",
+                      "PERCENTILE(column_name, 75, LINEAR))")
+with_distinct <- c("Maximum(Distinct(column_name))", "Minimum(Distinct(column_name))",
+                   "Average(Distinct(column_name)", "STDDEV_SAMP(Distinct(column_name))",
+                   "MEDIAN(Distinct(column_name))", "MODE(column_name)",
+                   "PERCENTILE(Distinct(column_name, 25, LINEAR))",
+                   "PERCENTILE(Distinct(column_name, 50, LINEAR))",
+                   "PERCENTILE(Distinct(column_name, 75, LINEAR))")
+
+resultant_cols <- data.frame(without_distinct, with_distinct)
+colnames(resultant_cols) <- c('Without distinct()', 'With distinct()')
+
+kable(resultant_cols, caption = 'Resultant column names for ts.describe()')
+```
+
+Please refer to notes section for additional information.
+```{r describe_runnable}
+# Calculate the statistics of the 'temperature' column of sequenced PTI table.
+df_seq_describe <- df_seq_grp %>% summarise(describe_temp = ts.describe(temperature))
+
+# Print the results.
+df_seq_describe %>% arrange(TIMECODE_RANGE, buoyid, `MODE(temperature)`)
+
+# Calculate the statistics of the 'temperature' column of non-sequenced PTI table.
+df_nonseq_describe <- df_nonseq_grp %>% summarise(ts.describe(temperature))
+
+# Print the results.
+df_nonseq_describe
+
+# Calculate the statistics of only distinct values of the 'temperature' column of non-PTI table.
+df_nonpti_describe <- df_nonpti %>% group_by_time(timebucket.duration = "10m", timecode.column = "TIMECODE") %>% summarise(describe_temp = ts.describe(distinct(temperature)))
+
+# Print the results.
+df_nonpti_describe %>% arrange(TIMECODE_RANGE, `Mode(temperature)`)
+```
+
+The following example shows how to use the resultant columns of the describe operation in other dplyr verbs:
+```{r describe_accessing}
+# Select some columns from the describe operation and perform filter on one of the selected columns.
+df_sel <- df_nonpti_describe %>% select(`GROUP BY TIME(MINUTES(10))`, 
+                                        `PERCENTILE(Distinct(temperature, 75, LINEAR))`, 
+                                        `Average(Distinct(temperature))`,
+                                        `MODE(temperature)`
+                                        )
+df_filter <- df_sel %>% filter(`PERCENTILE(Distinct(temperature, 75, LINEAR))` < 77)
+
+# Print the results.
+df_filter %>% arrange(`GROUP BY TIME(MINUTES(10))`, `MODE(temperature)`)
+```
+#### Notes
+- NULLs/NAs are not included in the result computation.
+- `ts.describe` is valid only for numeric data.
+- `ts.describe` must be used with `group_by_time()`.
+- Unlike other statistical values, mode values are calculated without excluding duplicates even though `distinct()` is used.
+- Mode computation can result in duplicate rows with different values.
+- Percentile computations use a linear interpolation process to determine if the percentile lies between two data points. Please refer to `ts.percentile` for additional interpolation options.
