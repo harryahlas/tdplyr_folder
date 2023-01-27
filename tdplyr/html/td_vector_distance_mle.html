@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: VectorDistance</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_vector_distance_mle {tdplyr}"><tr><td>td_vector_distance_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+VectorDistance
+</h2>
+
+<h3>Description</h3>
+
+<p>The VectorDistance function takes a tbl_teradata object of target vectors 
+and a tbl_teradata object of reference vectors and returns the distance between
+each target-reference pair present in the two objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_vector_distance_mle (
+      target.data = NULL,
+      ref.data = NULL,
+      target.id = NULL,
+      target.feature = NULL,
+      target.value = NULL,
+      ref.id = NULL,
+      ref.feature = NULL,
+      ref.value = NULL,
+      reftable.size = "small",
+      distance.measure = "cosine",
+      ignore.mismatch = TRUE,
+      replace.invalid = "positiveinfinity",
+      top.k = 2147483647,
+      max.distance = NULL,
+      target.data.sequence.column = NULL,
+      ref.data.sequence.column = NULL,
+      target.data.partition.column = NULL,
+      target.data.order.column = NULL,
+      ref.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>target.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies a tbl_teradata object that contains the target vectors.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;target.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;target.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>ref.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies a tbl_teradata object that contains the reference vectors.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>ref.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;ref.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.id</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns that comprise the target vector 
+identifier. You must partition the &quot;target.data&quot; tbl_teradata by these 
+columns and specify them with this argument.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.feature</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the target vector 
+feature name (for example, the axis of a 3-D vector).<br />
+Note: Entries with NULL values in the &quot;target.feature&quot; column are dropped.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.value</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains the value for the 
+column in the &quot;target.feature&quot; argument.<br />
+Note: Entries with NULL values in the &quot;target.value&quot; column are dropped.<br />
+Default Value: The first column in the &quot;target.data&quot; tbl_teradata object.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>ref.id</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the columns that comprise the reference vector 
+identifier.<br />
+Default Value: The value of the &quot;target.id&quot; argument.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>ref.feature</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains the reference vector 
+feature name.<br />
+Default Value: The value of the &quot;target.feature&quot; argument.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>ref.value</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains the value for the 
+reference vector feature.<br />
+Note: Entries with NULL values are dropped.<br />
+Default Value: The value of the &quot;target.value&quot; argument.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>reftable.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the size of the &quot;ref.data&quot; tbl_teradata object. 
+Specify &quot;LARGE&quot; only if the &quot;ref.data&quot; tbl_teradata object does 
+not fit in memory. &quot;SMALL&quot; allows faster processing.<br /> 
+Default Value: &quot;small&quot;<br />
+Permitted Values: small, large<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>distance.measure</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies one or more distance measures that the function must use.<br />
+Default Value: &quot;cosine&quot;<br />
+Permitted Values: COSINE, EUCLIDEAN, MANHATTAN, BINARY<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>ignore.mismatch</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to drop mismatched dimensions. If &quot;distance.measure&quot; 
+is &quot;cosine&quot;, then this argument is FALSE. If you specify TRUE, 
+then two vectors with no common features become two empty vectors 
+when only their common features are considered, and the function 
+cannot measure the distance between them.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>replace.invalid</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the value to return when the function encounters an 
+infinite value or empty vectors. To customize, you can specify any
+numeric value in quotes.<br />
+Default Value: &quot;positiveinfinity&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>top.k</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies, for each target vector and for each measure, the maximum 
+number of closest reference vectors to include in the output tbl_teradata.<br />
+Default Value: 2147483647<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.distance</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum distance between a pair of target and reference 
+vectors. If the distance exceeds the &quot;max.distance&quot; threshold value,
+the pair does not appear in the output tbl_teradata object. If the 
+&quot;distance.measure&quot; argument specifies multiple measures, then the 
+&quot;max.distance&quot; argument must specify a threshold value for each measure. 
+The <em>i</em>th threshold corresponds to the <em>i</em>th measure. If you 
+omit this argument, then the function returns all results.<br />
+Types: numeric OR vector of numerics
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;target.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>ref.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;ref.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_vector_distance_mle&quot; which is 
+a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("vectordistance_example", "target_mobile_data", "ref_mobile_data")
+
+    # Create object(s) of class "tbl_teradata".
+    target_mobile_data &lt;- tbl(con, "target_mobile_data")
+    ref_mobile_data &lt;- tbl(con, "ref_mobile_data")
+
+    # Example 1 - Using the default ("cosine") distance measure with no threshold.
+    td_vector_distance_out &lt;- td_vector_distance_mle(target.data = target_mobile_data,
+                                                 target.data.partition.column = c("userid"),
+                                                 ref.data = ref_mobile_data,
+                                                 target.id = c("userid"),
+                                                 target.feature = "feature",
+                                                 target.value = "value1"
+                                                 )
+
+    # Example 2 - Using three distance measures with corresponding thresholds "max.distance".
+    td_vector_distance_out1 &lt;- td_vector_distance_mle(target.data = target_mobile_data,
+                                                 target.data.partition.column = c("userid"),
+                                                 ref.data = ref_mobile_data,
+                                                 target.id = c("userid"),
+                                                 target.feature = "feature",
+                                                 target.value = "value1",
+                                                 distance.measure = c("Cosine","Euclidean",
+                                                                      "Manhattan"),
+                                                 max.distance = c(0.03,0.8,1.0)
+                                                 )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

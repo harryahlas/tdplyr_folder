@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: PathStart</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_path_start_mle {tdplyr}"><tr><td>td_path_start_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+PathStart
+</h2>
+
+<h3>Description</h3>
+
+<p>The PathStart function takes output of the function PathSummarizer
+(<code><a href="td_path_summarizer_mle.html">td_path_summarizer</a></code>) function and returns, for
+each parent in the input tbl_teradata, the parent and children and
+the number of times that each of its subsequences was traveled.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_path_start_mle (
+      object = NULL,
+      count.column = NULL,
+      delimiter = ",",
+      parent.column = NULL,
+      partition.names = NULL,
+      node.column = NULL,
+      object.sequence.column = NULL,
+      object.partition.column = NULL,
+      object.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the object returned by the <code>td_path_summarizer_mle</code> function,
+or the tbl_teradata containing the input data.
+</p>
+</td></tr>
+<tr valign="top"><td><code>object.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;object&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>object.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;object&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>count.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the
+number of times a path was traveled.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the single-character delimiter that separates symbols in
+the path string.<br />
+Note: Do not use any of the following characters as
+delimiter (they cause the function to fail):
+Asterisk (*), Plus (+), Left parenthesis ((), Right
+parenthesis ()), Single quotation mark ('),
+Escaped single quotation mark (\'), Backslash (\).<br />
+Default Value: &quot;,&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>parent.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the
+parent nodes. The &quot;object.partition.column&quot; clause in the function call must
+include this column.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>partition.names</code></td>
+<td>
+
+<p>Required Argument.<br />
+Lists the names of the columns that the &quot;object.partition.column&quot; argument
+specifies. The function uses these names for output tbl_teradata
+columns. This argument and the &quot;object.partition.column&quot; argument must specify
+the same names in the same order. One of the &quot;object.partition.column&quot; must be
+the values specified in the &quot;parent.column&quot; argument.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>node.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains
+the nodes.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>object.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;object&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_path_start_mle&quot; which is a
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("pathgenerator_example", "clickstream1")
+
+    # Create remote tibble objects.
+    # The table contains clickstream data, where the "path" column
+    # contains symbols for the pages that the customer clicked.
+    clickstream1 &lt;- tbl(con, "clickstream1")
+
+    # Example 1 - td_path_start_mle() uses the output of td_path_summarizer_mle().
+    td_path_generator_out &lt;- td_path_generator_mle(data = clickstream1,
+                                               seq.column = "path"
+                                               )
+    td_path_summarizer_out &lt;- td_path_summarizer_mle(object = td_path_generator_out,
+                                                  object.partition.column = c('prefix'),
+                                                  seq.column = 'sequence',
+                                                  partition.names = 'prefix',
+                                                  prefix.column = 'prefix'
+                                                )
+    td_path_start_out1 &lt;- td_path_start_mle(object = td_path_summarizer_out,
+                                          object.partition.column = c('parent'),
+                                          node.column = 'node',
+                                          parent.column = 'parent',
+                                          count.column = 'cnt',
+                                          partition.names = 'partitioned'
+                                          )
+
+    # Example 2 - Alternatively, use a persisted output of path summarizer
+    td_path_summarizer_out %&gt;% extract2(1) %&gt;%
+          copy_to(con, df = ., name = "td_path_summarizer_table", overwrite = TRUE)
+
+    td_path_start_out2 &lt;- td_path_start_mle(object = tbl(con, "td_path_summarizer_table"),
+                                          object.partition.column = c('parent'),
+                                          node.column = 'node',
+                                          parent.column = 'parent',
+                                          count.column = 'cnt',
+                                          partition.names = 'partitioned'
+                                          )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

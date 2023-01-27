@@ -1,0 +1,624 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Attribution</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_attribution_mle {tdplyr}"><tr><td>td_attribution_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Attribution
+</h2>
+
+<h3>Description</h3>
+
+<p>The Attribution function is used in web page analysis, where it lets
+companies assign weights to pages before certain events, such as
+buying a product.<br />
+The function calculates attributions with a choice of distribution
+models and has two versions:
+</p>
+
+<ul>
+<li><p> Multiple-input: Accepts one or more input tables and gets many
+parameters from other dimension tables.
+</p>
+</li>
+<li><p> Single-input: Accepts only one input table and gets all parameters
+from argments.
+</p>
+</li></ul>
+
+<p>Note: This function is only available when tdplyr is connected to Vantage 1.1
+or later versions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_attribution_mle (
+      data = NULL,
+      data.optional = NULL,
+      conversion.events = NULL,
+      excluding.data = NULL,
+      optional.data = NULL,
+      model1.type = NULL,
+      model2.type = NULL,
+      model1.name = NULL,
+      model2.name = NULL,
+      event.column = NULL,
+      timestamp.column = NULL,
+      window.size = NULL,
+      conversion.data = NULL,
+      optional.events = NULL,
+      exclude.events = NULL,
+      data.sequence.column = NULL,
+      data.optional.sequence.column = NULL,
+      conversion.data.sequence.column = NULL,
+      excluding.data.sequence.column = NULL,
+      optional.data.sequence.column = NULL,
+      model1.type.sequence.column = NULL,
+      model2.type.sequence.column = NULL,
+      data.partition.column = NULL,
+      data.optional.partition.column = NULL,
+      data.order.column = NULL,
+      data.optional.order.column = NULL,
+      conversion.data.order.column = NULL,
+      excluding.data.order.column = NULL,
+      optional.data.order.column = NULL,
+      model1.type.order.column = NULL,
+      model2.type.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata that contains the click
+stream data to compute attributions.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.optional</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that contains the click stream data, which
+cogroups attributes from all specified tbl_teradata.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.optional.partition.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;data.optional&quot; is specified.<br />
+Specifies Partition By columns for &quot;data.optional&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.optional.order.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;data.optional&quot; is specified.<br />
+Specifies Order By columns for &quot;data.optional&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>conversion.events</code></td>
+<td>
+
+<p>Optional Argument. &quot;conversion.events&quot; is a required argument if
+&quot;conversion.data&quot; is not provided.<br />
+Specifies the conversion events. Each &quot;conversion.event&quot; is a string
+or integer<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>excluding.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input tbl_teradata that contains one
+varchar column (excluding_events) containing excluding cause event values.
+</p>
+</td></tr>
+<tr valign="top"><td><code>excluding.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;excluding.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>optional.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input tbl_teradata contains one varchar
+column (optional_events) containing optional cause event values.
+</p>
+</td></tr>
+<tr valign="top"><td><code>optional.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;optional.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model1.type</code></td>
+<td>
+
+<p>Optional Argument. &quot;model1.type&quot; is a required argument if
+&quot;model1.name&quot; is not provided.<br />
+Specifies the tbl_teradata that defines the type and distributions
+of the first model.<br />
+For example:<br />
+model1.data (&quot;EVENT_REGULAR&quot;, &quot;email:0.19:LAST_CLICK:NA&quot;,
+&quot;impression:0.81:WEIGHTED:0.4,0.3,0.2,0.1&quot;)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model1.type.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;model1.type&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model2.type</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that defines the type and distributions of the
+second model.<br />
+For example:<br />
+model2.data (&quot;EVENT_OPTIONAL&quot;, &quot;OrganicSearch:0.5:UNIFORM:NA&quot;,
+&quot;Direct:0.3:UNIFORM:NA&quot;, &quot;Referral:0.2:UNIFORM:NA&quot;)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model2.type.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;model2.type&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model1.name</code></td>
+<td>
+
+<p>Optional Argument. &quot;model1.name&quot; is a required argument if &quot;model1.type&quot;
+is not provided.<br />
+Specifies the type and specifcation of the first model.<br />
+For example:<br />
+Model1 ('EVENT_REGULAR', 'email:0.19:LAST_CLICK:NA',
+'impression:0.81:WEIGHTED:0.4,0.3,0.2,0.1')<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>model2.name</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the type and distributions of the second model. <br />
+For example:<br />
+Model2 ('EVENT_OPTIONAL', 'OrganicSearch:0.5:UNIFORM:NA',
+'Direct:0.3:UNIFORM:NA', 'Referral:0.2:UNIFORM:NA')<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>event.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the clickstream
+events.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>timestamp.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the timestamps
+of the clickstream events.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>window.size</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies how to determine the maximum window size for the
+attribution calculation:<br />
+</p>
+
+<ul>
+<li><p> rows:K: Considers the maximum number of events to be attributed,
+excluding events of types specified in excluding_event_table,
+which means assigning attributions to atmost K effective
+events before the current impact event.
+</p>
+</li>
+<li><p> seconds:K: Consider the maximum time difference between the
+current impact event and the earliest effective event to
+be attributed.
+</p>
+</li>
+<li><p> rows:K&amp;seconds:K2: Consider both constraints and comply with
+the stricter one.
+</p>
+</li></ul>
+
+<p>Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>conversion.data</code></td>
+<td>
+
+<p>Optional Argument.&quot;conversion.data&quot; is a required argument if
+&quot;conversion.events&quot; is not provided.<br />
+Specifies the names of the input tbl_teradata that contains
+one varchar column (conversion_events) containing conversion
+event values.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>conversion.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;conversion.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>optional.events</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the optional events. Each optional event is a string or
+integer. An &quot;optional.event&quot; cannot be a conversion event or
+exclude events. The function attributes a conversion event to an
+optional event only if it cannot attribute it to a regular event.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>exclude.events</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the events to exclude from the attribution calculation.
+Each &quot;exclude.event&quot; is a string or integer. An &quot;exclude.event&quot; cannot be
+a conversion event.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;data&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.optional.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;data.optional&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>conversion.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;conversion.data&quot;. The argument is used to
+ensure deterministic results for functions which produce results that
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>excluding.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;excluding.data&quot;. The argument is used to
+ensure deterministic results for functions which produce results that
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>optional.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;optional.data&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model1.type.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;model1.type&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model2.type.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;model2.type&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_attribution_mle&quot; which is a
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using the name: result.
+</p>
+
+
+<h3>Note</h3>
+
+
+<ul>
+<li>
+<p>The Multiple-input Attribution takes data from multiple tbl_teradata
+(&quot;data.optional&quot;, &quot;conversion.data&quot;, &quot;excluding.data&quot;,
+&quot;optional.data&quot;, &quot;model1.type&quot; and &quot;model2.type&quot;).<br />
+The arguments &quot;data.optional&quot;, &quot;conversion.data&quot;, &quot;excluding.data&quot;,
+&quot;optional.data&quot;, &quot;model1.type&quot; and &quot;model2.type&quot; should be mentioned
+together and should not be used with arguments &quot;conversion.events&quot;,
+&quot;model1.name&quot;, &quot;optional.events&quot;, &quot;exclude.events&quot; and &quot;model2.name&quot;.<br />
+For example,<br />
+attribution &lt;- Attribution(data = &lt; table | view | (query) &gt;,<br />
+data.partition.column = 'partition_column',<br />
+data.order.column = 'order_column',<br />
+data.optional = &lt; table | view | (query) &gt;,<br />
+conversion.data = &lt; table | view | (query) &gt;,<br />
+excluding.data = &lt; table | view | (query) &gt;,<br />
+optional.data = &lt; table | view | (query) &gt;,<br />
+model1.type = &lt; table | view | (query) &gt;,<br />
+model2.type = &lt; table | view | (query) &gt;,<br />
+event.column = 'event_column',<br />
+timestamp.column = 'timestamp_column',<br />
+window.size = 'rows:K | seconds:K | rows:K&amp;seconds:K'<br />
+)
+
+</p>
+</li>
+<li>
+<p>The Single-input Attribution takes data from single tbl_teradata (&quot;data&quot;)
+and parameters come from arguments (&quot;conversion.events&quot;,
+&quot;model1.name&quot;, &quot;optional.events&quot;, &quot;exclude.events&quot; and &quot;model2.name&quot;),
+not input tbl_teradata.<br />
+The arguments &quot;conversion.events&quot;, &quot;model1.name&quot;, &quot;optional.events&quot;,
+&quot;exclude.events&quot; and &quot;model2.name&quot; should be used together and
+should not be used with arguments &quot;data.optional&quot;, &quot;conversion.data&quot;,
+&quot;excluding.data&quot;, &quot;optional.data&quot;, &quot;model1.type&quot; and &quot;model2.type&quot;.<br />
+For example,<br />
+attribution &lt;- Attribution(data = &lt; table | view | (query) &gt;,<br />
+conversion.events = c('conversion_event', ...),<br />
+timestamp.column = &rdquo;timestamp_column&rdquo;,<br />
+model1.name = c('type',  'K' | 'EVENT:WEIGHT:MODEL:PARAMETERS', ...),<br />
+model2.name = c('type',  'K' | 'EVENT:WEIGHT:MODEL:PARAMETERS', ...),<br />
+event.column = &quot;event_column&quot;<br />
+window.size = 'rows:K | seconds:K | rows:K&amp;seconds:K',<br />
+optional.events = c(&quot;organicsearch&quot;, &quot;direct&quot;, &quot;referral&quot;),<br />
+data.order.column = 'order_by_column'<br />
+)
+</p>
+
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("attribution_example", "attribution_sample_table",
+                    "attribution_sample_table1", "attribution_sample_table2",
+                    "conversion_event_table", "optional_event_table", "model1_table",
+                    "model2_table", "excluding_event_table")
+
+    # Create object(s) of class "tbl_teradata".
+    attribution_sample_table &lt;- tbl(con, "attribution_sample_table")
+    attribution_sample_table1 &lt;- tbl(con, "attribution_sample_table1")
+    attribution_sample_table2 &lt;- tbl(con, "attribution_sample_table2")
+    conversion_event_table &lt;- tbl(con, "conversion_event_table")
+    optional_event_table &lt;- tbl(con, "optional_event_table")
+    model1_table &lt;- tbl(con, "model1_table")
+    model2_table &lt;- tbl(con, "model2_table")
+    excluding_event_table &lt;- tbl(con, "excluding_event_table")
+
+    # Example 1 - One Regular Model, Multiple Optional Models.
+    # This example specifes one distribution model for regular events
+    # and one distribution model for each type of optional event.
+    attribution_out1 &lt;- td_attribution_mle(data = attribution_sample_table,
+                                   data.partition.column = 'user_id',
+                                   data.order.column = 'time_stamp',
+                                   event.column = 'event',
+                                   timestamp.column = 'time_stamp',
+                                   window.size = 'rows:10&amp;seconds:20',
+                                   exclude.events = 'Email',
+                                   conversion.events = c('SocialNetwork','PaidSearch'),
+                                   model1.name = c('SEGMENT_ROWS','3:0.5:EXPONENTIAL:0.5,ROW',
+                                                   '4:0.3:WEIGHTED:0.4,0.3,0.2,0.1',
+                                                   '3:0.2:FIRST_CLICK:NA'),
+                                   model2.name = c('SEGMENT_SECONDS','6:0.5:UNIFORM:NA',
+                                                   '8:0.3:LAST_CLICK:NA','6:0.2:FIRST_CLICK:NA'),
+                                   optional.events = c('OrganicSearch','Direct','Referral')
+                                   )
+
+  # Example 2 - Multiple Regular Models, One Optional Model.
+  # This example specifes one distribution model for each type of regular
+  # event and one distribution model for optional events.
+  attribution_out2 &lt;- td_attribution_mle(data = attribution_sample_table,
+                                         data.partition.column = 'user_id',
+                                         conversion.events = c('SocialNetwork','PaidSearch'),
+                                         timestamp.column = 'time_stamp',
+                                         model1.name = c('EVENT_REGULAR',
+                                                         'email:0.19:LAST_CLICK:NA',
+                                                         'impression:0.81:UNIFORM:NA'),
+                                         model2.name = c('EVENT_OPTIONAL',
+                                                         'ALL:1:EXPONENTIAL:0.5,ROW'),
+                                         event.column = 'event',
+                                         window.size = 'rows:10&amp;seconds:20',
+                                         optional.events = c('OrganicSearch','Direct','Referral'),
+                                         data.order.column = 'time_stamp'
+                                         )
+
+  # Example 3 - # This example uses Dynamic Weighted Distribution Models Input.
+  attribution_out3 &lt;- td_attribution_mle(data = attribution_sample_table,
+                                     data.partition.column = 'user_id',
+                                     conversion.events = c('SocialNetwork','PaidSearch'),
+                                     timestamp.column = 'time_stamp',
+                                     model1.name = c('EVENT_REGULAR',
+                                                     'email:0.19:LAST_CLICK:NA',
+                                                     'impression:0.81:WEIGHTED:0.4,0.3,0.2,0.1'),
+                                     model2.name = c('EVENT_OPTIONAL',
+                                                     'ALL:1:WEIGHTED:0.4,0.3,0.2,0.1'),
+                                     event.column = 'event',
+                                     window.size = 'rows:10&amp;seconds:20',
+                                     optional.events = c('OrganicSearch','Direct','Referral'),
+                                     data.order.column = 'time_stamp'
+                                     )
+
+  # Example 4 - This example uses Window Models.
+  attribution_out4 &lt;- td_attribution_mle(data = attribution_sample_table,
+                                         data.partition.column = 'user_id',
+                                         conversion.events = c('SocialNetwork','PaidSearch'),
+                                         timestamp.column = 'time_stamp',
+                                         model1.name = c('SEGMENT_ROWS',
+                                                         '3:0.5:EXPONENTIAL:0.5,ROW',
+                                                         '4:0.3:WEIGHTED:0.4,0.3,0.2,0.1',
+                                                         '3:0.2:FIRST_CLICK:NA'),
+                                         model2.name = c('SEGMENT_SECONDS', '6:0.5:UNIFORM:NA',
+                                          '8:0.3:LAST_CLICK:NA','6:0.2:FIRST_CLICK:NA'),
+                                         event.column = 'event',
+                                         window.size = 'rows:10&amp;seconds:20',
+                                         optional.events = c('OrganicSearch','Direct','Referral'),
+                                         exclude.events  = 'Email',
+                                         data.order.column = 'time_stamp'
+                                         )
+
+  # Example 5 - This example uses Single-Window Model.
+  attribution_out5 &lt;- td_attribution_mle(data = attribution_sample_table,
+                                         data.partition.column = 'user_id',
+                                         conversion.events = c('SocialNetwork','PaidSearch'),
+                                         timestamp.column = 'time_stamp',
+                                         model1.name = c('SIMPLE', 'UNIFORM:NA'),
+                                         event.column = 'event',
+                                         window.size = 'rows:10&amp;seconds:20',
+                                         exclude.events  = 'Email',
+                                         data.order.column = 'time_stamp'
+                                         )
+
+  # Example 6 - This example uses Unused Segment Windows.
+  attribution_out6 &lt;- td_attribution_mle(data = attribution_sample_table,
+                                         data.partition.column = 'user_id',
+                                         conversion.events = c('SocialNetwork','PaidSearch'),
+                                         timestamp.column = 'time_stamp',
+                                         model1.name = c('SEGMENT_ROWS',
+                                                         '3:0.5:EXPONENTIAL:0.5,ROW',
+                                                         '4:0.3:WEIGHTED:0.4,0.3,0.2,0.1',
+                                                         '3:0.2:FIRST_CLICK:NA'),
+                                          model2.name = c('SEGMENT_SECONDS','6:0.5:UNIFORM:NA',
+                                                          '8:0.3:LAST_CLICK:NA',
+                                                          '6:0.2:FIRST_CLICK:NA'),
+                                         event.column = 'event',
+                                         window.size = 'rows:10&amp;seconds:20',
+                                         exclude.events  = 'Email',
+                                         data.order.column = 'time_stamp'
+                                         )
+
+  # Example 7 - This example uses Multiple Inputs which takes data
+  # and parameters from multiple tables and outputs attributions.
+  attribution_out7 &lt;- td_attribution_mle(data = attribution_sample_table1,
+                                         data.partition.column = 'user_id',
+                                         data.optional = attribution_sample_table2,
+                                         data.optional.partition.column = 'user_id',
+                                         data.order.column = 'time_stamp',
+                                         conversion.data = conversion_event_table,
+                                         excluding.data = excluding_event_table,
+                                         optional.data = optional_event_table,
+                                         model1.type = model1_table,
+                                         model2.type = model2_table,
+                                         event.column = 'event',
+                                         timestamp.column = 'time_stamp',
+                                         window.size = 'rows:10&amp;seconds:20'
+                                         )
+
+
+
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

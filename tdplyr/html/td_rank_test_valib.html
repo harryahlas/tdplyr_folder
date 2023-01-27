@@ -1,0 +1,625 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Rank Test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_rank_test_valib {tdplyr}"><tr><td>td_rank_test_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Rank Test</h2>
+
+<h3>Description</h3>
+
+<p>Statistical tests of this type calculate statistics based on the rank of 
+variables rather than variable values. In general, data that are ranked and 
+ordinal may be analyzed by these tests. Within some restraints, either 
+numeric or non-numeric data may be analyzed.<br />
+Supported rank tests include the following:
+</p>
+
+<ol>
+<li><p> Mann-Whitney/Kruskal-Wallis Test
+</p>
+</li>
+<li><p> Mann-Whitney/Kruskal-Wallis Test (Independent Tests)
+</p>
+</li>
+<li><p> Wilcoxon Signed Ranks Test
+</p>
+</li>
+<li><p> Friedman Test with Kendall's Coefficient of Concordance &amp; Spearmans' 
+Rho
+</p>
+</li></ol>
+
+<p>The choice between the Mann-Whitney and Kruskal-Wallis tests is made 
+automatically, looking at the number of distinct values of the independent 
+variable. A variation of the Mann-Whitney test considers each requested 
+variable individually, rather than combined, performing a series of 
+independent tests.<br />
+Detailed information about each test can be found in 
+<b>'Statistical Tests offered'</b> section.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_rank_test_valib(data, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to run statistical tests.<br />
+Types: teradataml DataFrame</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described 
+in the '<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_rank_test_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>block.column</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the name of the column representing blocks. 
+Notes:
+</p>
+
+<ol>
+<li><p> Used only by the Friedman test.
+</p>
+</li>
+<li><p> When pairing treatment and block column 
+values, a division by zero error can occur if 
+unequal cell counts are found.
+</p>
+</li></ol>
+
+<p>Types: character
+</p>
+
+
+
+<h4>dependent.column</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the name of the column representing 
+the dependent variable. If non-numeric, it will 
+be ranked alphanumerically.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Used only by the Mann-Whitney and Friedman 
+tests.
+</p>
+</li></ul>
+
+<p>Types: character
+</p>
+
+
+
+<h4>columns</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the categorical column(s) 
+representing independent variables.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Used only by the Mann-Whitney test.
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>fallback</h4>
+
+<p>Optional Argument.<br /> 
+Specifies whether the FALLBACK is requested as in the 
+output result or not.<br />
+Default Value: FALSE (Not requested)<br />
+Types: logical
+</p>
+
+
+
+<h4>first.column</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the name of the column that represents 
+the first sample variable.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Used only by the Wilcoxon test.
+</p>
+</li></ul>
+
+<p>Types: character
+</p>
+
+
+
+<h4>group.columns</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) for grouping 
+so that a separate result is produced for each 
+value or combination of values in the specified 
+column or columns.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>include.zero</h4>
+
+<p>Optional Argument.<br /> 
+Specifies whether to discard cases with zero 
+differences or not. Ordinarily, the Wilcoxon test 
+discards cases with zero differences. When set to 
+TRUE, includes these cases with the positive 
+count.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Used only by the Wilcoxon test.
+</p>
+</li></ul>
+
+<p>Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>independent</h4>
+
+<p>Optional Argument.<br /> 
+Specifies whether variation of the Mann-Whitney test 
+should be performed or not. When set to TRUE, 
+Mann-Whitney test variation is performed considering 
+each requested variable individually, rather than in 
+combination, performing a series of independent 
+tests.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Used only by the Mann-Whitney test.
+</p>
+</li></ul>
+
+<p>Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>allow.duplicates</h4>
+
+<p>Optional Argument.<br /> 
+Specifies whether duplicates are allowed in the 
+output or not.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>second.column</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the name of the column that represents 
+the second sample variable.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Used only by the Wilcoxon test.
+</p>
+</li></ul>
+
+<p>Types: character
+</p>
+
+
+
+<h4>single.tail</h4>
+
+<p>Optional Argument.<br /> 
+Specifies whether to request single-tailed test or 
+not. When TRUE, a single-tailed test is requested. 
+Otherwise, a two-tailed test is requested.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Used only by the Mann-Whitney and Wilcoxon 
+tests.
+</p>
+</li>
+<li><p> If the Mann-Whitney test becomes a 
+Kruskall-Wallis test, the &quot;single.tail&quot; option is 
+invalid. 
+</p>
+</li></ol>
+
+<p>Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>stats.database</h4>
+
+<p>Optional Argument.<br /> Specifies the database where 
+the statistical test metadata tables are 
+installed. If not specified, the source database 
+is searched for these metadata tables.<br />
+Types: character
+</p>
+
+
+
+<h4>style</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the test style.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> 'mw' - Mann-Whitney test.
+</p>
+</li>
+<li><p> 'friedman' - Friedman test.
+</p>
+</li>
+<li><p> 'wilcoxon' - Wilcoxon test.
+</p>
+</li></ol>
+
+<p>Default Value: 'mw'<br />
+Types: character
+</p>
+
+
+
+<h4>probability.threshold</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the threshold probability, i.e., 
+'alpha' probability, below which the null 
+hypothesis is rejected.<br />
+Default Value: 0.05<br />
+Types: numeric
+</p>
+
+
+
+<h4>treatment.column</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the name of the column representing 
+the independent categorical variable.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Used only by the Friedman test.
+</p>
+</li>
+<li><p> When pairing treatment and block column 
+values, a division by zero error can occur if 
+unequal cell counts are found.
+</p>
+</li></ol>
+
+<p>Types: character
+</p>
+
+
+
+<h3>Statistical Tests offered</h3>
+
+
+
+<h4>Mann-Whitney/Kruskal-Wallis</h4>
+
+<p>The selection of which test to execute is automatically based on the number 
+of distinct values of the independent variable. The Mann-Whitney is used for 
+two groups, the Kruskal-Wallis for three or more groups.<br />
+<br />
+A special version of the Mann-Whitney/Kruskal-Wallis test performs a 
+separate, independent test for each independent variable, and displays the 
+result of each test with its accompanying column name. Under the primary 
+version of the Mann-Whitney/Kruskal-Wallis test, all independent variable 
+value combinations are used, often forcing the Kruskal-Wallis test, since 
+the number of value combinations exceeds two. When a variable which has more 
+than two distinct values is included in the set of independent variables, 
+then the Kruskal-Wallis test is performed for all variables. Since 
+Kruskal-Wallis is a generalization of Mann-Whitney, the Kruskal-Wallis 
+results are valid for all the variables, including two-valued ones. In the 
+discussion below, both types of Mann-Whitney/Kruskal-Wallis are referred to 
+as Mann-Whitney/Kruskal-Wallis tests, since the only difference is the way 
+the independent variable is treated.<br />
+<br />
+The Mann-Whitney test, AKA Wilcoxon Two Sample Test, is the nonparametric 
+analog of the 2-sample t test. It is used to compare two independent groups 
+of sampled data, and tests whether they are from the same population or from 
+different populations (i.e., whether the samples have the same distribution 
+function). Unlike the parametric t-test, this non-parametric test makes no 
+assumptions about the distribution of the data (e.g., normality). It is to 
+be used as an alternative to the independent group t-test, when the 
+assumption of normality or equality of variance is not met. Like many 
+non-parametric tests, it uses the ranks of the data rather than the data 
+itself to calculate the U statistic. But since the Mann-Whitney test makes 
+no distribution assumption, it is less powerful than the t-test. On the 
+other hand, the Mann-Whitney is more powerful than the t-test when parametric 
+assumptions are not met. Another advantage is that it will provide the same 
+results under any monotonic transformation of the data so the results of the 
+test are more generalizable.<br />
+<br />
+The Mann-Whitney is used when the independent variable is nominal or ordinal 
+and the dependent variable is ordinal (or treated as ordinal). The main 
+assumption is that the variable on which the 2 groups are to be compared is 
+continuously distributed. This variable may be non-numeric, and if so, is 
+converted to a rank based on alphanumeric precedence.<br />
+<br />
+The null hypothesis is that both samples have the same distribution. The 
+alternative hypotheses are that the distributions differ from each other in 
+either direction (two-tailed test), or in a specific direction (upper-tailed 
+or lower-tailed tests). Output is a p-value, which when compared to the 
+user's threshold, determines whether the null hypothesis should be rejected. 
+Given one or more columns (independent variables) whose values define two 
+independent groups of sampled data, and a column (dependent variable) whose 
+distribution is of interest from the same input, the Mann-Whitney test 
+is performed for each set of unique values of the group-by variables (GBVs), 
+if any.<br />
+<br />
+The Kruskal-Wallis test is the nonparametric analog of the one-way analysis 
+of variance or F-test used to compare three or more independent groups of 
+sampled data. When there are only two groups, it reduces to the Mann-Whitney 
+test (above). The Kruskal-Wallis test tests whether multiple samples of data 
+are from the same population or from different populations (i.e., whether the
+samples have the same distribution function). Unlike the parametric 
+independent group ANOVA (one-way ANOVA), this non-parametric test makes no 
+assumptions about the distribution of the data (e.g., normality). Since this 
+test does not make a distributional assumption, it is not as powerful as 
+ANOVA.<br />
+<br />
+Given k independent samples of numeric values, a Kruskal-Wallis test is 
+produced for each set of unique values of the GBVs, testing whether all the 
+populations are identical. This test variable may be non-numeric, and if so, 
+is converted to a rank based on alphanumeric precedence. The null hypothesis 
+is that all samples have the same distribution. The alternative hypotheses 
+are that the distributions differ from each other. Output for each unique set
+of values of the GBVs is a statistic H, and a p-value, which when compared to
+the user's threshold, determines whether the null hypothesis should be 
+rejected for the unique set of values of the GBVs.<br />
+</p>
+
+
+
+<h4>Wilcoxon Signed Ranks Test</h4>
+
+<p>The Wilcoxon Signed Ranks Test is an alternative analogous to the t-test for 
+correlated samples. The correlated-samples t-test makes assumptions about the
+data, and can be properly applied only if certain assumptions are met:
+</p>
+
+<ol>
+<li><p> the scale of measurement has the properties of an equal-interval scale
+</p>
+</li>
+<li><p> differences between paired values are randomly selected from the source
+population
+</p>
+</li>
+<li><p> the source population has a normal distribution
+</p>
+</li></ol>
+
+<p>If any of these assumptions are invalid, the t-test for correlated samples 
+should not be used. Of cases where these assumptions are unmet, the most 
+common are those where the scale of measurement fails to have equal-interval 
+scale properties, e.g., a case in which the measures are from a rating scale.
+When data within two correlated samples fail to meet one or another of the 
+assumptions of the t-test, an appropriate non-parametric alternative is the 
+Wilcoxon Signed-Rank Test, a test based on ranks. Assumptions for this test 
+are:
+</p>
+
+<ol>
+<li><p> the distribution of difference scores is symmetric (implies equal 
+interval scale)
+</p>
+</li>
+<li><p> difference scores are mutually independent
+</p>
+</li>
+<li><p> difference scores have the same mean
+</p>
+</li></ol>
+
+<p>The original measures are replaced with ranks resulting in analysis only of 
+the ordinal relationships. The signed ranks are organized and summed, giving 
+a number, W. When the numbers of positive and negative signs are about equal 
+(i.e., there is no tendency in either direction), the value of W will be near 
+zero, and the null hypothesis will be supported. Positive or negative sums 
+indicate there is a tendency for the ranks to have significance so there is a 
+difference in the cases in the specified direction.<br />
+<br />
+Given the input and names of paired numeric columns, a Wilcoxon test is 
+produced. The Wilcoxon tests whether a sample comes from a population with a 
+specific mean or median. The null hypothesis is that the samples come from 
+populations with the same mean or median. The alternative hypothesis is that 
+the samples come from populations with different means or medians 
+(two-tailed test), or that in addition the difference is in a specific 
+direction (upper-tailed or lower-tailed tests). Output is a p-value, which 
+when compared to the user's threshold, determines whether the null hypothesis 
+should be rejected.<br />
+</p>
+
+
+
+<h4>Friedman Test with Kendall's Coefficient of Concordance &amp; 
+Spearmans' Rho</h4>
+
+<p>The Friedman test is an extension of the sign test for several independent 
+samples. It is analogous to the 2-way Analysis of Variance, but depends only 
+on the ranks of the observations, so it is like a 2-way ANOVA on ranks.<br />
+<br />
+The Friedman test should not be used for only three treatments due to lack of 
+power, and is best for six or more treatments. It is a test for treatment 
+differences in a randomized, complete block design. Data consists of b 
+mutually independent k-variate random variables called blocks. The Friedman 
+assumptions are that the data in these blocks are mutually independent, and 
+that within each block, observations are ordinally rankable according to some 
+criterion of interest.<br />
+<br />
+A Friedman test is produced using rank scores and the F table, though 
+alternative implementations call it the Friedman Statistic and use the 
+chi-square table. Note that when all of the treatments are not applied to 
+each block, it is an incomplete block design. The requirements of the 
+Friedman test are not met under these conditions, and other tests such as 
+the Durban test should be applied.<br />
+<br />
+In addition to the Friedman statistics, Kendall's Coefficient of Concordance 
+(W) is produced, as well as Spearman's Rho. Kendall's coefficient of 
+concordance can range from 0 to 1. The higher its value, the stronger the 
+association. W is 1.0 if all treatments receive the same rankness in all 
+blocks, and 0 if there is &quot;perfect disagreement&quot; among blocks.<br />
+<br />
+Spearman's rho is a measure of the linear relationship between two variables. 
+It differs from Pearson's correlation only in that the computations are done 
+after the numbers are converted to ranks. Spearman's Rho equals 1 if there is 
+perfect agreement among rankings; disagreement causes rho to be less than 1, 
+sometimes becoming negative.<br />
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 
+#      'val.install.location' to the database name where Vantage analytic 
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+#   3. The Statistical Test metadata tables must be loaded into the database 
+#      where Analytics Library is installed.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+custanly &lt;- tbl(con, "customer_analysis")
+print(custanly)
+cust &lt;- tbl(con, "customer")
+print(cust)
+
+# Example 1: Shows the parameters for a Mann-Whitney test with a threshold
+#            probability of 0.01.
+obj &lt;- td_rank_test_valib(data= cust,
+                          dependent.column="income",
+                          columns="gender",
+                          group.columns="years_with_bank",
+                          probability.threshold=0.01,
+                          style="mw")
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Shows the parameters for a set of Mann-Whitney independent tests.
+#            The threshold probability assumes the default value of 0.05.
+obj &lt;- td_rank_test_valib(data= custanly,
+                          dependent.column="income",
+                          columns=c("gender", "ccacct", "svacct"),
+                          style="mw")
+
+# Print the results.
+print(obj$result)
+
+# Example 3: Shows the parameters for a Wilcoxon Test.
+obj &lt;- td_rank_test_valib(data= custanly,
+                          first.column="avg_ck_bal",
+                          second.column="avg_sv_bal",
+                          group.columns="years_with_bank",
+                          style=" wilcoxon")
+
+# Print the results.
+print(obj$result)
+
+# Example 4: Shows the parameters for a Friedman Test using a specially 
+#            prepared input.
+
+# Prepare data for test style "friedman" as per example in VAL user guide.
+# The "Friedman" style need same number of rows for each combination 
+# "treatment.column" and "block.column".
+# Let's get the smallest count of value combinations in the 'gender' and 
+# 'marital_status' columns from custanly tbl_teradata.
+cgb &lt;- custanly %&gt;% group_by(marital_status, gender) 
+min_val &lt;- cgb %&gt;% summarise(cnt_id = n(cust_id)) %&gt;% pull(cnt_id) %&gt;% min()
+val &lt;- as.numeric(min_val)  
+df_cr &lt;- custanly %&gt;% select("cust_id", "gender", "marital_status", "income", 
+                            "ckacct", "svacct")
+df_fried &lt;- td_sample(df_cr, 
+                      when_then=list("gender='F' and marital_status=1"=val,
+                                     "gender='F' and marital_status=2"=val,
+                                     "gender='F' and marital_status=3"=val,
+                                     "gender='F' and marital_status=4"=val,
+                                     "gender='M' and marital_status=1"=val,
+                                     "gender='M' and marital_status=2"=val,
+                                     "gender='M' and marital_status=3"=val,
+                                     "gender='M' and marital_status=4"=val))
+
+# Execute the RankTest() function.
+obj &lt;- td_rank_test_valib(data=df_fried,
+                          style="friedman",
+                          dependent.column="income",
+                          block.column="marital_status",
+                          treatment.column="gender")
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

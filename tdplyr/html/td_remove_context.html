@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Remove the current context and close the corresponding...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_remove_context {tdplyr}"><tr><td>td_remove_context {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Remove the current context and close the corresponding connection to Teradata Vantage</h2>
+
+<h3>Description</h3>
+
+<p>Use the <code>td_remove_context</code> function to remove an existing context created using the 
+<code>td_create_context</code> or the <code>td_set_context</code> or
+<code>dbConnect(tdplyr::NativeDriver(), ...)</code> function.
+This performs removal (garbage collection) of all non-persistent work tables created by the 
+analytic functions. This closes the corresponding connection object.<br />
+Note: If <code>DBI::dbDisconnect</code> is invoked on the connection object in the current context 
+before calling the <code>td_remove_context</code> function, then a warning is displayed and garbage 
+collection is not performed.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_remove_context()
+</pre>
+
+
+<h3>Value</h3>
+
+<p>Returns NULL invisibly
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_create_context</code>, <code>td_set_context</code>, <code>td_get_context</code>,
+<code>dbConnect</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Example 1: Remove the connection that is established using td_create_context().
+td_create_context(dsn = "TeradataDSN")
+# The nonpersistent work tables are garbage collected and the connection is disconnected
+td_remove_context()
+
+# Example 2: Remove the connection that is established using td_set_context().
+# Establish connection to Teradata Vantage using the dbConnect API
+con &lt;- DBI::dbConnect(odbc::odbc(), dsn = "TeradataDSN")
+
+# Use td_set_context to initialize a context with a given connection object.
+td_set_context(con = con)
+td_remove_context()
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

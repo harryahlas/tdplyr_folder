@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Creates query to analyze the table</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for sql_table_analyze.Teradata {tdplyr}"><tr><td>sql_table_analyze.Teradata {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Creates query to analyze the table</h2>
+
+<h3>Description</h3>
+
+<p>This function creates a query to analyze and collect table statistics.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'Teradata'
+sql_table_analyze(con, table, column, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>con</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies remote data source.</p>
+</td></tr>
+<tr valign="top"><td><code>table</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies remote table name.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>column</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies name of the remote table column(s). Column name is
+required to collect the statistics in Teradata.<br />
+Types: character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Other parameters passed to methods.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Returns the SQL query to collect the statistics.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>db_analyze</code>, <code>copy_to</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get the connection.
+con &lt;- td_get_context()$connection
+
+# Load the data.frame 'iris' to "sql_table_analyze_table" table.
+copy_to(con, iris, "sql_table_analyze_table", overwrite = FALSE)
+
+# Get the query to analyze the table "sql_table_analyze_table".
+sql_table_analyze(con, "sql_table_analyze_table", "Sepal.Length")
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

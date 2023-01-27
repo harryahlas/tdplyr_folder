@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: ScaleByPartition</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_scale_by_partition_mle {tdplyr}"><tr><td>td_scale_by_partition_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+ScaleByPartition
+</h2>
+
+<h3>Description</h3>
+
+<p>This ScaleByPartition function scales the sequences in each partition 
+independently, using the same formula as the function Scale (<code>td_scale_mle</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_scale_by_partition_mle (
+    data = NULL,
+    method = NULL,
+    miss.value = "KEEP",
+    input.columns = NULL,
+    global = FALSE,
+    accumulate = NULL,
+    multiplier = 1,
+    intercept = "0",
+    data.sequence.column = NULL,
+    data.partition.column = NULL,
+    data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata for scaling.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies one or more statistical methods to use to scale the data 
+set. For method values and descriptions. If you specify multiple 
+methods, the output tbl_teradata includes the column scalemethod 
+(which contains the method name) and a row for each input-row/method 
+combination.<br />
+Permitted Values: MEAN, SUM, USTD, STD, RANGE, MIDRANGE, MAXABS.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>miss.value</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies how the function processes NULL values in input.<br />
+To process NULL values in input, pass any permitted values which are as follows:<br />
+</p>
+
+<ol>
+<li><p> KEEP : Keep NULL values.
+</p>
+</li>
+<li><p> OMIT : Ignore any row that has a NULL value.
+</p>
+</li>
+<li><p> ZERO : Replace each NULL value with zero.
+</p>
+</li>
+<li><p> LOCATION : Replace each NULL value with its location value.
+</p>
+</li></ol>
+
+<p>Default Value: &quot;KEEP&quot;.<br />
+Permitted Values: KEEP, OMIT, ZERO, LOCATION.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata columns that contain the attribute 
+values of the samples. The attribute values must be numeric values 
+between -1e308 and 1e308. If a value is outside this range, the 
+function treats it as infinity.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>global</code></td>
+<td>
+
+<p>Optional Argument.
+Specifies whether all input columns are scaled to the same location 
+and scale.<br />
+Note: Each input column is scaled separately.<br /> 
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.
+Specifies the input tbl_teradata columns to copy to the output tbl_teradata. 
+By default, the function copies no input tbl_teradata columns to the 
+output tbl_teradata.<br /> 
+Tip: To identify the sequences in the output, specify the partition 
+columns in this argument.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>multiplier</code></td>
+<td>
+
+<p>Optional Argument.
+Specifies one or more multiplying factors to apply to the input 
+variables (multiplier in the following formula): <br />
+X' = intercept + multiplier * (X - location)/scale<br />
+If you specify only one multiplier, it applies to all columns specified
+in the &quot;input.columns&quot; argument. If you specify multiple multiplying factor,
+each multiplier applies to the corresponding input column. For example,
+the first multiplier applies to the first column specified in the &quot;input.columns&quot;
+argument, the second multiplier applies to the second input column, and so on.<br />
+Default Value: 1<br />
+Types: numeric OR vector of numerics
+</p>
+</td></tr>
+<tr valign="top"><td><code>intercept</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies one or more addition factors incrementing the scaled 
+results-intercept in the following formula:<br />
+X' = intercept + multiplier * (X - location)/scale<br /> 
+If you specify only one intercept, it applies to all columns specified 
+in the &quot;input.columns&quot; argument. If you specify multiple addition factors, 
+each intercept applies to the corresponding input column.<br />
+The syntax of intercept is: [-]number | min | mean | max <br /> 
+where min, mean, and max are the global minimum, mean values in 
+the corresponding columns.<br /> 
+The function scales the values of min, mean, and max.<br /> 
+For example, if intercept is &quot;- min&quot; and multiplier is 1, the scaled result 
+is transformed to a nonnegative sequence according to this formula, where 
+scaledmin is the scaled value:<br /> 
+X' = -scaledmin + 1 * (X - location)/scale<br />
+Default Value: &quot;0&quot;<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_scale_by_partition_mle&quot; which 
+is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("scalemap_example", "scale_housing")
+
+    # Create object(s) of class "tbl_teradata".
+    scale_housing_input &lt;- tbl(con, "scale_housing")
+
+    # Create object(s) of class "tbl_teradata".
+    # Example 1 - This function scales the sequences on partition cloumn 'lotsize' using
+    # the same formula as the function td_scale_mle().
+    td_scale_by_partition_out &lt;- td_scale_by_partition_mle(data=scale_housing_input,
+                                                       data.partition.column ="lotsize",
+                                                       input.columns = c("id","price", "lotsize", 
+                                                                         "bedrooms", "bathrms"),
+                                                       method = c("maxabs"),
+                                                       accumulate = c("types")
+                                                      )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

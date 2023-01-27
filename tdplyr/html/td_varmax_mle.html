@@ -1,0 +1,518 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: VARMAX</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_varmax_mle {tdplyr}"><tr><td>td_varmax_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+VARMAX
+</h2>
+
+<h3>Description</h3>
+
+<p>VARMAX (Vector Autoregressive Moving Average model with eXogenous variables)
+extends the ARMA/ARIMA model in two ways:<br />
+</p>
+
+<ol>
+<li><p> To work with time series with multiple response variables (vector time
+series).
+</p>
+</li>
+<li><p> To work with exogenous variables, or variables that are independent of
+the other variables in the system.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_varmax_mle (
+      data = NULL,
+      response.columns = NULL,
+      exogenous.columns = NULL,
+      partition.columns = NULL,
+      orders = NULL,
+      seasonal.orders = NULL,
+      period = NULL,
+      exogenous.order = NULL,
+      lag = 0,
+      include.mean = FALSE,
+      max.iter.num = 100,
+      step.ahead = NULL,
+      method = "SSE",
+      data.orders = NULL,
+      include.drift = FALSE,
+      order.p = NULL,
+      order.d = NULL,
+      order.q = NULL,
+      seasonal.order.p = NULL,
+      seasonal.order.d = NULL,
+      seasonal.order.q = NULL,
+      data.sequence.column = NULL,
+      data.orders.sequence.column = NULL,
+      data.partition.column = "1",
+      data.orders.partition.column = "1",
+      data.order.column = NULL,
+      data.orders.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata that stores the input sequence.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Optional Argument<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Default Value: &quot;1&quot;<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.orders</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the output tbl_teradata created from TimeSeriesOrders ML Engine functions
+output table.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.orders.partition.column</code></td>
+<td>
+
+<p>Optional Argument<br />
+Specifies Partition By columns for &quot;data.orders&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Default Value: 1<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.orders.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data.orders&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the columns containing the response data. NULL values are 
+acceptable at the end of the series. If &quot;step.ahead&quot; is specified, the 
+function will report predicted values for the missing values, taking 
+into account values from the predictor columns for those time 
+periods.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>exogenous.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the columns containing the independent (exogenous) 
+predictors. If not specified, the model will be calculated without 
+exogenous vectors.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>partition.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the partition columns that will be passed to the output. If 
+not specified, the output will not contain partition columns.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>orders</code></td>
+<td>
+
+<p>Optional Argument. This argument is required if &quot;data.orders&quot; and (&quot;order.p&quot;,
+&quot;orders.d&quot;, &quot;orders.q&quot;) are not specified.<br />
+Specifies the parameters p, d, q for VARMAX model. This argument 
+consists of 3 non-negative integer values separated by commas. The p and q 
+must be an integer between 0 and 10, inclusive. The d must be between 
+0 and 1, inclusive.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>seasonal.orders</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies seasonal parameters sp, sd, sq for VARMAX model. This argument 
+consists of 3 non-negative integer values separated by commas. The sp 
+and sq must be an integer between 0 and 10, inclusive. The sd must be 
+between 0 and 3, inclusive If not specified, the model will be 
+treated as a non-seasonal model.<br />
+If the &quot;seasonal.orders&quot; argument is used, the &quot;period&quot; argument should 
+also be present.<br />
+If &quot;data.orders&quot; is specified, this argument cannot be specified.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>period</code></td>
+<td>
+
+<p>Optional Argument. This argument is required if &quot;seasonal.orders&quot; or
+(&quot;seasonl.orders.p&quot;, &quot;seasonal.orders.d&quot;, &quot;seasonal.orders.d&quot;) is specified.<br />
+Specifies the period of each season. It must be a positive integer 
+value. If this argument is not specified, the model will be treated as a
+non-seasonal model.<br />
+If this argument is used, the &quot;seasonal.orders&quot; or (&quot;seasonl.orders.p&quot;,
+&quot;seasonal.orders.d&quot;, &quot;seasonal.orders.d&quot;) argument must also be
+present.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>exogenous.order</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the order of exogenous variables. If the current time is t 
+and &quot;exogenous.order&quot; is b, the following values of the exogenous time 
+series will be used in calculating the response: Xt Xt-1 ... Xt-b+1. 
+If not specified, the model will be calculated without exogenous 
+vectors.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>lag</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the lag in the effect of the exogenous variables on the
+response variables. For example, if lag = 3, and &quot;exogenous.order&quot; is
+b, Yi will be predicted based on Xi-3 to Xi-b-2, where<br />
+</p>
+
+<ol>
+<li><p> Yi is a vector of n response variables
+</p>
+</li>
+<li><p> Xi is a vector of m exegenous variables
+</p>
+</li></ol>
+
+<p>Default Value: 0<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>include.mean</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether mean vector of the response data series (constant c 
+in the formula) is added in the VARMAX model.<br />
+Note: If this argument is TRUE, the difference parameters d (in the &quot;orders&quot; 
+argument) and sd (in the &quot;seasonal.orders&quot; argument) should be 0.<br />
+This argument cannot be specified along with the data.orders arugment.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.iter.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations performed. It must be a
+positive integer value.<br />
+Default Value: 100<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>step.ahead</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of steps to forecast after the end of the
+time series. Must be a positive integer value. If this argument is not
+provided, no forecast values are calculated.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the method for fitting the model parameters:<br />
+</p>
+
+<ol>
+<li><p> SSE: Sum of squared error.
+</p>
+</li>
+<li><p> ML: Maximum likelihood.
+</p>
+</li></ol>
+
+<p>Default Value: &quot;SSE&quot;<br />
+Permitted Values: SSE, ML<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>include.drift</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specify whether drift term is included in the VARMAX model.<br />
+Note: <br />
+</p>
+
+<ol>
+<li><p> This argument can only be TRUE when d is non-zero and less than 2.<br />
+</p>
+</li>
+<li><p> This argument cannot be specified along with the &quot;data.orders&quot; arugment.<br />
+</p>
+</li></ol>
+
+<p>Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>order.p</code></td>
+<td>
+
+<p>Optional Argument. This argument is required if &quot;data.orders&quot; and &quot;orders&quot;
+are not specified.<br />
+Specifies the p value of the non-seasonal order parameter. The p value
+must be an integer between 0 and 10, inclusive. <br />
+Note: &quot;order.p&quot; argument support is only available when tdplyr is
+connected to Vantage 1.1 or later versions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>order.d</code></td>
+<td>
+
+<p>Optional Argument. This argument is required if &quot;data.orders&quot; and &quot;orders&quot;
+are not specified.<br />
+Specifies the d value of the non-seasonal order parameter. The d value
+must be an integer between 0 and 1, inclusive. <br />
+Note: &quot;order.d&quot; argument support is only available when tdplyr is
+connected to Vantage 1.1 or later versions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>order.q</code></td>
+<td>
+
+<p>Optional Argument.This argument is required if &quot;data.orders&quot; and &quot;orders&quot; are
+not specified.<br />
+Specifies the q value of the non-seasonal order parameter. The q value
+must be an integer between 0 and 10, inclusive. <br />
+Note: &quot;order.q&quot; argument support is only available when tdplyr is
+connected to Vantage 1.1 or later versions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>seasonal.order.p</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the sp value of the seasonal order parameter. The sp value must
+be an integer between 0 and 10, inclusive.<br />
+If &quot;data.orders&quot; or &quot;seasonal.orders&quot; is specified, this argument cannot be
+specified.<br />
+Note: &quot;seasonal.order.p&quot; argument support is only available when tdplyr
+is connected to Vantage 1.1 or later versions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>seasonal.order.d</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the sd value of the seasonal order parameter. The sd value must
+be an integer between 0 and 3, inclusive.<br />
+If &quot;data.orders&quot; or &quot;seasonal.orders&quot; is specified, this argument cannot be
+specified.<br />
+Note: &quot;seasonal.order.d&quot; argument support is only available when tdplyr
+is connected to Vantage 1.1 or later versions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>seasonal.order.q</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the sq value of the seasonal order parameter. The sq value must
+be an integer between 0 and 10, inclusive.<br />
+If &quot;data.orders&quot; or &quot;seasonal.orders&quot; is specified, this argument cannot be
+specified.<br />
+Note: &quot;seasonal.order.q&quot; argument support is only available when tdplyr
+is connected to Vantage 1.1 or later versions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.orders.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data.orders&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_varmax_mle&quot; which is a named 
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("varmax_example", "finance_data3", "orders_ex")
+
+    # Create object(s) of class "tbl_teradata".
+    finance_data3 &lt;- tbl(con, "finance_data3")
+    orders_ex &lt;- tbl(con, "orders_ex")
+
+    # Example 1 - Without "exogenous.columns" argument.
+    varmax_out1 &lt;- td_varmax_mle(data = finance_data3,
+                                 data.partition.column = c("id"),
+                                 data.order.column = c("period"),
+                                 response.columns = c("expenditure","income","investment"),
+                                 partition.columns = c("id"),
+                                 orders = "1,1,1",
+                                 include.mean = FALSE,
+                                 step.ahead = 3
+                                 )
+
+    # Example 2 - Without "seasonal.orders" argument.
+    varmax_out2 &lt;- td_varmax_mle(data = finance_data3,
+                                 data.partition.column = c("id"),
+                                 data.order.column = c("period"),
+                                 response.columns = c("expenditure"),
+                                 exogenous.columns = c("income","investment"),
+                                 partition.columns = c("id"),
+                                 orders = "1,1,1",
+                                 exogenous.order = 3,
+                                 lag = 3,
+                                 include.mean = FALSE,
+                                 step.ahead = 3
+                                 )
+
+    # Example 3 - With both "orders" and "seasonal.orders" arguments.
+    varmax_out3 &lt;- td_varmax_mle(data = finance_data3,
+                                 data.partition.column = c("id"),
+                                 data.order.column = c("period"),
+                                 response.columns = c("expenditure"),
+                                 exogenous.columns = c("income","investment"),
+                                 partition.columns = c("id"),
+                                 orders = "1,1,1",
+                                 seasonal.orders = "1,0,0",
+                                 period = 4,
+                                 exogenous.order = 3,
+                                 lag = 3,
+                                 include.mean = FALSE,
+                                 step.ahead = 3
+                                 )
+
+    # Example 4 - Using "data.orders" arguments.
+    varmax_out4 &lt;- td_varmax_mle(data = finance_data3,
+                                 data.partition.column = c("id"),
+                                 data.order.column = c("period"),
+                                 response.columns = c("expenditure"),
+                                 partition.columns = c("id"),
+                                 max.iter.num = 1000,
+                                 method = "ML",
+                                 data.orders = orders_ex,
+                                 data.orders.partition.column = c("id")
+                                 )
+
+    # Example 5 - Using "order.p", "order.d" and "order.q" arguments.
+    varmax_out5 &lt;- td_varmax_mle(data = finance_data3,
+                                 data.partition.column = c("id"),
+                                 data.order.column = c("period"),
+                                 response.columns = c("expenditure"),
+                                 exogenous.columns = c("income","investment"),
+                                 partition.columns = c("id"),
+                                 order.p = 1,
+                                 order.d = 1,
+                                 order.q = 1,
+                                 seasonal.orders = "1,0,0",
+                                 period = 4,
+                                 exogenous.order = 3,
+                                 lag = 3,
+                                 include.mean = FALSE,
+                                 step.ahead = 3
+    )
+
+    # Example 6 - Using "seasonal.order.p", "seasonal.order.d" and "seasonal.order.q" arguments.
+    varmax_out6 &lt;- td_varmax_mle(data = finance_data3,
+                                 data.partition.column = c("id"),
+                                 data.order.column = c("period"),
+                                 response.columns = c("expenditure"),
+                                 exogenous.columns = c("income","investment"),
+                                 partition.columns = c("id"),
+                                 orders = "1,1,1",
+                                 seasonal.order.p = 1,
+                                 seasonal.order.d = 0,
+                                 seasonal.order.q = 0,
+                                 period = 4,
+                                 exogenous.order = 3,
+                                 lag = 3,
+                                 include.mean = FALSE,
+                                 step.ahead = 3
+    )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: DBI functions that are overwritten by tdplyr</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for overwritten_dbi_functions {tdplyr}"><tr><td>overwritten_dbi_functions {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>DBI functions that are overwritten by tdplyr</h2>
+
+<h3>Description</h3>
+
+<p>For DBI S4 methods that are overwritten by tdplyr.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'Teradata,ident_q'
+dbExistsTable(conn, name, ...)
+
+## S4 method for signature 'Teradata,dbplyr_schema'
+dbExistsTable(conn, name, ...)
+
+## S4 method for signature 'Teradata,character'
+dbExistsTable(conn, name, ...)
+
+## S4 method for signature 'Teradata,dbplyr_schema,ANY'
+dbWriteTable(
+  conn,
+  name,
+  value,
+  field.types = NULL,
+  temporary = FALSE,
+  row.names = FALSE,
+  append = TRUE,
+  ...
+)
+
+## S4 method for signature 'Teradata'
+sqlCreateTable(con, table, fields, row.names = NA, temporary = FALSE, ...)
+
+## S4 method for signature 'Teradata,dbplyr_schema'
+dbRemoveTable(conn, name, ...)
+
+## S4 method for signature 'Teradata,ident_q'
+dbQuoteIdentifier(conn, x, ...)
+
+## S4 method for signature 'Teradata,dbplyr_schema'
+dbQuoteIdentifier(conn, x, ...)
+
+## S4 method for signature 'Teradata,data.frame'
+dbDataType(dbObj, obj, ...)
+
+## S4 method for signature 'Teradata,ANY'
+dbDataType(dbObj, obj, ...)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

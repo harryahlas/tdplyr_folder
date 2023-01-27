@@ -1,0 +1,390 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Descriptive Statistics Function: Histogram</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_histogram_valib {tdplyr}"><tr><td>td_histogram_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Descriptive Statistics Function: Histogram</h2>
+
+<h3>Description</h3>
+
+<p>Histogram analysis reveals the distribution of continuous numeric or date values
+in a column. Histogram analysis is also referred to as binning because it counts the
+occurrence of values in a series of numeric ranges called bins. The histogram
+analysis provides a number of ways to define bins, allowing multidimensional binning,
+overlaying of categorical data, and the calculation of numeric statistics within
+bins. If you set the desired number of equal sized data bins, the desired number of
+bins with a nearly equal number of values, a desired width, or the specific boundaries,
+the Histogram analysis separates the data to show its distributional properties.
+It does this by separating the data by bin number and gives counts and percentages
+over the requested rows. Percentages always sum to 100
+to specify a number of equal sized data bins in which the analysis determines the
+minimum and maximum value, as well as a user-specified minimum and maximum value.
+If the minimum and maximum are specified, all values less than the minimum are put in
+bin 0, while all values greater than the maximum are put in bin N+1. The same is
+true when the boundary option is specified.<br />
+<br />
+The Histogram analysis optionally provides subtotals within each bin of the count,
+percentage within the bin and percentage overall for each value or combination of
+values of one or more overlaid columns. Another option is provided to collect simple
+statistics for a binned column or another column of numeric or date type within the
+table, providing the minimum, maximum, mean, and standard deviation. When statistics
+are collected for a date type column, the standard deviation is given in units of days.
+Histogram analysis can be performed on columns of numeric or date data type.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_histogram_valib(data, columns, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to perform Histogram analysis.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br /> 
+Specifies the name(s) of the column(s) to analyze. <br />
+Occasionally, it can also accept permitted strings to specify all columns, 
+or all numeric columns, or all numeric and date columns. <br />
+Permitted Values: 
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;. 
+</p>
+</li>
+<li><p> Pre-defined strings: 
+</p>
+
+<ol>
+<li><p> 'all' - all columns 
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns 
+</p>
+</li>
+<li><p> 'allnumericanddate' - all numeric and date columns 
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the 
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_histogram_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>bins</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the number of equal width bins to create. If multiple columns are 
+requested, multiple bin sizes may be specified, such as bins=c(5, 10). 
+If fewer sizes are specified than columns, left-over columns are associated 
+with the default size of 10 bins. <br />
+Default Value: 10 <br />
+Types: integer OR vector of Integers (int)  
+</p>
+
+
+
+<h4>bins.with.boundaries</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the number of bins spanning a range specified by 
+the minimum and maximum values. <br />
+For example, <br />
+bins.with.boundaries=c(5,0,200) creates 5 bins ranging 
+from 0 to 200.<br /> 
+If multiple columns are requested, multiple sets of parameters 
+must be specified, such as 
+bins.with.boundaries=c(&quot;10, 0, 200000&quot;, &quot;5, 0, 100&quot;). 
+Note that multiple values are provided as string with numbers 
+enclosed in curly braces ''. Each such value corresponds 
+to the value in &quot;columns&quot; argument. <br />
+Types: integer, character OR vector of Integers (int) or Strings (character)  
+</p>
+
+
+
+<h4>boundaries</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the boundaries that define the bins. <br />
+For example, <br />
+boundaries=c(0,50,100,150) provides 3 bins between 0 and 150 
+(0 to 50, 50 to 100, and 100 to 150). <br />
+If multiple columns are requested, multiple sets of parameters must 
+be specified, such as 
+boundariesc(&quot;0, 50000, 100000, 150000&quot;, &quot;0, 50, 100&quot;). 
+Note that multiple values are provided as string with numbers enclosed 
+in curly braces ''. Each such value corresponds to the value in 
+&quot;columns&quot; argument. <br />
+Types: integer, character OR vector of Integers (int) or Strings (character)
+</p>
+
+
+
+<h4>quantiles</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the number of approximately equally populated bins to create. 
+If multiple columns are requested, multiple quantile sizes may be 
+specified, such as quantiles=c(5, 10). If fewer sizes are specified than 
+columns, left-over columns are associated with the default size of 10 
+quantiles. <br />
+Default Value: 10 <br />
+Types: integer OR vector of Integers (int)  
+</p>
+
+
+
+<h4>widths</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the width of the bins to create. If multiple columns are 
+requested, multiple widths must be specified, such as widths=c(5, 10). 
+If fewer sizes are specified than columns, an error is raised.<br />
+Types: integer OR vector of Integers (int)  
+</p>
+
+
+
+<h4>exclude.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) to exclude from the 
+analysis, if a column specifier such as 'all', 'allnumeric', 
+'allnumericanddate' is used in the &quot;columns&quot; argument. <br />
+Types: character OR vector of Strings (character)  
+</p>
+
+
+
+<h4>overlay.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies a categorical variable with only a few values. If an 
+overlay column is specified, frequencies within each bin are 
+calculated for each value of that overlay column (frequencies for 
+crosstabs of values are given if more than one overlay column is 
+requested). <br />
+Note: 
+</p>
+
+<ul>
+<li><p> Use a specific column in either &quot;overlay.columns&quot; or 
+&quot;stats.columns&quot;, but not both. 
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings (character)  
+</p>
+
+
+
+<h4>stats.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies a list of numeric columns/aliases for which simple 
+statistics are calculated (minimum, maximum, mean and standard 
+deviation) in each bin. This argument is not available for DATE 
+columns. <br />
+Note:
+</p>
+
+<ul>
+<li><p> Use a specific column in either &quot;overlay.columns&quot; or 
+&quot;stats.columns&quot;, but not both. 
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings (character)  
+</p>
+
+
+
+<h4>hist.style</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the histogram style to use for analysis. <br />
+Permitted Values: 
+</p>
+
+<ol>
+<li><p> 'basic' - Creates a histogram for individual columns. 
+</p>
+</li>
+<li><p> 'crosstab' - Creates a multidimensional histogram by combining 
+columns. 
+</p>
+</li></ol>
+
+<p>Default Value: 'basic'<br />
+Types: character  
+</p>
+
+
+
+<h4>filter</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the clause to filter rows selected for analysis within Histogram. <br />
+For example, <br />
+filter = &quot;cust_id &gt; 0&quot; <br />
+Types: character
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set options 'val.install.location' to
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Perform Histogram analysis using default values.
+obj &lt;- td_histogram_valib(data=df,
+                          columns=c("income", "age"))
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Perform Histogram analysis using "overlay.columns".
+obj &lt;- td_histogram_valib(data=df,
+                          columns=c("income", "age"),
+                          overlay.columns="gender")
+
+# Print the results.
+print(obj$result)
+
+# Example 3: Perform Histogram analysis using "stats.columns".
+obj &lt;- td_histogram_valib(data=df,
+                          columns=c("income", "age"),
+                          stats.columns="years_with_bank")
+
+# Print the results.
+print(obj$result)
+
+# Example 4: Perform Histogram analysis using 'crosstab' style, with filter.
+obj &lt;- td_histogram_valib(data=df,
+                          columns=c("income", "age"),
+                          hist.style="crosstab",
+                          filter="income &gt; 0")
+
+# Print the results.
+print(obj$result)
+
+# Example 5: Perform Histogram analysis by specifying number of bins.
+obj &lt;- td_histogram_valib(data=df,
+                          columns="income",
+                          bins=5)
+
+# Print the results.
+print(obj$result)
+
+# Example 6: Perform Histogram analysis by specifying bin width.
+obj &lt;- td_histogram_valib(data=df,
+                          columns="income",
+                          widths=25000)
+
+# Print the results.
+print(obj$result)
+
+# Example 7: Perform Histogram analysis by specifying number of quantiles.
+obj &lt;- td_histogram_valib(data=df,
+                          columns="income",
+                          quantiles=4)
+
+# Print the results.
+print(obj$result)
+
+# Example 8: Perform Histogram analysis by specifying boundaries on single column.
+obj &lt;- td_histogram_valib(data=df,
+                          columns="income",
+                          boundaries=c(0, 50000, 100000, 150000))
+
+# Print the results.
+print(obj$result)
+
+# Example 9: Perform Histogram analysis by specifying boundaries on multiple columns.
+obj &lt;- td_histogram_valib(data=df,
+                          columns=c("income", "age"),
+                          boundaries=c("{0, 50000, 100000, 150000}", "{0,25,50,75}"))
+
+# Print the results.
+print(obj$result)
+
+# Example 10: Perform Histogram analysis by specifying bins with boundaries
+#             on single column.
+obj &lt;- td_histogram_valib(data=df,
+                          columns="income",
+                          bins.with.boundaries=c(10, 0, 200000))
+
+# Print the results.
+print(obj$result)
+
+# Example 11: Perform Histogram analysis by specifying bins with boundaries on 
+#             multiple columns.
+obj &lt;- td_histogram_valib(data=df,
+                          columns=c("income", "age"),
+                          bins.with.boundaries=c("{10, 0, 200000}", "{5, 0, 75}"))
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

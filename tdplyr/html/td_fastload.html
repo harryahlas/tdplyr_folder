@@ -1,0 +1,359 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Copy a local dataframe to a remote data source using fastload...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_fastload {tdplyr}"><tr><td>td_fastload {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Copy a local dataframe to a remote data source using fastload protocol</h2>
+
+<h3>Description</h3>
+
+<p>This function loads data from a local dataframe into a remote data source
+using the fastload protocol. A MULTISET table will be created if it is not
+present in the Teradata SQL Engine.<br />
+<br />
+Usage Notes:
+</p>
+
+<ol>
+<li> <p><code>td_fastload</code> function cannot be used with ODBC driver.
+</p>
+</li>
+<li> <p><code>td_fastload</code> function cannot load duplicate rows of the dataframe
+even if the table is a MULTISET table.
+</p>
+</li>
+<li><p> Only use <code>td_fastload</code> function to load many rows (at least
+100,000 rows) so that the row-loading performance exceeds the overhead of
+opening additional connections. To insert small amount of data, please use
+<code>copy_to</code> for better performance.
+</p>
+</li>
+<li> <p><code>td_fastload</code> function does not support all Teradata SQL data
+types. For example, dataframe having BLOB and CLOB data type columns cannot
+be loaded.
+</p>
+</li>
+<li><p> If there are any incorrect rows, fastload protocol ignores those
+rows and inserts all valid rows. Failed rows are categorised into errors and
+warnings by fastload protocol and these errors and warnings are returned by
+the <code>td_fastload</code> function.
+</p>
+</li>
+<li><p> For additional information about fastload protocol through teradatasql
+driver, please refer the FASTLOAD section of
+<a href="https://github.com/Teradata/r-driver#FastLoad">terdatasql driver documentation</a>.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_fastload(
+  conn,
+  df = NULL,
+  table.name = NULL,
+  overwrite = FALSE,
+  types = NULL,
+  append = FALSE,
+  save.errors = FALSE,
+  batch.size = NULL
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>conn</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the remote data source connection.</p>
+</td></tr>
+<tr valign="top"><td><code>df</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the dataframe which contains the data to be inserted.<br />
+Types : data.frame</p>
+</td></tr>
+<tr valign="top"><td><code>table.name</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the destination remote table.<br />
+Types : character</p>
+</td></tr>
+<tr valign="top"><td><code>overwrite</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to overwrite an existing table or not.
+If TRUE, will overwrite an existing table with name
+'table.name'. If FALSE, will throw an error if table with
+'table.name' already exists.<br />
+Default : FALSE<br />
+Types : logical<br />
+Note : The existing table will be dropped and new table
+schema will replace the existing table.</p>
+</td></tr>
+<tr valign="top"><td><code>types</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the data types for the columns in remote table. This
+argument accepts both named and unnamed character vectors.
+If it is NULL, the function will use data types of the columns
+present in R dataframe.<br />
+Suppose the dataframe with columns 'col1' and 'col2' is to be
+loaded into the remote data source.<br />
+</p>
+
+<ol>
+<li><p> When an unnamed character vector is specified, the data
+types of all the columns must be specified.<br />
+Example:<br />
+If <code>types = c("FLOAT", "VARCHAR(10)")</code>, then the
+table is created with 2 columns, 'col1' and 'col2' with data
+types 'FLOAT' and 'VARCHAR(10)' respectively.
+</p>
+</li>
+<li><p> If a named character vector is specified,
+then data types for only a subset of columns can be
+specified. If the names of the column data types do not match
+with any in the dataframe, then an error will be raised.<br />
+Examples:<br />
+</p>
+
+<ol>
+<li><p> If <code>types = c("col1" = "FLOAT", col2 = "VARCHAR(10)")</code>,
+then the table is created with 2 columns, 'col1' and 'col2' with
+data types 'FLOAT' and 'VARCHAR(10)' respectively.
+</p>
+</li>
+<li><p> If <code>types = c("col1" = "FLOAT")</code>, then the table is
+created with 2 columns - 'col1' with data type 'FLOAT' and
+'col2' with data type of the column in R dataframe.
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Default : NULL<br />
+Types : Named or unnamed vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>append</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies if the dataframe needs to be appended to a table.<br />
+Default : FALSE<br />
+Types : logical</p>
+</td></tr>
+<tr valign="top"><td><code>save.errors</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to persist the errors and warnings
+information in Teradata SQL Engine or not. If this argument
+is set to TRUE, the error and warnings information are
+presisted and names of error and warning tables are
+returned by <code>td_fastload</code> function. Otherwise, the
+function return NULL for the names of the tables.<br />
+Default : FALSE<br />
+Types : logical<br />
+Note : Persisting of the error and warning messages have
+performance impact on <code>td_fastload</code> in terms of
+time, based on the number of error and warning messages.
+However, the errors and warnings are returned as R
+dataframes by <code>td_fastload</code> which can then be
+persisted, if needed.</p>
+</td></tr>
+<tr valign="top"><td><code>batch.size</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the number of rows to be inserted per batch using
+fastload. For better performance, Teradata recommend the
+batch size to be at least 100,000 rows. batch.size takes
+positive integers.<br />
+If this argument is NULL, there are two cases based on the
+number of rows (say N) in the dataframe 'df' as explained
+below:
+</p>
+
+<ol>
+<li><p> If N is greater than 100,000, the rows are
+divided into batches of equal size with each batch having
+at least 100,000 rows (except the last batch which might
+have more rows).
+</p>
+</li>
+<li><p> If N is less than 100,000, the rows are inserted in
+one batch after notifying the user that insertion happens
+with degradation of performance.
+</p>
+</li></ol>
+
+<p>If this argument is specified, the rows are inserted in
+batches, each batch with size given in this argument,
+irrespective of the recommended batch size. Last batch will
+have rows less than the batch size specified, if the number
+of rows is not in integral multiples of the argument
+batch.size.<br />
+Default : NULL<br />
+Types : numeric<br />
+Note : This argument is especially useful when there are
+memory constraints in client machines, in which case user
+can use smaller batch size.<br />
+Examples:<br />
+</p>
+
+<ol>
+<li><p> If <code>batch.size = 170,000</code>, the rows are inserted
+in the batches of size given in this argument.
+</p>
+</li>
+<li><p> If <code>batch.size = NULL</code> and number of rows is
+52,300, the rows are inserted in one batch with 52,300
+rows.
+</p>
+</li>
+<li><p> If <code>batch.size = NULL</code> and number of rows is
+200,500, the rows are inserted in two batches, each
+inserting 100,250 rows.
+</p>
+</li>
+<li><p> If <code>batch.size = NULL</code> and number of rows is
+300,521, there will be three batches, of which two batches
+inserting 100,173 rows and one batch inserting 100,175
+rows.
+</p>
+</li></ol>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A named list containing attributes:<br />
+</p>
+
+<ol>
+<li> <p><code>errors.dataframe</code> : Has the error messages thrown by fastload
+protocol. It has an empty dataframe if there are no error messages.
+</p>
+</li>
+<li> <p><code>warnings.dataframe</code> : Has the warning messages thrown by fastload
+protocol. It has an empty dataframe if there are no warning messages.
+</p>
+</li>
+<li> <p><code>errors.table</code> : Has the table name of error messages. This is
+NULL if the argument <code>save.errors</code> is FALSE.
+</p>
+</li>
+<li> <p><code>warnings.table</code> : Has the table name of warning messages. This is
+NULL if the argument <code>save.errors</code> is FALSE.
+</p>
+</li></ol>
+
+
+
+<h3>See Also</h3>
+
+<p><code>copy_to</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Install the "nycflights13" package on your R client, if it is not already
+# installed and load the library.
+install.packages('nycflights13', repos='https://cloud.r-project.org', quiet = TRUE)
+library(nycflights13)
+
+# Create a dataframe.
+flights_df &lt;- as.data.frame(nycflights13::flights)
+
+# Example 1: Using td_fastload to load data from dataframe.
+fl_list &lt;- td_fastload(con, flights_df, table.name = "flights_fl")
+
+# Prints the loaded table.
+tbl(con, "flights_fl")
+
+# Example 2: Using td_fastload to overwrite existing "flights_fl" table.
+fl_list &lt;- td_fastload(con, flights_df, table.name = "flights_fl",
+                       overwrite = TRUE)
+
+# Prints the loaded table.
+tbl(con, "flights_fl")
+
+# Example 3: Using td_fastload to append dataframe to an already available
+# table.
+df1 &lt;- head(flights_df, n = 200000)
+df2 &lt;- tail(flights_df, n = 136776)
+fl_list1 &lt;- td_fastload(con, df1, table.name = "flights_fl_append")
+fl_list2 &lt;- td_fastload(con, df2, table.name = "flights_fl_append",
+                        append = TRUE)
+
+# Prints the loaded table.
+tbl(con, "flights_fl_append")
+
+# Example 4: Using td_fastload specifying column types as unnamed character
+#vector.
+fl_list &lt;- td_fastload(con, flights_df, table.name = "flights_fl_coltypes",
+           types = c("INTEGER", "INTEGER", "INTEGER", "INTEGER", "INTEGER",
+           "FLOAT", "INTEGER", "INTEGER", "FLOAT", "VARCHAR(50)", "INTEGER",
+           "VARCHAR(100)", "VARCHAR(50)", "VARCHAR(50)","FLOAT","FLOAT","FLOAT",
+           "FLOAT","TIMESTAMP(6)"))
+
+# Prints the loaded table.
+tbl(con, "flights_fl_coltypes")
+
+# Example 5: Using td_fastload specifying column types as named character
+#vector.
+fl_list &lt;- td_fastload(con, flights_df, table.name = "flights_fl_coltypes1",
+            types = c(tailnum = "varchar(100)", dest = "varchar(50)"))
+
+# Prints the loaded table.
+tbl(con, "flights_fl_coltypes1")
+
+# Read erroneous data using td_fastload into R dataframe.
+file_name &lt;- system.file("extdata", "LargeErreneousData.csv", package="tdplyr")
+df_err &lt;- read.csv(file_name, header = TRUE,  stringsAsFactors = FALSE)
+
+# Example 6: Using td_fastload to insert the data with duplicate rows and
+# invalid columns. Note that errors and warnings are not persisted.
+
+fl_list &lt;- td_fastload(con, df_err, table.name = "invalid_rows")
+
+# Prints errors dataframe.
+fl_list$errors.dataframe
+
+# Prints warnings dataframe.
+fl_list$warnings.dataframe
+
+# Prints the loaded table.
+tbl(con, "invalid_rows")
+
+# Example 7: Using td_fastload to insert the data with duplicate rows and
+# invalid type columns and save the errors and warnings information.
+
+fl_list &lt;- td_fastload(con, df_err, table.name = "invalid_saved_rows",
+                       save.errors = TRUE)
+
+# Prints errors table; will be NULL, if there are no errors.
+fl_list$errors.table
+
+# Prints warnings table; will be NULL, if there are no warnings.
+fl_list$warnings.table
+
+# Prints the loaded table.
+tbl(con, "invalid_saved_rows")
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Install or replace file in Vantage</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_install_file {tdplyr}"><tr><td>td_install_file {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Install or replace file in Vantage</h2>
+
+<h3>Description</h3>
+
+<p>This function installs or replaces external language script or model file in Vantage.
+On success, it prints a message that the file is installed or replaced.<br />
+Note: This function is not supported with ODBC driver connection.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_install_file(
+  file.path.loc = NULL,
+  file.identifier = NULL,
+  file.on.client = TRUE,
+  is.binary = FALSE,
+  replace = FALSE,
+  force.replace = FALSE,
+  ...
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>file.path.loc</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the absolute/relative path of the file (including file name) to
+be installed.<br />
+This file is identified in Vantage by &quot;file.identifier&quot;.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>file.identifier</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name associated with the user-installed file.<br />
+It cannot have a schema name associated with it, as the file is always
+installed in the current schema.<br />
+The name should be unique within the schema. It can be any valid Teradata
+identifier.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>file.on.client</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether the file is present on client or remote location on
+Vantage.<br />
+Set this to FALSE if the file to be installed is present at remote
+location on Vantage.<br />
+Default Value: TRUE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>is.binary</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies if file to be installed is a binary file.<br />
+Default Value: FALSE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>replace</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies if the file is to be installed or replaced.<br />
+If set to TRUE, then the file is replaced based on the value of &quot;force.replace&quot;
+argument.<br />
+Default Value: FALSE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>force.replace</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether the file is to be replaced even if it is being executed.<br />
+If set to TRUE, the file is replaced even if it is being executed.<br />
+If set to FALSE, an error is raised if it is being executed.<br />
+Note: This argument is ignored if the argument &quot;replace&quot; is set to FALSE.<br />
+Default Value: FALSE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Any additional parameters required for the function.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>None. Prints message if the operation is successful.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_remove_file</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Note:
+#  1. Connection must be established before running these examples.
+#  2. File can be on client or remote database server.
+#  3. Files mentioned in the examples are part of the package and can be found at
+#     package install location as shown in the below examples.
+
+# Replace "&lt;tdplyr_install_location&gt;" with the absolute path of the install location of the
+# tdplyr library. One can get this location using '.libPaths()'.
+# Make sure to include 'tdplyr' in the path. For example, &lt;r_pkg_install_location&gt;/tdplyr.
+
+tdplyr_install_location &lt;- "&lt;tdplyr_install_location&gt;"
+
+# Example 1: Install the file 'mapper.R' found at the path mentioned in "file.path.loc"
+#            argument.
+td_install_file(file.path.loc = file.path(tdplyr_install_location, "scripts", "mapper.R"),
+                file.identifier = 'mapper')
+
+# Example 2: Install the binary file 'binary_file.dms' found at the path mentioned in
+#            "file.path.loc" argument.
+td_install_file(file.path.loc = file.path(tdplyr_install_location, "scripts",
+                                          "binary_file.dms"),
+                file.identifier = 'binaryfile',
+                file.on.client = TRUE,
+                is.binary = TRUE)
+
+# Example 3: Replace the file 'mapper.R' with 'mapper_replace.R' found at the path mentioned
+#            in "file.path.loc" argument.
+td_install_file(file.path.loc = file.path(tdplyr_install_location, "scripts", "mapper_replace.R"),
+                file.identifier = 'mapper',
+                file.on.client = TRUE,
+                is.binary = FALSE,
+                replace = TRUE,
+                force.replace = TRUE)
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

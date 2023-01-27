@@ -1,0 +1,381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: DecisionTree</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_decision_tree_mle {tdplyr}"><tr><td>td_decision_tree_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+DecisionTree
+</h2>
+
+<h3>Description</h3>
+
+<p>The DecisionTree function creates a single decision tree
+in a distributed fashion, either weighted or unweighted.
+The model tbl_teradata that this function outputs can be
+input to the function DecisionTreePredict (<code>td_decision_tree_predict_sqle</code>)
+or DecisionTreePredict (<code>td_decision_tree_predict_mle</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_decision_tree_mle (
+      data = NULL,
+      attribute.name.columns = NULL,
+      attribute.value.column = NULL,
+      id.columns = NULL,
+      attribute.table = NULL,
+      response.table = NULL,
+      response.column = NULL,
+      categorical.attribute.table = NULL,
+      splits.table = NULL,
+      split.value = NULL,
+      num.splits = 10,
+      approx.splits = TRUE,
+      nodesize = 100,
+      max.depth = 30,
+      weighted = FALSE,
+      weight.column = NULL,
+      split.measure = "gini",
+      output.response.probdist = FALSE,
+      response.probdist.type = "Laplace",
+      categorical.encoding = "graycode",
+      attribute.table.sequence.column = NULL,
+      data.sequence.column = NULL,
+      categorical.attribute.table.sequence.column = NULL,
+      response.table.sequence.column = NULL,
+      splits.table.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Optional Argument. Required if you omit &quot;attribute.table&quot; and
+&quot;response.table&quot; arguments.<br />
+Specifies the name of the tbl_teradata that contains the input data set.
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.name.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the attribute tbl_teradata columns that define the
+attribute.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.value.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the attribute tbl_teradata column that define the
+value.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>id.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns in the response and attribute
+objects of class &quot;tbl_teradata&quot; that specify the ID of the instance.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.table</code></td>
+<td>
+
+<p>Optional Argument. Required if you omit &quot;data&quot; argument.<br />
+Specifies the name of the tbl_teradata that contains the attribute names and
+the values.
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.table</code></td>
+<td>
+
+<p>Optional Argument. Required if you omit &quot;data&quot; argument.<br />
+Specifies the name of the tbl_teradata that contains the response values.
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the response tbl_teradata column that contains the
+response variable.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.attribute.table</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the input tbl_teradata containing the categorical attributes.
+</p>
+</td></tr>
+<tr valign="top"><td><code>splits.table</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the input tbl_teradata that contains the
+user-specified splits. By default, the function creates new splits.
+</p>
+</td></tr>
+<tr valign="top"><td><code>split.value</code></td>
+<td>
+
+<p>Optional Argument.<br />
+If you specify the argument &quot;splits.table&quot;, this argument specifies the
+name of the column that contains the split value. If &quot;approx.splits&quot; is TRUE,
+then the default value is splits_valcol; if not, then the default
+value is the &quot;attribute.value.column&quot; argument, node_column.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>num.splits</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of splits to consider for each variable. The
+function does not consider all possible splits for all attributes.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>approx.splits</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to use approximate percentiles (TRUE) or exact
+percentiles (FALSE). Internally, the function uses percentile values
+as split values.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>nodesize</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the decision tree stopping criterion and the minimum size
+of any particular node within each decision tree.<br />
+Default Value: 100<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.depth</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a decision tree stopping criterion. If the tree reaches a
+depth past this value, the algorithm stops looking for splits.
+Decision trees can grow up to (2(max_depth+1) - 1) nodes. This
+stopping criteria has the greatest effect on function performance.
+The maximum value is 60. <br />
+Default Value: 30<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>weighted</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to build a weighted decision tree. If you specify
+&quot;TRUE&quot;, then you must also specify the &quot;weight.column&quot; argument.
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>weight.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the response tbl_teradata column that contains
+the weights of the attribute values.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>split.measure</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the impurity measurement to use while constructing the
+decision tree. <br />
+Default Value: &quot;gini&quot;<br />
+Permitted Values: GINI, ENTROPY, CHISQUARE<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.response.probdist</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a flag to enable or disable output of probability distribution for
+output labels.<br />
+Default Value: FALSE<br />
+Types: logical.<br />
+Note: This argument argument can accept input value TRUE
+only when tdplyr is connected to Vantage 1.0 Maintenance
+Update 2 version or later.
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.probdist.type</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the type of algorithm to use to generate output probability
+distribution for output labels. Uses one of Laplace, Frequency or
+RawCounts to generate Probability Estimation Trees (PET) based
+distributions.<br />
+Default Value: &quot;Laplace&quot;<br />
+Permitted Values: Laplace, Frequency, RawCount<br />
+Types: character<br />
+Note: This argument can only be used when &quot;output.response.probdist&quot; is
+set to TRUE.
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.encoding</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies which encoding method is used for categorical variables.<br />
+Default Value: &quot;graycode&quot;<br />
+Permitted Values: graycode, hashing<br />
+Types: character<br />
+Note: This argument is supported when tdplyr is connected to Vantage 1.1
+or later versions.
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.table.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;attribute.table&quot;. The argument is used to
+ensure deterministic results for functions which produce results that
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;data&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.attribute.table.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;categorical.attribute.table&quot;. The argument is
+used to ensure deterministic results for functions which produce
+results that vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.table.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;response.table&quot;. The argument is used to
+ensure deterministic results for functions which produce results that
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>splits.table.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;splits.table&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_decision_tree_mle&quot; which is a
+named list containing Teradata tbl objects.
+Named list members can be referenced directly with the &quot;$&quot; operator
+using following names:</p>
+<ol>
+<li><p> model.table</p>
+</li>
+<li>
+<p>intermediate.splits.table</p>
+</li>
+<li><p> final.response.tableto</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("decision_tree_example", "iris_attribute_train", "iris_response_train",
+                    "iris_altinput")
+
+    # Create object(s) of class "tbl_teradata".
+    iris_attribute_train &lt;- tbl(con, "iris_attribute_train")
+    iris_response_train &lt;- tbl(con, "iris_response_train")
+    iris_altinput &lt;- tbl(con, "iris_altinput")
+
+    # Example 1 - Create decision tree by specifying attribute and response tables.
+    td_decision_tree_out1 &lt;- td_decision_tree_mle(attribute.name.columns = c("attribute"),
+                                                  attribute.value.column = "attrvalue",
+                                                  id.columns = c("pid"),
+                                                  attribute.table = iris_attribute_train,
+                                                  response.table = iris_response_train,
+                                                  response.column = "response",
+                                                  num.splits = 3,
+                                                  approx.splits = FALSE,
+                                                  nodesize = 10,
+                                                  max.depth = 10,
+                                                  split.measure = "gini"
+                                                  )
+
+    # Example 2 - Create decision tree by specifying only the "data" argument.
+    td_decision_tree_out2 &lt;- td_decision_tree_mle(data = iris_altinput,
+                                                  attribute.name.columns = c("attribute"),
+                                                  attribute.value.column = "attrvalue",
+                                                  id.columns = c("pid"),
+                                                  response.column = "response",
+                                                  num.splits = 3,
+                                                  approx.splits = FALSE,
+                                                  nodesize = 10,
+                                                  max.depth = 10,
+                                                  split.measure = "gini"
+                                                  )
+
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

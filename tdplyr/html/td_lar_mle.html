@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: LAR</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_lar_mle {tdplyr}"><tr><td>td_lar_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+LAR
+</h2>
+
+<h3>Description</h3>
+
+<p>Least Angle Regression (LAR) and its most important modification, 
+least absolute shrinkage and selection operator (LASSO), are variants 
+of linear regression that select the most important variables, one by 
+one, and fit the coefficients dynamically.<br />
+The function generates a model that the function <code>td_lar_predict_mle</code>
+uses to make predictions for the response variables.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_lar_mle (
+      formula = NULL,
+      data = NULL,
+      type = "LASSO",
+      max.steps = NULL,
+      normalize = TRUE,
+      intercept = TRUE,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the model to be fitted, an object of class &quot;formula&quot;. Only 
+basic formula of the form (col1 ~ col2 + col3 +...) are supported, and 
+all variables must be valid columns in &quot;data&quot; argument. The 
+response should be a column of type real, numeric, integer or boolean.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata.<br />
+Note: All columns must be in lower case.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies either &quot;LAR&quot; (least angle regression) or &quot;LASSO&quot;.<br />
+Default Value: &quot;LASSO&quot;<br />
+Permitted Values: LAR, LASSO<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.steps</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of steps the function executes. The 
+default value is 8*min(number_of_predictors, sample_size - 
+intercept). For example, if the number of predictors is 11, the 
+sample size (number of rows in the input tbl_teradata) is 1532, and the 
+intercept is 1, then the default value is 8*min(11, 1532 - 1) = 88.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>normalize</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether each predictor is standardized to have unit L2 
+norm.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>intercept</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether an intercept is included in the model (and not 
+penalized).<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_lar_mle&quot; which is a named 
+list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> output.table</p>
+</li>
+<li><p> sql.stdout</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    # This input is diabetes data from "Least Angle Regression," by Bradley Efron and others.
+    # This data set is atypical in that each predictor has mean 0 and norm 1
+    loadExampleData("lar_example", "diabetes")
+
+    # Create object(s) of class "tbl_teradata".
+    diabetes &lt;- tbl(con, "diabetes")
+    # Rename columns in the tbl_teradata to lower case, since the input tbl_teradata
+    # contains one or more column names in upper case.
+    diabetes_lower &lt;- diabetes %&gt;% rename_all(tolower)
+
+    # Example - Build a LAR model with response variable 'y' and ten baseline predictors.
+    td_lar_out &lt;- td_lar_mle(formula = (y ~ hdl + glu + ldl + map1 + sex + tch + age + ltg
+                                        + bmi + tc),
+                             data = diabetes_lower,
+                             type = "LAR",
+                             max.steps  = 20,
+                             intercept = TRUE
+                             )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

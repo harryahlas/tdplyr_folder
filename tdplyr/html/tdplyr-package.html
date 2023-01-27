@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: tdplyr: dplyr for Teradata Vantage</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for tdplyr-package {tdplyr}"><tr><td>tdplyr-package {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>tdplyr: dplyr for Teradata Vantage</h2>
+
+<h3>Description</h3>
+
+<p>tdplyr is focused on integrating and scaling dplyr with Teradata 
+Vantage to solve challenges in data analysis.
+</p>
+
+
+<h3>Details</h3>
+
+<p>The main goals are to:
+</p>
+
+<ul>
+<li><p> Enable data scientists to work effectively with the data in Teradata Vantage.
+</p>
+</li>
+<li><p> Provide a growing list of analytic functions to leverage in-database analytics.
+</p>
+</li></ul>
+
+<p>To learn more about tdplyr, start with the vignettes:
+</p>
+<p><code>browseVignettes(package = "tdplyr")</code>
+</p>
+<p>Use the help command to view the list of exported functions:
+</p>
+<p><code>help(package = "tdplyr")</code>
+</p>
+<p>To learn more about dplyr, start with the vignettes:
+</p>
+<p><code>browseVignettes(package = "dplyr")</code>
+</p>
+
+
+<h3>Package options</h3>
+
+
+<dl>
+<dt><code>td.db_desc.output</code></dt><dd><p>Sets the Database output when printing tbls</p>
+</dd>
+</dl>
+
+
+
+<h3>Package options for dplyr related packages</h3>
+
+<p>Options from the dplyr package
+</p>
+
+<dl>
+<dt><code>dplyr.strict_sql</code></dt><dd><p>Forces an error if dplyr doesn't know how to 
+map a function when translating SQL if TRUE. 
+FALSE by default.</p>
+</dd>
+</dl>
+
+<p>Options from the tibble package
+</p>
+
+<dl>
+<dt><code>tibble.print_min</code></dt><dd><p>Sets minimum amount of rows to print by default</p>
+</dd>
+</dl>
+
+
+
+<h3>Glossary of Terms</h3>
+
+<p>Teradata tbl object: Refers to the object created using the <code>tbl()</code> function of the &quot;dplyr&quot; package,
+when the function is invoked with a Teradata connection.
+Teradata tbl is an object of class &quot;tbl_teradata&quot;.
+For example, to create a Teradata tbl object from an existing table &quot;TABLE1&quot; with a connection &quot;con&quot;,
+use the command: <code>dplyr::tbl(con, "TABLE1")</code>.
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

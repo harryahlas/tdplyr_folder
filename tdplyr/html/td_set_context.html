@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Initialize a context to perform analytic functions on...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_set_context {tdplyr}"><tr><td>td_set_context {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Initialize a context to perform analytic functions on Teradata Vantage</h2>
+
+<h3>Description</h3>
+
+<p>A context must be initialized before executing analytic functions. Use the
+<code>td_set_context</code> function to initialize or update a context using an
+already established connection.<br />
+<br />
+Note:
+</p>
+
+<ul>
+<li><p> If there is no previous context, then a new context is initialized.
+</p>
+</li>
+<li><p> If the context already exists, and
+</p>
+
+<ol>
+<li><p> the connection object &quot;con&quot; is created using
+<code>tdplyr::NativeDriver()</code> (as in Example 2), then the context
+attribute &quot;temp.database&quot; is updated if it is different compared to that
+of previous context. Since the connection parameters host, user/uid and
+database (i.e. default schema) are same for both &quot;con&quot; and the connection
+object from the context (because <code>dbConnect</code> on <code>NativeDriver</code>
+object initializes the context), the previous context (that is created by
+<code>dbConnect</code>) is NOT overwritten and all nonpersistent work tables
+remain in the session.
+</p>
+</li>
+<li><p> the connection object &quot;con&quot; is created using
+<code>teradatasql::TeradataDriver()</code> (as in Example 3) object (For more
+information on this, please check documentation from Teradata SQL Driver
+for R), then
+</p>
+
+<ol>
+<li><p> the previous context is overwritten and all nonpersistent work
+tables are removed if the connection parameters of &quot;con&quot; are different
+than those of the connection object from the previous context.
+</p>
+</li>
+<li><p> the previous context is NOT overwritten and all nonpersistent work
+tables remain in the session if the connection parameters are same for
+both &quot;con&quot; and the connection object from the previous context.
+</p>
+</li></ol>
+
+<p>In this case, the new connection object should be retrieved using
+<code>td_get_context()$connection</code> before using it.
+</p>
+</li></ol>
+
+</li></ul>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_set_context(con, temp.database = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>con</code></td>
+<td>
+<p>Required Argument<br />
+Specifies a <code>DBIConnection</code> object with a <code>Teradata</code> or
+a <code>TeradataConnection</code> subclass.</p>
+</td></tr>
+<tr valign="top"><td><code>temp.database</code></td>
+<td>
+<p>Optional Argument<br />
+Specifies the database name which needs to be used to
+create temporary database objects (table/view) for
+processing data. Such objects are garbage collected at
+the end of the session. If a user wants to specifically
+use a known database for temporary objects, the
+database name can be specified using this argument.<br />
+Note:
+</p>
+
+<ol>
+<li><p> Make sure the user has privilege to create
+objects in this database, otherwise the functions that
+create temporary objects will fail.
+</p>
+</li>
+<li><p> If this argument is not specified, default
+database of the connection is used for temporary
+objects.
+</p>
+</li>
+<li><p> To get the temporary database name, use
+function <code>td_get_context()</code>.
+</p>
+</li></ol>
+
+<p>Default: NULL<br />
+Types: character</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Returns NULL invisibly
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_remove_context</code>, <code>td_create_context</code>,
+<code>td_get_context</code>, <code>dbConnect</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Example 1: Create a new context and switch its temporary database using
+#            td_set_context() function without removing nonpersistent work
+#            tables.
+con &lt;- td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;",
+                         pwd = "&lt;tdpwd&gt;", dType = "native")
+
+# Get the current context information.
+td_get_context()
+
+# Change temporary database.
+td_set_context(con, temp.database = "database_for_transient_objects")
+
+# Get the current and changed context information.
+td_get_context()
+
+# Remove the current context.
+td_remove_context()
+
+# Example 2: Use dbConnect() function to connect to Advanced SQL Engine
+#            through tdplyr NativeDriver() and set context using different
+#            temporary database to change "temp.database" of an existing
+#            context without removing nonpersistent work tables.
+con &lt;- DBI::dbConnect(tdplyr::NativeDriver(), "&lt;dbcname&gt;", "&lt;tduser&gt;",
+                      "&lt;tdpwd&gt;")
+
+# Set context using different temporary database.
+td_set_context(con, temp.database = "database_for_transient_objects")
+
+# Remove the current context.
+td_remove_context()
+
+# Example 3: Use dbConnect() function to connect to Advanced SQL Engine
+#            directly through Teradata SQL Driver (i.e. TeradataDriver()).
+con &lt;- DBI::dbConnect(teradatasql::TeradataDriver(),
+                      '{"host":"&lt;dbcname&gt;","user":"&lt;tduser&gt;","password":"&lt;tdpwd&gt;"}')
+
+# Set context using different temporary database.
+td_set_context(con, temp.database = "database_for_transient_objects")
+
+# The td_set_context() function just sets the context and does not return
+# the connection object. Hence, get the connection object as follows.
+con &lt;- td_get_context()$connection
+
+# Remove the current context.
+td_remove_context()
+
+# Example 4: Managing multiple connections with td_set_context() function.
+con1 &lt;- DBI::dbConnect(teradatasql::TeradataDriver(),
+                       '{"host":"&lt;dbcname&gt;","user":"&lt;tduser&gt;","password":"&lt;tdpwd&gt;"}')
+con2 &lt;- DBI::dbConnect(teradatasql::TeradataDriver(),
+                       '{"host":"&lt;dbcname&gt;","user":"&lt;tduser&gt;","password":"&lt;tdpwd&gt;"}')
+
+# Initialize the context with 'con1'.
+td_set_context(con = con1, temp.database = "database_for_transient_objects")
+
+# Get the current context information.
+td_get_context()
+
+# Initialize the context with 'con2'. This overwrites current context and
+# 'con1' is disconnected.
+td_set_context(con = con2)
+
+# Get the current context information.
+td_get_context()
+
+# Remove the current context.
+# Note: This performs garbage collection and disconnects current context
+#       connection i.e., 'con2'.
+td_remove_context()
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

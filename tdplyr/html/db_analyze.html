@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Analyze the table</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for db_analyze.Teradata {tdplyr}"><tr><td>db_analyze.Teradata {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Analyze the table</h2>
+
+<h3>Description</h3>
+
+<p>This function collects the statistics of the given table.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'Teradata'
+db_analyze(con, table, column, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>con</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies remote data source.</p>
+</td></tr>
+<tr valign="top"><td><code>table</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies remote table name.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>column</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies name of the remote table column(s). Column name
+is required to collect the statistics in Teradata.<br />
+Types: character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Other parameters passed to methods.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Returns 2 on success.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>db_begin, db_commit, db_rollback, sql_table_analyze</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get the connection.
+con &lt;- td_get_context()$connection
+
+# Load the data.frame 'iris' to "iris" table.
+iris2 &lt;- copy_to(con, iris, overwrite = FALSE)
+
+# Analyze the table "iris".
+db_analyze(con, "iris", "Sepal.Length")
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

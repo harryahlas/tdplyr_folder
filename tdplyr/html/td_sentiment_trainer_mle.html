@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TrainSentimentExtractor</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_sentiment_trainer_mle {tdplyr}"><tr><td>td_sentiment_trainer_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+TrainSentimentExtractor
+</h2>
+
+<h3>Description</h3>
+
+<p>The TrainSentimentExtractor function trains a model, that is, 
+takes training documents and outputs a maximum entropy
+classification model, which it installs on ML Engine. See 
+<a href="https://en.wikipedia.org/wiki/Maximum_entropy">Maximum Entropy</a> for
+more information.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_sentiment_trainer_mle (
+      data = NULL,
+      text.column = NULL,
+      sentiment.column = NULL,
+      language = "en",
+      model.file = NULL,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the training 
+data.
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+training data.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>sentiment.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+sentiment values, which are &quot;POS&quot; (positive), &quot;NEG&quot; (negative), and 
+&quot;NEU&quot; (neutral).<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>language</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the language of the training data: &quot;en&quot; (English), &quot;zh_CN&quot; 
+(Simplified Chinese), &quot;zh_TW&quot; (Traditional Chinese).<br />
+Default Value: &quot;en&quot;<br />
+Permitted Values: en, zh_CN, zh_TW<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>model.file</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the file to which the function outputs the 
+model. If a file of the same name already exists, it gets overwritten.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_sentiment_trainer_mle&quot; which 
+is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: output.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("sentimenttrainer_example", "sentiment_train")
+    
+    # Create object(s) of class "tbl_teradata".
+    # The sample dataset contains collection of user reviews for different products.
+    sentiment_train &lt;- tbl(con, "sentiment_train")
+    
+    # Example 1 - Build and output a maximum entropy classification model to a binary file.
+    td_sentiment_trainer_mle_out &lt;- td_sentiment_trainer_mle(data = sentiment_train,
+                                                             text.column = "review",
+                                                             sentiment.column = "category",
+                                                             model.file = "sentimentmodel1.bin"
+                                                             )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

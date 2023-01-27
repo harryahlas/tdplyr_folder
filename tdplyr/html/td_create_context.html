@@ -1,0 +1,406 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Create a Context to run analytic functions on Teradata...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_create_context {tdplyr}"><tr><td>td_create_context {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Create a Context to run analytic functions on Teradata Vantage</h2>
+
+<h3>Description</h3>
+
+<p>Use the <code>td_create_context</code> function to establish a connection to
+Teradata Vantage. The established connection will be set as the current
+context for all subsequent analytic functions.<br />
+Note:
+</p>
+
+<ol>
+<li><p> If a context already exists, this overwrites the previous context and
+removes all non-persistent work tables created by the analytic functions,
+even though the connection parameters <code>host</code>, <code>uid</code> and
+<code>database</code> (i.e. default schema) are same for both the new connection
+object and the connection object from the previous context.
+</p>
+</li>
+<li><p> When logmech argument (other than TD2 which is the current default
+logon mechanism) is used, you should setup the client with relevant security
+mechanisms.
+</p>
+</li>
+<li><p> tdplyr requires that the user has certain permissions on the user's
+default database or the initial default database specified using the
+&quot;database&quot; argument, or the temporary database when specified using
+&quot;temp.database&quot;.<br />
+These permissions allow the user to:
+</p>
+
+<ol>
+<li><p> Create tables to save results of Vantage analytic functions.
+</p>
+</li>
+<li><p> Create views in the background for objects of class
+&quot;tbl_teradata&quot; based on query.
+</p>
+</li></ol>
+
+<p>It is expected that the user has the required permissions to create these
+objects in the database that will be used.<br />
+For views based on Vantage Analytic Functions, additional permissions may be
+required, which can be granted using:<br />
+<code>GRANT EXECUTE FUNCTION ON SYSLIB ... WITH GRANT OPTION</code>.<br />
+The access to the views created may also require issuing additional
+permissions depending on which database is used and which object the view
+being created is based on, which can be granted using:<br />
+<code>GRANT SELECT ... WITH GRANT OPTION</code>.
+</p>
+</li>
+<li><p> The &quot;temp.database&quot; and &quot;database&quot; parameters help determine which
+database is used by default to lookup for tables/views while creating
+objects of class &quot;tbl_teradata&quot; and which database is used to create all
+internal temporary objects, as shown in the table below.<br />
+</p>
+
+<table summary="Rd table">
+<tr>
+ <td style="text-align: left;">
+ </td><td style="text-align: left;"> <strong>Scenario</strong> </td><td style="text-align: left;"> <strong>tdplyr behaviour</strong> </td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+1. </td><td style="text-align: left;"> Both "database" and "temp.database" are provided </td><td style="text-align: left;">
+   Internal temporary objects are created in "temp.database", and database
+   table/view lookup is done from "database".</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+2. </td><td style="text-align: left;"> "database" is provided but "temp.database" is not </td><td style="text-align: left;">
+   Database table/view lookup and internal temporary objects are created in
+   "database".</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+3. </td><td style="text-align: left;"> "temp.database" is provided but "database" is not </td><td style="text-align: left;">
+   Internal temporary objects are created in "temp.database", database
+   table/view lookup from the users default database. </td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+4. </td><td style="text-align: left;"> Neither "database" nor "temp.database" are provided </td><td style="text-align: left;">
+   Database table/view lookup and internal temporary objects are created in
+   users default database. </td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+</td>
+</tr>
+
+</table>
+
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_create_context(
+  dsn = NULL,
+  host = NULL,
+  uid = NULL,
+  pwd = NULL,
+  tdWalletString = NULL,
+  database = NULL,
+  temp.database = NULL,
+  dType = "odbc",
+  logmech = NULL,
+  logdata = NULL,
+  log = 0,
+  ...
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>dsn</code></td>
+<td>
+<p><b><em>(Deprecated)</em></b> Optional argument.<br />
+Specifies the Data Source Name (DSN) for the ODBC connection. If this
+argument is not specified, relevant optional arguments are used to
+form the connection string.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Only applicable when the argument &quot;dType&quot; is 'ODBC'.
+</p>
+</li></ul>
+
+<p>Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>host</code></td>
+<td>
+<p>Optional argument. Required when &quot;dType&quot; is 'NATIVE'.<br />
+Specifies the fully qualified domain name or IP address of the Teradata
+Vantage System.<br />
+Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>uid</code></td>
+<td>
+<p>Optional argument.<br />
+Specifies the user Id for connection. If not supplied, the userid
+present in DSN is used.<br />
+Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>pwd</code></td>
+<td>
+<p>Optional argument.<br />
+Specifies the password. If not supplied, the password present in DSN is
+used.<br />
+Default Value: NULL<br />
+Types: character<br />
+Note:
+</p>
+
+<ul>
+<li><p> Encrypted passwords can also be passed to this argument, using
+Stored Password Protection feature. Examples section below demonstrates
+passing encrypted password to the function. More details on Stored
+Password Protection and how to generate key and encrypted password file
+can be found at
+<a href="https://github.com/Teradata/r-driver#StoredPasswordProtection">
+Stored Password Protection</a>.
+</p>
+</li></ul>
+</td></tr>
+<tr valign="top"><td><code>tdWalletString</code></td>
+<td>
+<p><b><em>(Deprecated)</em></b> Optional argument.<br />
+Specifies the tdwallet reference string for the password required for
+the connection. If this is specified, the argument &quot;pwd&quot; is ignored.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Only applicable when the argument &quot;dType&quot; is 'ODBC'.
+</p>
+</li></ul>
+
+<p>Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>database</code></td>
+<td>
+<p>Optional argument.<br />
+Specifies the database name to which connection is needed. If not
+supplied, the database name present in the DSN is used.<br />
+If not supplied and
+</p>
+
+<ol>
+<li><p> &quot;dType&quot; is 'ODBC', then the database name present in the DSN is
+used.
+</p>
+</li>
+<li><p> &quot;dType&quot; is 'NATIVE', then database name associated with the user
+specified in the argument &quot;uid&quot; is used.
+</p>
+</li></ol>
+
+<p>Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>temp.database</code></td>
+<td>
+<p>Optional argument.<br />
+Some of the functions need to create temporary database objects
+(table/view) for processing data. Such objects are garbage collected
+at the end of the session. If a user wants to specifically use a known
+database for temporary objects, the database name can be specified
+using this argument. Make sure the user has privilege to create objects
+in this database, otherwise the functions that create temporary objects
+will fail.<br />
+If this argument is not supplied, default database of the connection is
+used for temporary objects. To get the temporary database name, use
+function <code>td_get_context()</code>.<br />
+Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>dType</code></td>
+<td>
+<p>Required argument.<br />
+Specifies the driver type.<br />
+Permitted Values: ODBC <b><em>(Deprecated)</em></b>, NATIVE<br />
+Default Value: ODBC<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>logmech</code></td>
+<td>
+<p>Optional argument.<br />
+Specifies the logon authentication method.<br />
+If the value is NULL, it takes default value used by the
+Teradata SQL Driver for R.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Only applicable when &quot;dType&quot; is 'NATIVE'. Ignored when used with
+'ODBC'.
+</p>
+</li></ul>
+
+<p>Permitted Values: TD2, LDAP, TDNEGO, KRB5 (for Kerberos) and JWT<br />
+Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>logdata</code></td>
+<td>
+<p>Optional argument.<br />
+Specifies additional data for the chosen logon authentication method.<br />
+Note:
+</p>
+
+<ol>
+<li><p> Only applicable when &quot;dType&quot; is 'NATIVE'. Ignored when used
+with 'ODBC'.
+</p>
+</li>
+<li><p> If &quot;logmech&quot; is &quot;JWT&quot;, then JWT token should be provided with the
+key 'jwt.token' in the named list of this argument.
+</p>
+</li></ol>
+
+<p>Default Value: NULL<br />
+Types: Named list of characters</p>
+</td></tr>
+<tr valign="top"><td><code>log</code></td>
+<td>
+<p>Optional argument.<br />
+Specifies the controls for debug logging.<br />
+The 1-bit governs function and method tracing, the 2-bit governs
+debug logging, the 4-bit governs transmit and receive message hex dumps,
+and the 8-bit governs timing.<br />
+Default Value: 0<br />
+Types: integer<br />
+Examples:
+</p>
+
+<ol>
+<li><p> If the user wants only debug logging, 2 (in bit representation:
+0010) should be used as argument value.
+</p>
+</li>
+<li><p> If the user wants timing and debug logging, 10 (in bit
+representation: 1010) should be used as argument value.
+</p>
+</li></ol>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies the additional connection parameters that are passed
+to Teradata SQL Driver for R. Please refer to
+<a href="https://github.com/Teradata/r-driver#ConnectionParameters">
+Connection Parameters</a>
+of the driver.<br />
+Note:
+</p>
+
+<ul>
+<li><p> When the type of a connection parameter is integer or
+boolean (eg: lob_support etc,.), pass integer or boolean
+value, instead of quoted integer or quoted boolean as suggested
+in the documentation.
+</p>
+</li></ul>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Invisibly returns an object of class: <code>DBIConnection</code>.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_remove_context</code>, <code>td_set_context</code>,
+<code>td_get_context</code>, <code>dbConnect</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Note: The default database in the connection is used as the temporary
+#       database. For retrieving and removing context, check td_get_context()
+#       and td_remove_context() respectively.
+
+# Example 1: Create a context using the Teradata SQL Driver. Note that the argument 'logmech' is
+# not specified. Connection is established with default logon mechanism.
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;", pwd = "&lt;tdpwd&gt;", dType = "NATIVE")
+
+# Example 2: Create a context using the Teradata SQL Driver with various logon mechanisms.
+
+# Connection using TD2: The Teradata 2(TD2) mechanism provides authentication using a Vantage
+# database username and password.
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;", pwd = "&lt;tdpwd&gt;", dType = "NATIVE",
+                  logmech = "TD2")
+
+# Connection using TDNEGO: TDNEGO is a security mechanism that automatically determines the
+# actual mechanism required, based on policy, without user's involvement. The actual mechanism
+# is determined by the TDGSS server configuration and the security policy's mechanism
+# restrictions.
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;", pwd = "&lt;tdpwd&gt;", dType = "NATIVE",
+                  logmech = "TDNEGO")
+
+# Connection using LDAP: LDAP is a directory-based mechanism. User logs on to a Vantage database
+# with a directory username and password and is authenticated by the directory.
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;", pwd = "&lt;tdpwd&gt;", dType = "NATIVE",
+                  logmech = "LDAP")
+
+# Connection using KRB5: KRB5 is a directory-based mechanism. User logs on to a Vantage database
+# with a domain username and password and is authenticated by Kerberos (KRB5 or SPNEGO
+# mechanism).
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;", dType = "NATIVE", logmech = "KRB5")
+
+# Connection using JWT: Using JWT token to connect to Vantage.
+td_create_context(host = "&lt;dbcname&gt;", dType = "NATIVE", logmech = "JWT",
+                  logdata = list(jwt.token="&lt;token_value&gt;"))
+
+# Example 3: Create context using encrypted password and key passed to "pwd" parameter.
+# The password should be specified in the format mentioned below:
+# ENCRYPTED_PASSWORD(file:&lt;PasswordEncryptionKeyFileName&gt;, file:&lt;EncryptedPasswordFileName&gt;)
+# The PasswordEncryptionKeyFileName specifies the name of a file that contains the password
+# encryption key and associated information.
+# The EncryptedPasswordFileName specifies the name of a file that contains the encrypted
+# password and associated information.
+# Each filename must be preceded by the 'file:' prefix. The PasswordEncryptionKeyFileName must
+# be separated from the EncryptedPasswordFileName by a single comma.
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;",
+                  pwd = "ENCRYPTED_PASSWORD(file:PassKey.properties, file:EncPass.properties)",
+                  dType = "NATIVE")
+
+# Example 4: Create context using encrypted password in LDAP logon mechanism.
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;",
+                  pwd = "ENCRYPTED_PASSWORD(file:PassKey.properties, file:EncPass.properties)",
+                  dType = "NATIVE", logmech = "LDAP")
+
+# Example 5: Create context using 'ansi' mode with log value set to 8 and lob_support disabled.
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;", pwd = "&lt;tdpwd&gt;", dType = "NATIVE",
+                  tmode = 'ansi', log = 8, lob_support = FALSE)
+
+# Example 6: Create context with 'database' parameter.
+td_create_context(host = "&lt;dbcname&gt;", uid = "&lt;tduser&gt;", pwd = "&lt;tdpwd&gt;", dType = "NATIVE",
+                  database = '&lt;schema_name&gt;')
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

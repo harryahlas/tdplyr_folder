@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: EvaluateSentimentExtractor</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_sentiment_evaluator_mle {tdplyr}"><tr><td>td_sentiment_evaluator_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+EvaluateSentimentExtractor
+</h2>
+
+<h3>Description</h3>
+
+<p>The EvaluateSentimentExtractor function uses test data to evaluate the precision
+and recall of the predictions output by the function ExtractSentiment
+(<code>td_sentiment_extractor_mle</code>). The precision and recall are affected by
+the model that the function <code>td_sentiment_extractor_mle</code> uses; therefore,
+if the model is changed, EvaluateSentimentExtractor must be rerun on the new predictions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_sentiment_evaluator_mle (
+      object = NULL,
+      obs.column = NULL,
+      sentiment.column = NULL,
+      object.sequence.column = NULL,
+      object.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata with a text column which contains
+input text.
+</p>
+</td></tr>
+<tr valign="top"><td><code>object.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;object&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>obs.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column with the observed sentiment
+(POS, NEG or NEU).<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>sentiment.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column with the predicted sentiment
+(POS, NEG or NEU).<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>object.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;object&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_sentiment_evaluator_mle&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("sentimenttrainer_example", "sentiment_train")
+    loadExampleData("sentimentextractor_example", "sentiment_extract_input", "sentiment_word")
+
+    # Create object(s) of class "tbl_teradata".
+    sentiment_train &lt;- tbl(con, "sentiment_train")
+    sentiment_extract_input &lt;- tbl(con, "sentiment_extract_input")
+    sentiment_word &lt;- tbl(con, "sentiment_word")
+
+    # Example 1 - This example uses the dictionary model file 'default_sentiment_lexicon.txt'.
+    td_sentiment_extractor_out1 &lt;- td_sentiment_extractor_mle(object = "dictionary",
+                                                              newdata = sentiment_extract_input,
+                                                              text.column = "review",
+                                                              accumulate = c("category")
+                                                              )
+
+    td_sent_eval_out1 &lt;- td_sentiment_evaluator_mle(object=td_sentiment_extractor_out1$result,
+                                                    obs.column='category',
+                                                    sentiment.column='out_polarity'
+                                                    )
+
+    # Example 2 - This example uses the classification model file
+    # 'default_sentiment_classification_model.bin'
+    td_sentiment_extractor_out2 &lt;- td_sentiment_extractor_mle(
+                            object = "classification:default_sentiment_classification_model.bin",
+                            newdata = sentiment_extract_input,
+                            text.column = "review",
+                            accumulate = c("category")
+                            )
+
+    td_sent_eval_out2 &lt;- td_sentiment_evaluator_mle(object=td_sentiment_extractor_out2$result,
+                                                    obs.column='category',
+                                                    sentiment.column='out_polarity'
+                                                    )
+
+    # Example 3 - This example uses classification model file output by
+    # the td_sentiment_trainer_mle() function.
+    td_sentiment_trainer_out &lt;- td_sentiment_trainer_mle(data = sentiment_train,
+                                                         text.column = "review",
+                                                         sentiment.column = "category",
+                                                         model.file = "sentimentmodel1.bin"
+                                                         )
+
+    # Use the td_sentiment_extractor_mle() function to extract sentiment of each input document.
+    td_sentiment_extractor_out3 &lt;- td_sentiment_extractor_mle(
+                                                  object = "classification:sentimentmodel1.bin",
+                                                  newdata = sentiment_extract_input,
+                                                  text.column = "review",
+                                                  accumulate = c("category")
+                                                  )
+
+    td_sent_eval_out3 &lt;- td_sentiment_evaluator_mle(object=td_sentiment_extractor_out3$result,
+                                                    obs.column="category",
+                                                    sentiment.column="out_polarity"
+                                                    )
+
+    # Example 4 - This example uses a dictionary tbl_teradata ('sentiment_word')
+    # instead of model file.
+    td_sentiment_extractor_out4 &lt;- td_sentiment_extractor_mle(newdata = sentiment_extract_input,
+                                                              dict.data = sentiment_word,
+                                                              text.column = "review",
+                                                              accumulate = c("category")
+                                                              )
+
+    td_sent_eval_out4 &lt;- td_sentiment_evaluator_mle(object=td_sentiment_extractor_out4$result,
+                                                    obs.column="category",
+                                                    sentiment.column="out_polarity"
+                                                    )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

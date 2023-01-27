@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: NamedEntityFinderEvaluator</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_namedentity_finder_evaluator_mle {tdplyr}"><tr><td>td_namedentity_finder_evaluator_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+NamedEntityFinderEvaluator
+</h2>
+
+<h3>Description</h3>
+
+<p>The NamedEntityFinderEvaluator function invokes the NamedEntityFinderEvaluatorMap 
+and NamedEntityFinderEvaluatorReduce functions, which operate as a row and
+a partition function, respectively. Each function takes a set of evaluating data and
+generates the precision, recall, and F-measure values of a specified maximum entropy data model.
+The function supports neither regular-expression-based nor dictionary-based models.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_namedentity_finder_evaluator_mle (
+      newdata = NULL,
+      text.column = NULL,
+      model = NULL,
+      newdata.sequence.column = NULL,
+      newdata.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>newdata</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata containing the text column to analyze.
+</p>
+</td></tr>
+<tr valign="top"><td><code>newdata.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;newdata&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the text to analyze.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>model</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the model file to evaluate. The function TrainNamedEntityFinder 
+(<code>td_namedentity_finder_trainer_mle</code>) can be used to create a model file.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>newdata.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;newdata&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_namedentity_finder_evaluator_mle&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("namedentityfinderevaluator_example", "nermem_sports_test")
+    loadExampleData("namedentityfindertrainer_example", "nermem_sports_train")
+    
+    # Create object(s) of class "tbl_teradata".
+    nermem_sports_train &lt;- tbl(con, "nermem_sports_train")
+    nermem_sports_test &lt;- tbl(con, "nermem_sports_test")
+
+    # Train a namedentity finder model on entity type: "LOCATION".
+    # The trained model is stored in a binary file: "location.sports".
+    td_nef_trainer_out &lt;- td_namedentity_finder_trainer_mle(data = nermem_sports_train,
+                                                            text.column = "content",
+                                                            entity.type = "LOCATION",
+                                                            model.file = "location.sports"
+                                                            )
+
+    # Example 1 - Use the model file: location.sports as the input model on the test 
+    # data: nermem_sports_test.
+    td_nef_evaluator_out &lt;- td_namedentity_finder_evaluator_mle(newdata = nermem_sports_test,
+                                                                text.column = "content",
+                                                                model = "location.sports"
+                                                                )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

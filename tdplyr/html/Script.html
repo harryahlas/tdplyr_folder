@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Creates and initializes an object of &quot;ScriptTableOperator&quot;...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for Script {tdplyr}"><tr><td>Script {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Creates and initializes an object of &quot;ScriptTableOperator&quot; class.</h2>
+
+<h3>Description</h3>
+
+<p>The function constructs a ScriptTableOperator object, that can be used to
+execute a user-installed script or any Linux command inside database on
+Teradata Vantage.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+Script(
+  script.command = NULL,
+  returns = NULL,
+  data = NULL,
+  data.hash.column = NULL,
+  data.partition.column = NULL,
+  data.order.column = NULL,
+  is.local.order = FALSE,
+  sort.ascending = TRUE,
+  nulls.first = TRUE,
+  delimiter = "\t",
+  auth = NULL,
+  charset = "LATIN",
+  quotechar = NULL
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>script.command</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the command/script to run.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>returns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the output column definition. It contains a named
+list of key-value pairs where key contains the column name
+and value contains the Teradata Vantage SQL data type.<br />
+Types: named list of characters</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the tbl_teradata containing the input for the script.
+<br />
+Default Value: NULL<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>data.hash.column</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the input tbl_teradata column to be used
+for hashing.<br />
+The rows in the data are redistributed to AMPs based
+on the hash value of the column specified. The
+user-installed script file then runs once on each
+AMP.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This argument cannot be specified along with
+the arguments &quot;data.partition.column&quot; and
+&quot;data.order.column&quot;.
+</p>
+</li></ul>
+
+<p>Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a
+vector, if multiple columns are used for
+partition.<br />
+Note:
+</p>
+
+<ol>
+<li><p> This argument cannot be specified along
+with &quot;data.hash.column&quot; argument.
+</p>
+</li>
+<li><p> This argument cannot be specified when the
+argument &quot;is.local.order&quot; is set to TRUE.
+</p>
+</li>
+<li><p> If this argument is not specified, then
+the entire result set, delivered by the
+function, constitutes a single group or
+partition.
+</p>
+</li></ol>
+
+<p>Permitted Values: &quot;ANY&quot; OR one or more columns
+in &quot;data&quot; tbl_teradata.<br />
+Default Value: NULL<br />
+Types: character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector,
+if multiple columns are used for ordering.<br />
+The column(s) mentioned in the argument is/are used
+in ordering irrespective of whether the argument
+&quot;is.local.order&quot; is set to TRUE or not.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This argument cannot be specified along with
+the argument &quot;data.hash.column&quot;.
+</p>
+</li></ul>
+
+<p>Default Value: NULL<br />
+Types: character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>is.local.order</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether the input data is to be ordered
+locally or not. When set to TRUE, the data is ordered
+locally.<br />
+Order by (Vs) Local Order by:<br />
+</p>
+
+<ul>
+<li><p> Order by: Specifies the order in which the values
+in a group, or partition, are sorted.
+</p>
+</li>
+<li><p> Local Order by: Orders qualified rows on each AMP
+in preparation to be input to a table function.
+</p>
+</li></ul>
+
+<p>Note:
+</p>
+
+<ol>
+<li><p> This argument is ignored if the argument
+&quot;data.order.column&quot; is NOT specified or NULL.
+</p>
+</li>
+<li><p> When this argument is specified, the argument
+&quot;data.order.column&quot; should be specified and the
+column(s) specified in &quot;data.order.column&quot; is/are used
+for local ordering.
+</p>
+</li></ol>
+
+<p>Default Value: FALSE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>sort.ascending</code></td>
+<td>
+<p>Optional Argument.<br />
+Specfies whether to sort the result set in ascending or
+descending order using columns specified in
+&quot;data.order.column&quot; argument.<br />
+The sorting is ascending when this argument is set to
+TRUE, descending otherwise.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This argument is ignored if the argument
+&quot;data.order.column&quot; is NOT specified.
+</p>
+</li></ul>
+
+<p>Default Value: TRUE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>nulls.first</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether the result set containing NULL values
+are to be listed first during ordering.<br />
+NULLs are listed first when this argument is set to TRUE,
+otherwise NULLs are listed last.<br />
+Default Value: TRUE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the delimiter to use when reading the columns
+from a row and writing result columns.<br />
+Note:
+</p>
+
+<ol>
+<li><p> This argument cannot be same as &quot;delimiter&quot; argument.
+</p>
+</li>
+<li><p> This argument cannot be a NEWLINE character i.e., '\n'.
+</p>
+</li></ol>
+
+<p>Default Value: &quot;\t&quot;<br />
+Types: character of length 1</p>
+</td></tr>
+<tr valign="top"><td><code>auth</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies an authorization to use when running the script which
+binds an operating system user to the script via authorization
+objects.<br />
+Use this argument to specify the fully qualified name of an
+authorization object in single quotes.<br />
+If the database name is not provided, the name is fully qualified
+using the current user or database.<br />
+The database user executing the script query must have the
+following EXECUTE privileges:
+</p>
+
+<ol>
+<li><p> EXECUTE privilege on the authorization object specified.
+</p>
+</li>
+<li><p> EXECUTE FUNCTION on td_sysfnlib.script.
+</p>
+</li></ol>
+
+<p>Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>charset</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the character encoding for all of the data passed to
+and from the user-installed script.<br />
+Note:
+</p>
+
+<p>Teradata recommends to use 'UTF-16', when using CHAR or
+VARCHAR with CHARACTER SET UNICODE.
+
+Permitted Values: &quot;UTF-16&quot;, &quot;LATIN&quot;<br />
+Default Value: &quot;LATIN&quot;<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>quotechar</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies a character that forces all input and output of
+the script to be quoted using this specified character.<br />
+Using this argument enables the Advanced SQL Engine to
+distinguish between NULL fields and empty VARCHARs.
+A VARCHAR with length zero is quoted, while NULL
+fields are not.<br />
+If this character is found in the data, it will be escaped
+by a second quote character.<br />
+Note:
+</p>
+
+<ol>
+<li><p> This argument cannot be same as &quot;delimiter&quot; argument.
+</p>
+</li>
+<li><p> This argument cannot be a NEWLINE character i.e., '\n'.
+</p>
+</li></ol>
+
+<p>Default Value: NULL<br />
+Types: character of length 1</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A named list of &quot;ScriptTableOperator&quot; class.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_setup_sandbox_env</code>, <code>td_test_script</code>,
+<code>td_cleanup_sandbox_env</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Replace "&lt;schema_name&gt;" with the name of the schema to search the file for.
+schema_name &lt;- "&lt;schema_name&gt;"
+
+script_command &lt;- gettextf("Rscript ./%s/mapper.R", schema_name)
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load example data.
+loadExampleData("script_example", "barrier")
+
+# Create object(s) of class "tbl_teradata".
+barrier &lt;- tbl(con, "barrier")
+
+# Create a ScriptTableOperator object that allows us to execute user script
+# in Vantage.
+script_obj &lt;- Script(data = barrier %&gt;% select(Name),
+                     script.command = script_command,
+                     returns = list("word"= "VARCHAR(15)",
+                                    "count_input"= "VARCHAR(2)")
+                     )
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

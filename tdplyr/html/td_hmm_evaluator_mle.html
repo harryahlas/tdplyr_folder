@@ -1,0 +1,495 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: HMMEvaluator</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_hmm_evaluator_mle {tdplyr}"><tr><td>td_hmm_evaluator_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+HMMEvaluator
+</h2>
+
+<h3>Description</h3>
+
+<p>The HMMEvaluator function measures the probabilities of sequences,
+with respect to each trained HMM.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_hmm_evaluator_mle (
+      init.state.prob = NULL,
+      state.transition.prob = NULL,
+      emission.prob = NULL,
+      observation = NULL,
+      state.model.key = NULL,
+      state.key = NULL,
+      state.prob.key = NULL,
+      trans.model.key = NULL,
+      trans.from.key = NULL,
+      trans.to.key = NULL,
+      trans.prob.key = NULL,
+      emit.model.key = NULL,
+      emit.state.key = NULL,
+      emit.observed.key = NULL,
+      emit.prob.key = NULL,
+      model.key = NULL,
+      sequence.key = NULL,
+      observed.key = NULL,
+      incremental = TRUE,
+      show.rate.change = TRUE,
+      seq.prob.key = NULL,
+      skip.key = NULL,
+      accumulate = NULL,
+      observation.sequence.column = NULL,
+      init.state.prob.sequence.column = NULL,
+      state.transition.prob.sequence.column = NULL,
+      emission.prob.sequence.column = NULL,
+      observation.partition.column = NULL,
+      init.state.prob.partition.column = NULL,
+      state.transition.prob.partition.column = NULL,
+      emission.prob.partition.column = NULL,
+      observation.order.column = NULL,
+      init.state.prob.order.column = NULL,
+      state.transition.prob.order.column = NULL,
+      emission.prob.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>init.state.prob</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies a tbl_teradata that contains the initial state information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>init.state.prob.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the Partition By columns for &quot;init.state.prob&quot;.<br />
+Values to this argument can be provided as vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>init.state.prob.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the Order By columns for &quot;init.state.prob&quot;.<br />
+Values to this argument can be provided as vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>state.transition.prob</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies a tbl_teradata that contains the state transition information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>state.transition.prob.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the Partition By columns for &quot;state.transition.prob&quot;.<br />
+Values to this argument can be provided as vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>state.transition.prob.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the Order By columns for &quot;state.transition.prob&quot;.<br />
+Values to this argument can be provided as vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>emission.prob</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies a tbl_teradata that contains the emission probability information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>emission.prob.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the Partition By columns for &quot;emission.prob&quot;.<br />
+Values to this argument can be provided as vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>emission.prob.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the Order By columns for &quot;emission.prob&quot;.<br />
+Values to this argument can be provided as vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>observation</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies a tbl_teradata that contains the observation information
+for which the probabilities of sequences are to be found.
+</p>
+</td></tr>
+<tr valign="top"><td><code>observation.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the Partition By columns for &quot;observation&quot;.<br />
+Values to this argument can be provided as vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>observation.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the Order By columns for &quot;observation&quot;.<br />
+Values to this argument can be provided as vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>state.model.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the model attribute column in the &quot;init.state.prob&quot; tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>state.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the state attribute column in the &quot;init.state.prob&quot; tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>state.prob.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the initial probability column in the &quot;init.state.prob&quot;
+tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>trans.model.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the model attribute column in the &quot;state.transition.prob&quot;
+tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>trans.from.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the source state transition column in the
+&quot;state.transition.prob&quot; tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>trans.to.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the target state transition column in the
+&quot;state.transition.prob&quot; tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>trans.prob.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the state transition probability column in the
+&quot;state.transition.prob&quot; tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>emit.model.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the model attribute column in the &quot;emission.prob&quot; tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>emit.state.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the state attribute in the &quot;emission.prob&quot; tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>emit.observed.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the observation attribute column in the &quot;emission.prob&quot;
+tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>emit.prob.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the emission probability in the &quot;emission.prob&quot; tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the model attribute. It must match
+a column in the &quot;observation.partition.column&quot; argument.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>sequence.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the sequence attribute. It
+must be a sequence attribute in the &quot;observation.partition.column&quot; argument.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>observed.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the observed symbols.<br />
+Note: Observed symbols are case-sensitive.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>incremental</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether only new sequence probabilities are computed. If
+TRUE, only new sequence probabilities are computed. If FALSE, all
+probabilities are computed. <br />
+Note: If the &quot;seq.prob.key&quot; argument is not specified, the
+function cannot determine whether the observed
+sequence is new; therefore, all model sequences in the input
+tbl_teradata are treated as new.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>show.rate.change</code></td>
+<td>
+
+<p>Optional Argument.<br />
+If TRUE, the function shows the percentage change
+that corresponds to the applied model with the difference from
+previous predicted probability.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>seq.prob.key</code></td>
+<td>
+
+<p>Optional Argument.<br />
+The function uses the previous value under the column to calculate
+the change rate.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>skip.key</code></td>
+<td>
+
+<p>Optional Argument.<br />
+The name of the column whose values determine whether the function
+skips the row. The function skips the row if the value is &quot;true&quot;,
+&quot;yes&quot;, &quot;y&quot;, or &quot;1&quot;. The function does not skip the row if the value
+is &quot;false&quot;, &quot;f&quot;, &quot;no&quot;, &quot;n&quot;, &quot;0&quot;, or NULL.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the columns in &quot;observation&quot; tbl_teradata that the function
+copies to the output tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>observation.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;observation&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>init.state.prob.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;init.state.prob&quot;. The argument is used to
+ensure deterministic results for functions which produce results that
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>state.transition.prob.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;state.transition.prob&quot;. The argument is used
+to ensure deterministic results for functions which produce results
+that vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>emission.prob.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;emission.prob&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_hmm_evaluator_mle&quot; which is a
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("hmmunsupervised_example", "loan_prediction")
+    loadExampleData("hmmevaluator_example", "Pi_loan", "A_loan", "B_loan",
+                    "test_loan_prediction")
+
+    # Create object(s) of class "tbl_teradata".
+    pi_loan &lt;- tbl(con, "Pi_loan")
+    A_loan &lt;- tbl(con, "A_loan")
+    B_loan &lt;- tbl(con, "B_loan")
+    test_loan_prediction &lt;- tbl(con, "test_loan_prediction")
+    loan_prediction &lt;- tbl(con, "loan_prediction")
+
+    # Train a td_hmm_unsupervised_mle() function on the loan prediction dataset
+    td_hmm_unsupervised_out &lt;- td_hmm_unsupervised_mle(vertices = loan_prediction,
+                                             vertices.partition.column = c("model_id", "seq_id"),
+                                             vertices.order.column = c("seq_vertex_id"),
+                                             model.key = "model_id",
+                                             sequence.key = "seq_id",
+                                             observed.key = "observed_id",
+                                             hidden.states.num = 3,
+                                             init.methods = c("random")
+                                             )
+
+    # Use the output of the trained model to make the evaluation for probabilities of sequences.
+    # Note: Similarly, output of a trained td_hmm_supervised_mle() function can also be used
+    # to make evaluation.
+    td_hmm_evaluator_out &lt;- td_hmm_evaluator_mle(
+                    init.state.prob = td_hmm_unsupervised_out$output.initialstate.table,
+                    init.state.prob.partition.column = c("model_id"),
+                    state.transition.prob = td_hmm_unsupervised_out$output.statetransition.table,
+                    state.transition.prob.partition.column = c("model_id"),
+                    emission.prob = td_hmm_unsupervised_out$output.emission.table,
+                    emission.prob.partition.column = c("model_id"),
+                    observation = test_loan_prediction,
+                    observation.partition.column = c("model_id "),
+                    observation.order.column = c("seq_id", "seq_vertex_id"),
+                    state.model.key = "model_id",
+                    state.key = "state",
+                    state.prob.key = "probability",
+                    trans.model.key = "model_id",
+                    trans.from.key = "from_state",
+                    trans.to.key = "to_state",
+                    trans.prob.key = "probability",
+                    emit.model.key = "model_id",
+                    emit.state.key = "state",
+                    emit.observed.key = "observed",
+                    emit.prob.key = "probability",
+                    model.key = "model_id",
+                    sequence.key = "seq_id",
+                    observed.key = "observed_id"
+                    )
+
+    # Alternatively, load the trained model data from the Vantage Advanced SQL Engine tables
+    # to make the evaluations.
+    td_hmm_evaluator_out1 &lt;- td_hmm_evaluator_mle(init.state.prob = pi_loan,
+                                         init.state.prob.partition.column = c("model_id"),
+                                         state.transition.prob = A_loan,
+                                         state.transition.prob.partition.column = c("model_id"),
+                                         emission.prob = B_loan,
+                                         emission.prob.partition.column = c("model_id"),
+                                         observation = test_loan_prediction,
+                                         observation.partition.column = c("model_id "),
+                                         observation.order.column = c("seq_id", "seq_vertex_id"),
+                                         state.model.key = "model_id",
+                                         state.key = "state",
+                                         state.prob.key = "probability",
+                                         trans.model.key = "model_id",
+                                         trans.from.key = "from_state",
+                                         trans.to.key = "to_state",
+                                         trans.prob.key = "probability",
+                                         emit.model.key = "model_id",
+                                         emit.state.key = "state",
+                                         emit.observed.key = "observed",
+                                         emit.prob.key = "probability",
+                                         model.key = "model_id",
+                                         sequence.key = "seq_id",
+                                         observed.key = "observed_id"
+                                         )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

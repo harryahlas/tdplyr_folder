@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Cleanup Sandbox Environment</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_cleanup_sandbox_env {tdplyr}"><tr><td>td_cleanup_sandbox_env {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Cleanup Sandbox Environment</h2>
+
+<h3>Description</h3>
+
+<p>Function to remove the container and/or docker image set up using the
+function <code>td_setup_sandbox_env()</code>.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Docker image loaded by the <code>td_setup_sandbox_env()</code> function is
+not removed if there is another container created from the same image.
+If there is no other container, then image is cleaned up.
+</p>
+</li>
+<li><p> If user creates a container 'container_1' without using
+<code>td_setup_sandbox_env()</code> function and sets the option
+'sandbox.container' with this value, then <code>td_cleanup_sandbox_env()</code>
+function does not remove the container 'container_1' and image associated
+with it. Onus is on the user to remove the image and associated container
+manually.
+</p>
+</li>
+<li><p> If user sets the option 'sandbox.container' manually and runs
+<code>td_setup_sandbox_env()</code> later, then this function resets the option
+'sandbox.container' to NULL and performs the cleanup of the container/image
+created/loaded by <code>td_setup_sandbox_env()</code> function.
+</p>
+</li>
+<li><p> If user runs <code>td_setup_sandbox_env()</code> function and then sets the
+option 'sandbox.container' manually to a different container, then this
+function cleans up the container/image created/loaded by
+<code>td_setup_sandbox_env()</code> function, but the value of option
+'sandbox.container' remains the same.
+</p>
+</li>
+<li><p> Removing the context or ending the session also performs cleanup
+similar to this function.
+</p>
+</li>
+<li><p> To see if there are any issues while dropping the container and/or
+image, the user can set the option 'td.debug.enable' to TRUE.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_cleanup_sandbox_env()
+</pre>
+
+
+<h3>Value</h3>
+
+<p>TRUE, invisibly.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Example 1: Setup sandbox environment using td_setup_sandbox_env() function
+#            and clean it up using td_cleanup_sandbox_env() function.
+#            This cleans up image and container created by
+#            td_setup_sandbox_env().
+td_setup_sandbox_env(sandbox.image.location = "&lt;path_to_docker_image&gt;",
+                     sandbox.image.name = "rstosandbox:1.0")
+
+td_cleanup_sandbox_env()
+
+# Example 2: Setup sandbox environment using td_setup_sandbox_env() function
+#            and clean it up using td_cleanup_sandbox_env() function. Then,
+#            set the option 'sandbox.container' manually to a container
+#            created from a image different from the one used in
+#            td_setup_sandbox_env(). This only cleans up image and container
+#            created by td_setup_sandbox_env() and does NOT clean up the
+#            container specified in the option.
+td_setup_sandbox_env(sandbox.image.location = "&lt;path_to_docker_image&gt;",
+                     sandbox.image.name = "rstosandbox:1.0")
+
+# "&lt;container_1&gt;" is the container NOT created using the image
+# "rstosandbox:1.0".
+option(sandbox.container = "&lt;container_1&gt;")
+
+td_cleanup_sandbox_env()
+
+# Example 3: Setup sandbox environment using the already created container
+#            using td_setup_sandbox_env() function and the clean it up using
+#            td_cleanup_sandbox_env() function. This cleans up only the
+#            container setup by the td_setup_sandbox_env() function and does
+#            NOT clean up the image as it is not loaded by the setup.
+td_setup_sandbox_env(container = "&lt;container_1&gt;")
+
+td_cleanup_sandbox_env()
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

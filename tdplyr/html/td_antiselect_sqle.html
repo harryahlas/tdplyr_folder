@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Antiselect</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_antiselect_sqle {tdplyr}"><tr><td>td_antiselect_sqle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Antiselect
+</h2>
+
+<h3>Description</h3>
+
+<p>Antiselect function returns all columns except those specified in the
+&quot;exclude&quot; argument.<br />
+Note: This function is only available when tdplyr is connected to Vantage 1.1
+or later versions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_antiselect_sqle (
+    data = NULL,
+    exclude = NULL,
+    data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>exclude</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns not to return.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_antiselect_sqle&quot; which is a
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("antiselect_example", "antiselect_input")
+
+    # Create object(s) of class "tbl_teradata".
+    antiselect_input &lt;- tbl(con, "antiselect_input")
+
+    # Example 1 - Exclude five columns as specified in the "exclude" argument
+    td_antiselect_sqle_out &lt;- td_antiselect_sqle(data = antiselect_input,
+                                                 exclude = c("rowids","orderdate","discount",
+                                                             "province", "custsegment")
+                                                )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

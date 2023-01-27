@@ -1,0 +1,4 @@
+--loadByTypes--
+finance_data2::int,int,date,date,real,real,real
+--load--
+cpt

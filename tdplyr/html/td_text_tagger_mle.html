@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TextTagging</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_text_tagger_mle {tdplyr}"><tr><td>td_text_tagger_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+TextTagging
+</h2>
+
+<h3>Description</h3>
+
+<p>The TextTagging function tags text documents according to user-defined
+rules that use text-processing and logical operators.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_text_tagger_mle (
+      data = NULL,
+      rules.data = NULL,
+      language = "en",
+      rules = NULL,
+      tokenize = FALSE,
+      outputby.tag = FALSE,
+      tag.delimiter = ",",
+      accumulate = NULL,
+      data.sequence.column = NULL,
+      rules.data.sequence.column = NULL,
+      data.order.column = NULL,
+      rules.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata that contains the texts.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>rules.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the input tbl_teradata that contains the rules.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>rules.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;rules.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>language</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the language of the input text:<br />
+</p>
+
+<ol>
+<li><p> &quot;en&quot;: English
+</p>
+</li>
+<li><p> &quot;zh_CN&quot;: Simplified Chinese
+</p>
+</li>
+<li><p> &quot;zh_TW&quot;: Traditional Chinese
+</p>
+</li></ol>
+
+<p>If &quot;tokenize&quot; argument is set to TRUE, then the function uses the language 
+specified in this argument to create the word tokenizer.<br />
+Default Value: &quot;en&quot;<br />
+Permitted Values: en, zh_CN, zh_TW<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>rules</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tag names and tagging rules. Use this argument if and 
+only if &quot;rules.data&quot; argument is not specified.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>tokenize</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function tokenizes the input text before 
+evaluating the rules and tokenizes the text string parameter in the 
+rule definition when parsing a rule. If you specify TRUE, then you 
+must also specify the &quot;language&quot; argument.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>outputby.tag</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function outputs a tuple when a text document 
+matches multiple tags, which means that one tuple in the output 
+stands for one document and the matched tags are listed in the output 
+column tag.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>tag.delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the delimiter that separates multiple tags in the output 
+column tag if &quot;outputby.tag&quot; argument has the value FALSE.<br />
+If &quot;outputby.tag&quot; argument is set to TRUE, specifying this argument 
+causes an error.<br />
+Default Value: &quot;,&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of text tbl_teradata columns to copy to the 
+output tbl_teradata.<br />
+Note: Do not use the column name 'tag' in the &quot;accumulate&quot; argument, because the
+function uses that name for the output tbl_teradata column that contains the tags.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>rules.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;rules.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_text_tagger_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("texttagger_example", "text_inputs", "rule_inputs")
+    
+    # Create object(s) of class "tbl_teradata".
+    text_inputs &lt;- tbl(con, "text_inputs")
+    rule_inputs &lt;- tbl(con, "rule_inputs")
+    
+    # Example 1 - Specifying rules as an argument.
+    # Defining the rules to be used in "rules" argument.
+    r1 &lt;- 'contain(content, "floods",1,) or contain(content,"tsunamis",1,) AS Natural-Disaster'
+    r2 &lt;- 'contain(content,"Roger",1,) and contain(content,"Nadal",1,) AS Tennis-Rivalry'
+    r3 &lt;- 'contain(titles,"Tennis",1,) and contain(content,"Roger",1,)  AS Tennis-Greats'
+    r4 &lt;- 'contain(content,"India",1,) and contain(content,"Pakistan",1,) AS Cricket-Rivalry'
+    r5 &lt;- 'contain(content,"Australia",1,) and contain(content,"England",1,) AS The-Ashes'
+    
+    td_text_tagger_out1 &lt;- td_text_tagger_mle(data = text_inputs,
+                                              outputby.tag = TRUE,
+                                              rules=c(r1, r2, r3, r4, r5),
+                                              accumulate = c("id")
+                                              )
+    
+    # Example 2 - Specifying rules in a tbl_teradata.
+    td_text_tagger_out2 &lt;- td_text_tagger_mle(data = text_inputs,
+                                              rules.data = rule_inputs,
+                                              accumulate = c("id")
+                                              )
+    
+    # Example 3 - Specify dictionary file in rules argument.
+    # Defining the rules to be used in "rules" argument.
+    r1 &lt;- 'dict(content, "keywords.txt",1,) and equal(titles, "Chennai Floods") AS Natural-Disaster'
+    r2 &lt;- 'dict(content, "keywords.txt", 2,) and equal(catalog, "sports") AS Great-Sports-Rivalry '
+    
+    td_text_tagger_out3 &lt;- td_text_tagger_mle(data = text_inputs,
+                                              rules=c(r1, r2),
+                                              accumulate = c("id")
+                                              )
+                                         
+    # Example 4 - Specify superdist in rules argument.
+    # Defining the rules to be used in "rules" argument.
+    r1 &lt;- 'superdist(content,"Chennai","floods",sent,,) AS Chennai-Flood-Disaster'
+    r2 &lt;- 'superdist(content,"Roger","titles",para, "Nadal",para) AS Roger-Champion'
+    r3 &lt;- 'superdist(content,"Roger","Nadal",para,,) AS Tennis-Rivalry'
+    r4 &lt;- 'contain(content,regex"[A|a]shes",2,) AS Aus-Eng-Cricket'
+    r5 &lt;- 'superdist(content,"Australia","won",nw5,,) AS Aus-victory'
+    
+    td_text_tagger_out4 &lt;- td_text_tagger_mle(data = text_inputs,
+                                              rules=c(r1, r2, r3, r4, r5),
+                                              accumulate = c("id")
+                                              )
+                                         
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

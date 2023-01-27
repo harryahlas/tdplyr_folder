@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: CoxPH</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_coxph_mle {tdplyr}"><tr><td>td_coxph_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+CoxPH
+</h2>
+
+<h3>Description</h3>
+
+<p>The CoxPH function is named for the Cox proportional hazards model, a
+statistical survival model. The function estimates coefficients by learning
+a set of explanatory variables. The output of the CoxPH function
+is input to the CoxHazardRatio (<code>td_cox_hazard_ratio_mle</code>)
+and CoxSurvival (<code>td_cox_survival_mle</code>) functions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_coxph_mle (
+      data = NULL,
+      feature.columns = NULL,
+      time.interval.column = NULL,
+      event.column = NULL,
+      threshold = 1.0E-9,
+      max.iter.num = 10,
+      categorical.columns = NULL,
+      accumulate = NULL,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata object that contains the input 
+parameters.
+</p>
+</td></tr>
+<tr valign="top"><td><code>feature.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns from the input tbl_teradata used in the 
+&quot;data&quot; argument that contain the features of the input parameters.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.interval.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column from input tbl_teradata used in the 
+&quot;data&quot; argument that contains the  time intervals of the input parameters; 
+that is, end_time - start_time, in any unit of time (for example, years, 
+months, or days).<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>event.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column from the input tbl_teradata used in the 
+&quot;data&quot; argument that contains 1 if the event occurred by end_time and 0 if it 
+did not. (0 represents survival or right-censorship.) The function ignores values
+other than 1 and 0.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>threshold</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the convergence threshold.<br />
+Default Value: 1.0E-9<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.iter.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations that the function runs 
+before finishing, if the convergence threshold has not been met.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the columns from the input tbl_teradata used in the 
+&quot;data&quot; argument that contain categorical predictors. Each categorical column 
+must also be a feature column. By default, the function detects the categorical 
+columns by their SQL data types.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the columns from the input tbl_teradata used in the 
+&quot;data&quot; argument that the function copies to &quot;linear.predictor.table&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_coxph_mle&quot; which is a named 
+list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> coefficient.table</p>
+</li>
+<li> 
+<p>linear.predictor.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    # The input table, lungcancer, contains data from a randomized trial of two treatment 
+    # regimens for lung cancer used to model survival analysis. There are three categorical 
+    # predictors and three numerical predictors
+
+    loadExampleData("coxph_example", "lungcancer")
+
+    # Create object(s) of class "tbl_teradata".
+    lungcancer &lt;- tbl(con, "lungcancer")
+
+    # Example 1 -
+    td_coxph_out &lt;- td_coxph_mle(data = lungcancer,
+                                 feature.columns = c("trt", "celltype", "karno", "diagtime", "age",
+                                                     "prior"),
+                                 time.interval.column = "time_int",
+                                 event.column = "status",
+                                 categorical.columns = c("trt", "celltype", "prior")
+                                 )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,6 @@
+--loadByTypes--
+burst_data::int,date,date,real
+--loadByTypes--
+finance_data::int,date,date,real,real,real
+--loadByTypes--
+time_table2::int,date,date

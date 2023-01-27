@@ -1,0 +1,6 @@
+--load--
+iris_attribute_train
+--load--
+iris_response_train
+--load--
+iris_altinput

@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: ExtractSentiment</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_sentiment_extractor_mle {tdplyr}"><tr><td>td_sentiment_extractor_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+ExtractSentiment
+</h2>
+
+<h3>Description</h3>
+
+<p>The ExtractSentiment function extracts the sentiment (positive, negative, or neutral) of 
+each input document or sentence, using either a classification model output by the 
+TrainSentimentExtractor (<code>td_sentiment_trainer_mle</code>) function or a dictionary model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_sentiment_extractor_mle (
+      object = NULL,
+      newdata = NULL,
+      dict.data = NULL,
+      text.column = NULL,
+      language = "en",
+      level = "DOCUMENT",
+      high.priority = "NONE",
+      filter = "ALL",
+      accumulate = NULL,
+      newdata.sequence.column = NULL,
+      dict.data.sequence.column = NULL,
+      newdata.order.column = NULL,
+      dict.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the model type and file. The default model type is 
+dictionary. If you omit this argument or specify dictionary without 
+&quot;dict_file&quot;, then you must specify a dictionary tbl_teradata with alias 
+&quot;dict.data&quot;. If you specify both &quot;dict.data&quot; and &quot;dict_file&quot;, then whenever their 
+words conflict, &quot;dict.data&quot; has higher priority. The &quot;dict_file&quot; must be a 
+text file in which each line contains only a sentiment word, a space, 
+and the opinion score of the sentiment word. If you specify this argument as
+&quot;classification:model_file&quot;, model_file must be the name of a model file 
+generated and installed on the ML Engine by the <code>td_sentiment_trainer_mle</code> function.<br />
+Note: Before running the function, add the 
+location of dict_file or model_file to the user/session default 
+search path. The correct ways to specify this argument are &quot;dictionary&quot;, 
+&quot;dictionary:dict_file&quot; or &quot;classification:model_file&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>newdata</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata defining the input text.
+</p>
+</td></tr>
+<tr valign="top"><td><code>newdata.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;newdata&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>dict.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata defining the dictionary.
+</p>
+</td></tr>
+<tr valign="top"><td><code>dict.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;dict.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains text from which 
+to extract sentiments.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>language</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the language of the input text:  en (English), 
+zh_CN (Simplified Chinese),  zh_TW (Traditional Chinese)<br />
+Default Value: &quot;en&quot;<br />
+Permitted Values: en, zh_CN, zh_TW<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>level</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the level of analysis - whether to analyze each document 
+or each sentence.<br />
+Default Value: &quot;DOCUMENT&quot;<br />
+Permitted Values: DOCUMENT, SENTENCE<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>high.priority</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the highest priority when returning results:  
+</p>
+
+<ol>
+<li><p> NEGATIVE_RECALL: Give highest priority to negative results, 
+including those with lower confidence sentiment classifications 
+(maximizes the number of negative results returned).
+</p>
+</li>
+<li><p> NEGATIVE_PRECISION: Give highest priority to negative 
+results with high-confidence sentiment classifications.
+</p>
+</li>
+<li><p> POSITIVE_RECALL: Give highest priority to positive results, 
+including those with lower confidence sentiment classifications 
+(maximizes the number of positive results returned).
+</p>
+</li>
+<li><p> POSITIVE_PRECISION: Give highest priority to positive results 
+with high-confidence sentiment classifications.
+</p>
+</li>
+<li><p> NONE: Give all results the same priority.
+</p>
+</li></ol>
+
+<p>Default Value: &quot;NONE&quot;<br />
+Permitted Values: NEGATIVE_RECALL, NEGATIVE_PRECISION, 
+POSITIVE_RECALL, POSITIVE_PRECISION, NONE<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>filter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the kind of results to return: 
+</p>
+
+<ol>
+<li><p> POSITIVE: Return only results with positive sentiments.
+</p>
+</li>
+<li><p> NEGATIVE: Return only results with negative sentiments.
+</p>
+</li>
+<li><p> ALL: Return all results (default)
+</p>
+</li></ol>
+
+<p>Default Value: &quot;ALL&quot;<br />
+Permitted Values: POSITIVE, NEGATIVE, ALL<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input columns to copy to the output tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>newdata.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;newdata&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>dict.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;dict.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_sentiment_extractor_mle&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("sentimenttrainer_example", "sentiment_train")
+    loadExampleData("sentimentextractor_example", "sentiment_extract_input", "sentiment_word")
+    
+    # Create object(s) of class "tbl_teradata".
+    sentiment_train &lt;- tbl(con, "sentiment_train")
+    sentiment_extract_input &lt;- tbl(con, "sentiment_extract_input")
+    sentiment_word &lt;- tbl(con, "sentiment_word")
+    
+    # Example 1 - This example uses the dictionary model file and analysis level is document.
+    td_sentiment_extractor_out1 &lt;- td_sentiment_extractor_mle(object = "dictionary",
+                                                         newdata = sentiment_extract_input,
+                                                         text.column = "review",
+                                                         level = "document",
+                                                         accumulate = c("id","product")
+                                                         )
+    
+    # Example 2 - This example uses the dictionary model file and analysis level is sentence.
+    td_sentiment_extractor_out2 &lt;- td_sentiment_extractor_mle(object = "dictionary",
+                                                         newdata = sentiment_extract_input,
+                                                         text.column = "review",
+                                                         level = "sentence",
+                                                         accumulate = c("id","product")
+                                                         )
+    
+    # Example 3 - This example uses a maximum entropy classification model file.
+    td_sentiment_extractor_out3 &lt;- td_sentiment_extractor_mle(
+                            object = "classification:default_sentiment_classification_model.bin",
+                            newdata = sentiment_extract_input,
+                            text.column = "review",
+                            level = "document",
+                            accumulate = c("id")
+                            )
+    
+    # Example 4 - This example uses a model file output by the td_sentiment_trainer_mle() function.
+    td_sentiment_trainer_out &lt;- td_sentiment_trainer_mle(data = sentiment_train,
+                                                     text.column = "review",
+                                                     sentiment.column = "category",
+                                                     model.file = "sentimentmodel1.bin"
+                                                     )
+                                                     
+    td_sentiment_extractor_out4 &lt;- td_sentiment_extractor_mle(
+                                                    object = "classification:sentimentmodel1.bin",
+                                                    newdata = sentiment_extract_input,
+                                                    text.column = "review",
+                                                    level = "document",
+                                                    accumulate = c("id")
+                                                    )
+    
+    # Example 5 - This example uses a dictionary instead of a model file.
+    td_sentiment_extractor_out5 &lt;- td_sentiment_extractor_mle(newdata = sentiment_extract_input,
+                                                         dict.data = sentiment_word,
+                                                         text.column = "review",
+                                                         level = "document",
+                                                         accumulate = c("id", "product")
+                                                         )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

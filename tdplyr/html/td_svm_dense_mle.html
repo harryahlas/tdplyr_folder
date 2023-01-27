@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: DenseSVMTrainer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_svm_dense_mle {tdplyr}"><tr><td>td_svm_dense_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+DenseSVMTrainer
+</h2>
+
+<h3>Description</h3>
+
+<p>The DenseSVMTrainer function takes training data in dense format and outputs a 
+predictive model in binary format, which is the input to the functions 
+DenseSVMPredictor (<code>td_svm_dense_predict_mle</code>) and 
+DenseSVMModelPrinter (<code>td_svm_dense_summary_mle</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_svm_dense_mle (
+      data = NULL,
+      sample.id.column = NULL,
+      attribute.columns = NULL,
+      kernel.function = "LINEAR",
+      gamma = 1.0,
+      constant = 1.0,
+      degree = 2,
+      subspace.dimension = 256,
+      hash.bits = 256,
+      label.column = NULL,
+      cost = 1.0,
+      bias = 0.0,
+      class.weights = NULL,
+      max.step = 100,
+      epsilon = 0.01,
+      seed = 0,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata containing the training samples. 
+Each row consists of a sample id, a set of attribute values, and a 
+corresponding label.
+</p>
+</td></tr>
+<tr valign="top"><td><code>sample.id.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column in the data that contains the identifier of the 
+training samples.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies all the attribute columns. Attribute columns must have a 
+numeric value.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>kernel.function</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the distribution exponential family used to compute the hash function.
+For function linear, a Pegasos algorithm is used to solve the linear SVM. 
+For function polynomial, RBF, or sigmoid, a Hash-SVM algorithm is used. Each 
+sample is represented by compact hash bits, over which an inner 
+product is defined to serve as the surrogate of the original 
+nonlinear kernels.<br />
+Default Value: &quot;LINEAR&quot;<br />
+Permitted Values: LINEAR, POLYNOMIAL, RBF, SIGMOID<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>gamma</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies double value. This argument is used only when &quot;kernel.function&quot; 
+is polynomial, RBF, or sigmoid.<br />
+Default Value: 1.0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>constant</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies double value. This argument is used only when &quot;kernel.function&quot; 
+polynomial or sigmoid. If &quot;kernel.function&quot; is polynomial, the minimum 
+value is 0.0.<br />
+Default Value: 1.0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>degree</code></td>
+<td>
+
+<p>Optional Argument.<br />
+specifies the degree (d) of the polynomial kernel. This argument is used
+only when &quot;kernel.function&quot; polynomial. The input value must be greater 
+than 0.<br />
+Default Value: 2<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>subspace.dimension</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the random subspace dimension of the basis matrix V obtained 
+by the Gram-Schmidt process. Since the Gram-Schmidt process cannot be 
+parallelized, this dimension cannot be too large. Accuracy will increase 
+with higher values of this number, but computation costs will also 
+increase. The input value must be in the range [1, 2048]. <br />
+Only valid if &quot;kernel.function&quot; is polynomial, RBF, or sigmoid.<br />
+Default Value: 256<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>hash.bits</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of compact hash bits used to represent 
+a data point. Accuracy will increase with higher values of this 
+number, but computation costs will also increase. The input value 
+must be in the range [8, 8192].<br />
+Only valid if kernel is polynomial, RBF, or sigmoid.<br />
+Default Value: 256<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>label.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the column that identifies the class of the corresponding sample. Must be
+an integer or a string.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>cost</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the regularization parameter in the SVM soft-margin loss function. 
+Cost must be greater than 0.0. <br />
+Default Value: 1.0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>bias</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a non-negative value. If the value is greater than zero, each sample 
+(x) in the training set will be converted to (x, b); that is, it 
+will add another dimension containing the bias value b. This argument 
+addresses situations where not all samples center at 0.<br />
+Default Value: 0.0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>class.weights</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the weights for different classes. The format is: 
+&quot;classlabel m:weight m&quot;.<br />
+For a single class, the weight can be specified as the value 
+of type character:<br />
+&quot;classlabel m:weight m&quot;<br />
+For multiple classes, the weights can be specified as a vector
+of characters:<br />
+c(&quot;classlabel m:weight m&quot;, &quot;classlabel n:weight n&quot;)<br />
+If weight for a class is given, the cost parameter for this class 
+will be weight * cost. A weight larger than 1 often increases the 
+accuracy of the corresponding class; however, it may decrease 
+global accuracy. Classes not assigned a weight in this argument 
+will be assigned a weight of 1.0.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.step</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a positive integer value that specifies the maximum number of 
+iterations of the training process. One step means that each sample 
+is seen once by the trainer. The input value must be in the range (0, 
+10000].<br />
+Default Value: 100<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>epsilon</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the termination criterion. When the difference between the values of the 
+loss function in two sequential iterations is less than this number, 
+the function stops. Must be greater than 0.0.<br />
+Default Value: 0.01<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Speifies an integer value used to order the training set randomly and 
+consistently. This value can be used to ensure that the same model 
+will be generated if the function is run multiple times in a given 
+database with the same arguments. The input value must be in the 
+range [0, 9223372036854775807].<br />
+Default Value: 0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_svm_dense_mle&quot; which is a 
+named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> model.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("svmdense_example", "svm_iris_train")
+
+    # Create object(s) of class "tbl_teradata".
+    svm_iris_train &lt;- tbl(con, "svm_iris_train")
+
+    # Example 1 -  Linear Model
+    td_svm_dense_out &lt;- td_svm_dense_mle(data = svm_iris_train,
+                                         sample.id.column = "id",
+                                         attribute.columns = c('sepal_length', 'sepal_width', 
+                                                               'petal_length', 'petal_width'),
+                                         kernel.function = "linear",
+                                         label.column = "species",
+                                         cost = 1,
+                                         bias = 0,
+                                         max.step = 100,
+                                         seed = 1
+                                         )
+
+    # Example 2 - Polynomial Model
+    td_svm_dense_out &lt;- td_svm_dense_mle(data = svm_iris_train,
+                                         sample.id.column = "id",
+                                         attribute.columns = c('sepal_length', 'sepal_width', 
+                                                               'petal_length', 'petal_width'),
+                                         kernel.function = "polynomial",
+                                         gamma = 0.1,
+                                         degree = 2,
+                                         subspace.dimension = 120,
+                                         hash.bits = 512,
+                                         label.column = "species",
+                                         cost = 1,
+                                         bias = 0,
+                                         max.step = 100,
+                                         seed = 1
+                                         )
+
+    # Example 3 - Radial Basis Model (RBF) Model
+    td_svm_dense_out &lt;- td_svm_dense_mle(data = svm_iris_train,
+                                         sample.id.column = "id",
+                                         attribute.columns = c('sepal_length', 'sepal_width', 
+                                                               'petal_length', 'petal_width'),
+                                         kernel.function = "rbf",
+                                         gamma = 0.1,
+                                         subspace.dimension = 120,
+                                         hash.bits = 512,
+                                         label.column = "species",
+                                         cost = 1,
+                                         bias = 0,
+                                         max.step = 100,
+                                         seed = 1
+                                         )
+
+    # Example 4 - Sigmoid Model
+    td_svm_dense_out &lt;- td_svm_dense_mle(data = svm_iris_train,
+                                         sample.id.column = "id",
+                                         attribute.columns = c('sepal_length', 'sepal_width', 
+                                                               'petal_length', 'petal_width'),
+                                         kernel.function = "sigmoid",
+                                         gamma = 0.1,
+                                         subspace.dimension = 120,
+                                         hash.bits = 512,
+                                         label.column = "species",
+                                         cost = 1,
+                                         bias = 0,
+                                         max.step = 30,
+                                         seed = 1
+                                         )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

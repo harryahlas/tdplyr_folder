@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Descriptive Statistics Function: AdaptiveHistogram</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_adaptive_histogram_valib {tdplyr}"><tr><td>td_adaptive_histogram_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Descriptive Statistics Function: AdaptiveHistogram</h2>
+
+<h3>Description</h3>
+
+<p>Histogram analysis reveals the distribution of continuous numeric or date values in a
+column. Histogram analysis is also referred to as binning because it counts the
+occurrence of values in a series of numeric ranges called bins. Adaptive Histogram
+analysis supplements Histogram analysis by offering options to further subdivide the
+distribution. You can specify the frequency percentage above which a single value
+should be treated as a Spike, and a similar percentage above which a bin should be
+subdivided. The Adaptive Histogram analysis modifies the computed equal-sized bins to
+include a separate bin for each spike value, and to further subdivide a bin with an
+excessive number of values, returning counts and boundaries for each resulting bin.
+The subdivision of a bin with too many values is performed by first dividing the bin
+by the same originally requested number of bins, and then merging this with a subdivision
+in the region around the mean value within the bin, the region being the mean +/- the
+standard deviation of the values in the bin. Subdividing can optionally be performed
+using quantiles, giving approximately equally distributed sub-bins. (The quantiles
+option is not recommended for tbl_teradata with extremely large numbers of
+rows, such as input DataFrame with billions of rows.)<br />
+<br />
+Adaptive binning can reduce the number of function calls needed to understand the
+distribution of the values assumed by a column. Without adaptive binning, spike values
+and/or overpopulated bins can distort the bin counts, as they are not separated or
+subdivided unless the Adaptive Histogram function is used. It should be noted that
+adaptive binning does not offer many of the specialized options that the standard
+Histogram analysis does.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_adaptive_histogram_valib(data, columns, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to perform adaptive histogram analysis.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br /> 
+Specifies the name(s) of the column(s) to analyze. Occasionally, it can 
+also accept permitted strings to specify all columns, or all numeric 
+columns, or all numeric and date columns.<br />
+Permitted Values: 
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;. 
+</p>
+</li>
+<li><p> Pre-defined strings: 
+</p>
+
+<ol>
+<li><p> 'all' - all columns 
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns 
+</p>
+</li>
+<li><p> 'allnumericanddate' - all numeric and date columns
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the 
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_adaptive_histogram_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.cr
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>bins</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the number of equal width bins to create. If multiple columns 
+are requested, multiple bin sizes may be specified, such as bins=c(5, 10). 
+If fewer sizes are specified than columns, leftover columns are associated
+with the default size of 10 bins.<br />
+Default Value: 10<br />
+Types: integer OR list of Integers (int)
+</p>
+
+
+
+<h4>exclude.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) to exclude from the 
+analysis, if a column specifier such as 'all', 'allnumeric', 
+'allnumericanddate' is used in the &quot;columns&quot; argument.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>spike.threshold</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies a percentage of rows, expressed as an integer 
+from 1 to 100, above which an individual value of a column 
+is identified as a separate bin. Values with this or a larger 
+percentage of rows are identified as a Spike.<br />
+Default Value: 10 (10
+Types: integer
+</p>
+
+
+
+<h4>subdivision.method</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the option to subdivide the bins.<br />
+Permitted Values: 
+</p>
+
+<ol>
+<li><p> 'means' - Subdivide bins with too many values using a 
+range of +/- the standard deviation around the mean value in 
+the bin. 
+</p>
+</li>
+<li><p> 'quantiles' - Subdivide bins with too many values using 
+quantiles, giving approximately equally distributed bins.<br />
+</p>
+</li></ol>
+
+<p>Default Value: 'means'<br />
+Types: character
+</p>
+
+
+
+<h4>subdivision.threshold</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies a percentage of rows, expressed as an integer 
+from 0 to 100, above which a bin is subdivided into sub-bins.
+Values with this or a larger percentage of rows are 
+subdivided into sub-bins. <br />
+Default Value: 30 (30
+Types: integer
+</p>
+
+
+
+<h4>filter</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the clause to filter rows selected for analysis within Adaptive 
+Histogram.<br />
+For example,<br />
+filter = &quot;cust_id &gt; 0&quot;<br />
+Types: character
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set options 'val.install.location' to 
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Shows execution with 10 equal width bins created by default for the
+#            'income' column.
+#            The default value of 10 is used for "spike.threshold", and 30 for
+#            "subdivision.threshold", with means as the default "subdivision.method".
+obj &lt;- td_adaptive_histogram_valib(data=df, columns="income")
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Shows execution on two columns with different numbers of bins, 5 for
+#            'income' and 3 for 'age'. Threshold values and other parameters assume
+#            default values.
+obj &lt;- td_adaptive_histogram_valib(data=df,
+                                   columns=c("income", "age"),
+                                   bins=c(5,3))
+
+# Print the results.
+print(obj$result)
+
+# Example 3: Shows execution analysis done on two columns 'income' and 'age' with 5 bins
+#            for 'income' and default for 'age'. The non-default values of 12 is used for
+#            "spike.threshold", and 24 for "subdivision.threshold", with 'quantiles' as
+#            the default "subdivision.method".
+obj &lt;- td_adaptive_histogram_valib(data=df,
+                                   columns=c("income", "age"),
+                                   bins=5,
+                                   spike.threshold=12,
+                                   subdivision.method="quantiles",
+                                   subdivision.threshold=24,
+                                   filter="cust_id &gt; 0")
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

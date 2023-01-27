@@ -1,0 +1,26 @@
+Package: tdplyr
+Type: Package
+Title: Teradata R Package
+Version: 17.00.00.02
+Date: 2018-12-07
+Author: Waman Joshi, Mark Sandan, Arun Kalyanasundaram, Karthik Thelukuntla,
+    Pankaj Vinod Purandare, Trupti A Purohit, Amanda Moran, Jeris Alan Jawahar, 
+    Adithya Avvaru, Mounika Kotha, Rohit Khurd, Pavansai Kumar Alladi, Rohit Agrawal,
+    Gouri Patwardhan, Subhash Karemore, Aanchal Kavedia
+Maintainer: Analytic-Clients, Support <SA230577@teradata.com>
+LazyData: yes
+Depends: R (>= 3.4.3)
+Imports: DBI (>= 1.0.0), dplyr (>= 1.0.3), dbplyr (>= 2.0.0), jsonlite
+        (>= 1.7), magrittr (>= 1.5), teradatasql (>= 17.10.0.10),
+        rlang, bit64, purrr, methods
+Suggests: knitr, rmarkdown, odbc (>= 1.1.5), ggplot2
+SystemRequirements: Teradata SQL driver for R
+Description: This package enables users to access Teradata Vantage
+    analytic functions using the R language.
+License: file LICENSE + file THIRDPARTYLICENSE
+RoxygenNote: 7.1.2
+VignetteBuilder: knitr
+Encoding: UTF-8
+NeedsCompilation: no
+Packaged: 2022-05-18 08:45:23 UTC; Administrator
+Built: R 4.0.3; ; 2023-01-27 00:14:17 UTC; windows

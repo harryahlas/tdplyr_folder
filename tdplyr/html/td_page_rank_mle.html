@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: PageRank</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_page_rank_mle {tdplyr}"><tr><td>td_page_rank_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+PageRank
+</h2>
+
+<h3>Description</h3>
+
+<p>The PageRank function computes the PageRank values for a directed 
+graph, weighted or unweighted.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_page_rank_mle (
+      vertices.data = NULL,
+      edges.data = NULL,
+      target.key = NULL,
+      weights = NULL,
+      damping = 0.85,
+      niter = 1000,
+      eps = 0.001,
+      accumulate = NULL,
+      vertices.data.sequence.column = NULL,
+      edges.data.sequence.column = NULL,
+      vertices.data.partition.column = NULL,
+      edges.data.partition.column = NULL,
+      vertices.data.order.column = NULL,
+      edges.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>vertices.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata containing vertices in the graph.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>vertices.data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;vertices.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>vertices.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;vertices.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>edges.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata containing edges in the graph.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>edges.data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;edges.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>edges.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;edges.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the target key columns in the &quot;edges.data&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>weights</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the column in &quot;edges.data&quot; that contains the edge weight,
+which must be a positive value. By default, all edges have the same
+weight (that is, the graph is unweighted).<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>damping</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the value to use in the PageRank formula. This argument must be
+a numeric value between 0 and 1.<br />
+Default Value: 0.85<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>niter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations for which the algorithm runs
+before the function completes. This argument be a positive integer value.<br />
+Default Value: 1000<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>eps</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the convergence criteria value.<br />
+Default Value: 0.001<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of columns in &quot;vertices.data&quot; to copy to the &quot;result&quot;
+output tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>vertices.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;vertices.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>edges.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;edges.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_page_rank_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection.
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("pagerank_example", "callers", "calls")
+    
+    # Create object(s) of class "tbl_teradata".
+    callers &lt;- tbl(con, "callers")
+    calls &lt;- tbl(con, "calls")
+    
+    # Example 1 - Find pagerank for each vertex.
+    td_page_rank_mle_out &lt;- td_page_rank_mle(vertices.data = callers,
+                                             vertices.data.partition.column = c("callerid"),
+                                             edges.data = calls,
+                                             edges.data.partition.column = c("callerfrom"),
+                                             target.key = c("callerto"),
+                                             weights = "calls",
+                                             accumulate = c("callerid","callername")
+                                             )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

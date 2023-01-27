@@ -1,0 +1,338 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: RandomSample</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_random_sample_mle {tdplyr}"><tr><td>td_random_sample_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+RandomSample
+</h2>
+
+<h3>Description</h3>
+
+<p>The RandomSample function takes a data set and uses a specified 
+sampling method to output one or more random samples. Each sample 
+has exactly the number of rows specified.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_random_sample_mle (
+      data = NULL,
+      num.sample = NULL,
+      weight.column = NULL,
+      sampling.mode = "Basic",
+      distance = "EUCLIDEAN",
+      input.columns = NULL,
+      as.categories = NULL,
+      category.weights = NULL,
+      categorical.distance = "OVERLAP",
+      seed.column = NULL,
+      seed = NULL,
+      over.sampling.rate = 1.0,
+      iteration.num = 5,
+      setid.as.first.column = TRUE,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the data set 
+from which to take samples.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>num.sample</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the sample sizes for the sample sets. For each &quot;num.sample&quot;
+in this argument, the function selects a sample set that has sample size
+number of rows. For example, specifying it as c(2,4,5) creates 3 sample
+sets of size 2, 4, and 5 respectively. Similarly, specifying it as 10 creates
+one sample set of size 10.<br />
+Types: integer OR vector of integers
+</p>
+</td></tr>
+<tr valign="top"><td><code>weight.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains weights for weighted
+sampling. The &quot;weight.column&quot; must have a numeric SQL data
+type. By default, rows have equal weight.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>sampling.mode</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the sampling mode and can be one of the following:
+</p>
+
+<ol>
+<li><p> &quot;Basic&quot;: Each input tbl_teradata ('data') row 
+has a probability of being selected that is proportional to its 
+weight. The weight of each row is in &quot;weight.column&quot;.
+</p>
+</li>
+<li><p> &quot;KMeans++&quot;: One row is selected in each of k iterations, 
+where k is the number of desired output rows. The first row is 
+selected randomly. In subsequent iterations, the probability of 
+a row being selected is proportional to the value in the 
+&quot;weight.column&quot; multiplied by the distance from the nearest row 
+in the set of selected rows. The distance is calculated using 
+the methods specified by the &quot;distance&quot; and &quot;categorical.distance&quot; 
+arguments.
+</p>
+</li>
+<li><p> &quot;KMeans||&quot;: Enhanced version of kmeans++ that exploits parallel 
+architecture to accelerate the sampling process. The algorithm is described in the paper
+<a href="http://theory.stanford.edu/~sergei/papers/vldb12-kmpar.pdf">Scalable kmeans++</a> 
+by Bahmani et al.
+</p>
+</li></ol>
+
+<p>Briefly, at each iteration, the probability that a row is selected is 
+proportional to the value in the &quot;weight.column&quot; multiplied by the 
+distance from the nearest row in the set of selected rows (as in 
+kmeans++). However, the kmeans|| algorithm oversamples at each 
+iteration, significantly reducing the required number of iterations; 
+therefore, the resulting set of rows might have more than k data 
+points. Each row in the resulting set is then weighted by the number 
+of rows in the tbl_teradata that are closer to that row than to any 
+other selected row, and the rows are clustered to produce exactly k 
+rows. Tip: For optimal performance, use &quot;kmeans++&quot; when the desired 
+sample size is less than 15 and &quot;kmeans||&quot; otherwise.<br />
+Default Value: &quot;Basic&quot;<br />
+Permitted Values: Basic, KMeans++, KMeans||<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>distance</code></td>
+<td>
+
+<p>Required Argument for kmeans++ and kmeans|| sampling.<br />
+Specifies the function for computing the distance between 
+numerical variables. Following functions can be specified:<br />
+</p>
+
+<ol>
+<li><p> &quot;euclidean&quot;: The distance between two variables is defined in 
+&quot;Euclidean Distance&quot;.
+</p>
+</li>
+<li><p> &quot;manhattan&quot;: The distance beween two variables 
+is defined in &quot;Manhattan Distance&quot;.
+</p>
+</li></ol>
+<p><br />
+Default Value: &quot;EUCLIDEAN&quot;<br />
+Permitted Values: MANHATTAN, EUCLIDEAN<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.columns</code></td>
+<td>
+
+<p>Required Argument for kmeans++ and kmeans|| sampling.<br />
+Specifies the names of the input tbl_teradata columns to use 
+to calculate the distance between numerical variables.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>as.categories</code></td>
+<td>
+
+<p>Required Argument for kmeans++ and kmeans|| sampling.<br />
+Specifies the names of the input tbl_teradata columns that 
+contain numerical variables to treat as categorical variables.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>category.weights</code></td>
+<td>
+
+<p>Required Argument for kmeans++ and kmeans|| sampling.<br />
+Specifies the weights (numeric values) of the categorical variables, 
+including those that the &quot;as.categories&quot; argument specifies. Specify 
+the weights in the order (from left to right) that the variables appear 
+in the input tbl_teradata. When calculating the distance between two 
+rows, distances between categorical values are scaled by these weights.<br />
+Types: numeric OR vector of numerics
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.distance</code></td>
+<td>
+
+<p>Required Argument for kmeans++ and kmeans|| sampling.<br />
+Specifies the function for computing the distance between 
+categorical variables.
+</p>
+
+<ol>
+<li><p> &quot;overlap&quot;: The distance between two variables is 0 if they are the 
+same and 1 if they are different.  
+</p>
+</li>
+<li><p> &quot;hamming&quot;: The distance beween two variables is the Hamming 
+distance between the strings that represent them. The strings must 
+have equal length.
+</p>
+</li></ol>
+<p><br />
+Default Value: &quot;OVERLAP&quot;<br />
+Permitted Values: OVERLAP, HAMMING<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input tbl_teradata columns by which to partition 
+the input. Function calls that use the same input &quot;data&quot;, &quot;seed&quot;, and 
+&quot;seed.column&quot; output the same result. If you specify &quot;seed.column&quot;, you 
+must also specify &quot;seed&quot;.<br /> 
+Note: Ideally, the number of distinct values in the &quot;seed.column&quot; is the 
+same as the number of workers in the cluster. A very large number of 
+distinct values in the &quot;seed.column&quot; degrades function performance.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the random seed with which to initialize the algorithm (a 
+numeric value). If you specify this argument, then you must also specify 
+&quot;seed.column&quot;.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>over.sampling.rate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+For kmeans|| sampling, specifies the oversampling rate (a numeric 
+value greater than 0.0). The function multiplies rate by &quot;num.sample&quot; 
+(for each &quot;num.sample&quot;).<br />
+Default Value: 1.0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>iteration.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+For kmeans|| sampling, specifies the number of iterations (an 
+integer value greater than 0).<br />
+Default Value: 5<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>setid.as.first.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the generated set_id values are to be included as 
+first column in output.<br />
+Note: &quot;setid.as.first.column&quot; argument support is only available 
+when tdplyr is connected to Vantage 1.1 or later versions.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_random_sample_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("randomsample_example", "fs_input", "fs_input1")
+
+    # Create object(s) of class "tbl_teradata". The input tbl_teradata have observations
+    # of 11 variables for different models of cars.
+    fs_input &lt;- tbl(con, "fs_input")
+    fs_input1 &lt;- tbl(con, "fs_input1")
+
+    # Example 1: This example uses basic sampling to select 3 sample
+    # sets of sizes 2, 3 and 1 rows, weighted by car weight.
+    td_random_sample_out1 &lt;- td_random_sample_mle(data = fs_input,
+                                                  num.sample = c(2,3,1),
+                                                  weight.column = "wt",
+                                                 )
+
+    # Example 2: This example uses KMeans++ sampling with the Manhattan
+    # distance metric, and treats the numeric variables cyl, gear, and
+    # carb as categorical variables.
+    td_random_sample_out2 &lt;- td_random_sample_mle(data = fs_input,
+                                                  num.sample = 10,
+                                                  sampling.mode = "KMeans++",
+                                                  distance = "manhattan",
+                                                  input.columns = c('mpg','cyl','disp','hp',
+                                                                    'drat','wt','qsec','vs',
+                                                                    'am','gear','carb'),
+                                                  as.categories = c("cyl","gear","carb"),
+                                                  category.weights = c(1000,10,100,100,100),
+                                                  seed.column = c("model"),
+                                                  seed = 1
+                                                 )
+
+    # Example 3: This example uses KMeans|| sampling with the Manhattan
+    # distance metric for the numerical variables and the Hamming
+    # distance metric for the categorical variables.
+    td_random_sample_out3 &lt;- td_random_sample_mle(data = fs_input1,
+                                                  num.sample = 20,
+                                                  sampling.mode = "KMeans||",
+                                                  distance = "MANHATTAN",
+                                                  input.columns = c('mpg','cyl','disp','hp',
+                                                                    'drat','wt','qsec','vs',
+                                                                    'am','gear','carb'),
+                                                  as.categories = c("cyl","gear","carb"),
+                                                  category.weights = c(1000,10,100,100,100),
+                                                  categorical.distance = "HAMMING",
+                                                  seed.column = c("model"),
+                                                  seed = 1,
+                                                  iteration.num = 2
+                                                 )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

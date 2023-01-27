@@ -1,0 +1,592 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Copy a local dataframe to a remote data source</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for copy_to.Teradata {tdplyr}"><tr><td>copy_to.Teradata {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Copy a local dataframe to a remote data source</h2>
+
+<h3>Description</h3>
+
+<p>This function uploads a local dataframe or copies data from a tbl_teradata into a remote
+data source by creating the table definition. It can also be used to upload/copy data into time
+series Primary Time Index (PTI) tables.<br />
+Note :
+</p>
+
+<ol>
+<li><p> When the connection is set up using Teradata SQL Driver for R, the function
+inserts data in batches of 16384 rows. To insert large number of rows, please refer to
+<code>td_fastload</code> function.
+</p>
+</li>
+<li><p> When the connection is set up using ODBC Driver,the function inserts data
+in batches of 1024 rows. Please refer to <a href="https://github.com/r-dbi/odbc">ODBC Driver</a> page
+for more information.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'Teradata'
+copy_to(
+  dest,
+  df,
+  name = deparse(substitute(df)),
+  overwrite = FALSE,
+  types = NULL,
+  table.type = "PI",
+  primary.index = NULL,
+  row.names = FALSE,
+  temporary = FALSE,
+  analyze = FALSE,
+  append = FALSE,
+  pti.name = NULL,
+  timecode.column.info = NULL,
+  timezero.date = NULL,
+  timebucket.duration = NULL,
+  pti.columns = NULL,
+  sequence.column = NULL,
+  seq.max = NULL,
+  ...
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>dest</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the remote data source connection.</p>
+</td></tr>
+<tr valign="top"><td><code>df</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the local dataframe or tbl_teradata which contains the data to be
+inserted.<br />
+Types : R dataframe OR tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the name of new remote table.<br />
+Default : Name of the dataframe.<br />
+Types : character or ident or ident_q or dbplyr_schema</p>
+</td></tr>
+<tr valign="top"><td><code>overwrite</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to overwrite existing table or not.<br />
+</p>
+
+<ol>
+<li><p> If 'TRUE', <code>copy_to</code> will overwrite an existing table with name
+'name'. The existing table will be dropped and new table schema will replace
+the existing table.
+</p>
+</li>
+<li><p> If 'FALSE', <code>copy_to</code> will throw an error if table already exists.
+</p>
+</li></ol>
+
+<p>Default : FALSE<br />
+Types : logical</p>
+</td></tr>
+<tr valign="top"><td><code>types</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the SQL data types for the columns in remote table. This argument accepts
+both named and unnamed character vectors. If it is NULL, the function uses data
+types of the columns present in R dataframe to map to correct SQL data type.<br />
+While creating PTI table, the data types provided for the timecode and sequence columns
+are ignored as the columns are auto-generated during PTI table creation. This is
+same for both named and unnamed types. However, for unnamed types, all the data types
+must be specified like that for non-PTI tables.<br />
+Suppose a dataframe with columns 'col1' and 'col2' is to be loaded into the
+remote data source.<br />
+</p>
+
+<ol>
+<li><p> When an unnamed character vector is specified, the data types of all the
+columns must be specified.<br />
+Example:<br />
+If <code>types = c("FLOAT", "VARCHAR(10)")</code>, then the table is created with 2
+columns, 'col1' and 'col2' with data types 'FLOAT' and 'VARCHAR(10)' respectively.
+</p>
+</li>
+<li><p> If a named character vector is specified, then data types for only a subset of
+columns can be specified. If the names of the column data types do not match with
+any in the dataframe, then an error will be raised.<br />
+Examples:<br />
+</p>
+
+<ol>
+<li><p> If <code>types = c("col1" = "FLOAT", col2 = "VARCHAR(10)")</code>, then the table
+is created with 2 columns, 'col1' and 'col2' with data types 'FLOAT' and
+'VARCHAR(10)' respectively.
+</p>
+</li>
+<li><p> If <code>types = c("col1" = "FLOAT")</code>, then the table is created with 2
+columns - 'col1' with data type 'FLOAT' and 'col2' with data type of the column in
+R dataframe.
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Default : NULL<br />
+Types : Named OR unnamed vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>table.type</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the type of remote table.<br />
+Permitted Values : &quot;PI&quot; (Primary Index), &quot;NOPI&quot; (No Primary Index)<br />
+Default : &quot;PI&quot;<br />
+Types : character</p>
+</td></tr>
+<tr valign="top"><td><code>primary.index</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the name of the primary index column. You can provide multiple
+columns as a vector. When primary.index is not specified and table.type is
+&quot;PI&quot;, the behavior is specified by the &quot;PrimaryIndexDefault&quot; field in DBS
+Control.<br />
+Default : NULL<br />
+Types : character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>row.names</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to insert row names in remote table or not.<br />
+If dataframe contains row_names column, regardless of row.names option, row
+names will be inserted in remote table. If TRUE and dataframe doesn't contain
+row_names column, row names are converted to a column named &quot;row_names&quot;. If
+FALSE, row names are ignored.<br />
+Default : FALSE<br />
+Types : logical<br />
+Note : This argument is ignored when PTI tables are created.</p>
+</td></tr>
+<tr valign="top"><td><code>temporary</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to create temporary(Teradata volatile) remote table or not.
+Temporary tables are always created in the login user space, regardless of the
+current default database setting. If FALSE, a permanent table is created, that
+is available across all sessions. If TRUE, a temporary table is created that is
+not available in any other sessions.<br />
+To use a temporary table, a tbl_teradata for the table should be created
+using the in_schema() function.<br />
+Example: tbl(con, in_schema(&quot;username&quot;, &quot;temporary table name&quot;)<br />
+Default : FALSE<br />
+Types : logical</p>
+</td></tr>
+<tr valign="top"><td><code>analyze</code></td>
+<td>
+<p>Optional Argument.<br />
+Calls ANALYZE(collect statistics) on the target table after the creation.<br />
+If table.type is NOPI, it will collect statistics on first column of table, else
+i.e. for PI table, it will collect statistics on primary index column of
+the table.<br />
+To run analyze on multiple columns, directly call db_analyze function and pass
+multiple columns as character vector. This option is not supported and hence
+ignored when creating table from tbl_teradata.<br />
+Default : FALSE<br />
+Types : logical</p>
+</td></tr>
+<tr valign="top"><td><code>append</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies if the dataframe needs to be appended to a table.<br />
+When appending data in 'df' to a PTI table, the argument 'timecode.column.info' is
+required. The SQL data type in the argument 'timecode.column.info' is ignored if
+the 'append' is set to TRUE. If the PTI table is sequenced, the argument
+'sequence.column' is also required.<br />
+Default : FALSE<br />
+Types : logical</p>
+</td></tr>
+<tr valign="top"><td><code>pti.name</code></td>
+<td>
+<p>Optional Argument.<br />
+Used when 'df' is to be saved as a PTI table.<br />
+Secifies the name of the Primary Time Index (PTI) when the table to be created
+is a PTI table.<br />
+Default : NULL<br />
+Types : character</p>
+</td></tr>
+<tr valign="top"><td><code>timecode.column.info</code></td>
+<td>
+<p>Optional Argument.<br />
+Required when the table to be created is PTI table.<br />
+Specfies the column name (in the dataframe or tbl_teradata) and SQL
+data type of the column which contains timecode information as a
+named vector. This timecode column is TD_TIMECODE column in the table
+created. The SQL data type must be either of DATE, TIMESTAMP(n) or
+TIMESTAMP(n) WITH TIME ZONE where, n is the decimal precision of the
+fractional seconds in the timestamp. For more information on these
+data types, see <a href="https://docs.teradata.com/">Teradata Vantage
+Data Types and Literals</a>.<br />
+Default : NULL<br />
+Types : Named vector of column name and SQL type.<br />
+Example :
+<code>timecode.column.info = c("col1" = "TIMESTAMP(3) WITH TIME
+ZONE")</code> creates the column <code>TD_TIMECODE</code> of type
+<code>TIMESTAMP(3) WITH TIME ZONE</code>.<br />
+Note :
+</p>
+
+<ol>
+<li><p> This argument should be a named vector of length one.
+</p>
+</li>
+<li> <p><code>copy_to()</code> creates a new column named TD_TIMECODE in the
+PTI table and inserts/appends the data in the column specified in
+this argument into TD_TIMECODE column of remote table.
+</p>
+</li></ol>
+</td></tr>
+<tr valign="top"><td><code>timezero.date</code></td>
+<td>
+<p>Optional Argument.<br />
+Used when 'df' is to be saved as a PTI table.<br />
+Specifies the earliest time series data that the PTI table will accept. In
+other words, it is the date that precedes the earliest date in the time
+series data. If it is not specified, Advanced SQL Engine creates
+table with timezero as DATE '1970-01-01'.<br />
+Default : NULL<br />
+Types : Date in character format 'YYYY-MM-DD'<br />
+Note : Although this argument is optional, Teradata recommends to specify a
+date near to the earliest timestamp in the time series data.</p>
+</td></tr>
+<tr valign="top"><td><code>timebucket.duration</code></td>
+<td>
+<p>Optional Argument.<br />
+Required if <code>pti.columns</code> is not specified.<br />
+Used when 'df' is to be saved as a PTI table.<br />
+Specifies the duration that serves to break up the time continuum in
+the time series data into discrete groups or buckets.<br />
+This argument can be specified using any of the units of time
+as shown below:
+</p>
+
+<table summary="Rd table">
+<tr>
+ <td style="text-align: left;">
+------------------------</td><td style="text-align: left;">-------------------------------</td><td style="text-align: left;">
+---------------------------------------------------------------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Time Unit </td><td style="text-align: left;"> Formal Form Example </td><td style="text-align: left;"> Shorthand Equivalents </td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+------------------------</td><td style="text-align: left;">-------------------------------</td><td style="text-align: left;">
+---------------------------------------------------------------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Calendar Years </td><td style="text-align: left;"> CAL_YEARS(N)</td><td style="text-align: left;"> Ncy, Ncyear, Ncyears</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Calendar Months </td><td style="text-align: left;"> CAL_MONTHS(N) </td><td style="text-align: left;"> Ncm, Ncmonth, Ncmonths</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Calendar Days </td><td style="text-align: left;"> CAL_DAYS(N) </td><td style="text-align: left;"> Ncd, Ncday, Ncdays</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Weeks </td><td style="text-align: left;"> WEEKS(N) </td><td style="text-align: left;"> Nw, Nweek, Nweeks</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Days </td><td style="text-align: left;"> DAYS(N) </td><td style="text-align: left;"> Nd, Nday, Ndays</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Hours </td><td style="text-align: left;"> HOURS(N) </td><td style="text-align: left;"> Nh, Nhr, Nhrs, Nhour, Nhours</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Minutes </td><td style="text-align: left;"> MINUTES(N) </td><td style="text-align: left;"> Nm, Nmins, Nminute, Nminutes</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Seconds </td><td style="text-align: left;"> SECONDS(N) </td><td style="text-align: left;"> Ns, Nsec, Nsecs, Nsecond,
+Nseconds</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Milliseconds </td><td style="text-align: left;"> MILLISECONDS(N) </td><td style="text-align: left;"> Nms, Nmsec, Nmsecs,
+Nmillisecond, Nmilliseconds</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Microseconds </td><td style="text-align: left;"> MICROSECONDS(N) </td><td style="text-align: left;"> Nus, Nusec, Nusecs,
+Nmicrosecond, Nmicroseconds</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+------------------------</td><td style="text-align: left;">-------------------------------</td><td style="text-align: left;">
+---------------------------------------------------------------------
+</td>
+</tr>
+
+</table>
+
+<p>Where, N is a 16-bit positive integer with a maximum value of
+32767.<br />
+Default : NULL<br />
+Types: str<br />
+Examples:
+</p>
+
+<ol>
+<li><p> MINUTES(23) which is equal to 23 minutes
+</p>
+</li>
+<li><p> CAL_MONTHS(5) which is equal to 5 calendar months
+</p>
+</li></ol>
+</td></tr>
+<tr valign="top"><td><code>pti.columns</code></td>
+<td>
+<p>Optional Arugment.<br />
+Required if <code>timebucket.duration</code> is not specified.<br />
+Used when 'df' is to be saved as a PTI table.<br />
+Specifies one or more PTI table column names. These columns are
+used, together with the PTI, to determine how rows are distributed among
+the AMPs.<br />
+Default : NULL<br />
+Types : character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>sequence.column</code></td>
+<td>
+<p>Optional Argument.<br />
+Used when 'df' is to be saved as a PTI table.<br />
+Specifies the name of the column which contains the unique sequence
+numbers that differentiate the readings with the same timestamp. If this
+argument is provided, a SEQUENCED PTI table is created. Otherwise, a
+NONSEQUENCED PTI table is created. If the table is SEQUENCED PTI table,
+there can be multiple readings with the same timestamp from the same
+sensor. For nonsequenced data, there is one sensor reading per timestamp.
+<br />
+Default : NULL<br />
+Types : character<br />
+Note :
+</p>
+
+<ol>
+<li> <p><code>copy_to()</code> creates a new column named TD_SEQNO in the PTI
+table and inserts the data in the column specified in this argument into
+TD_SEQ column of remote table.
+</p>
+</li>
+<li><p> Advanced SQL Engine orders the rows in a sequenced table
+based on the timestamp, and within a single timestamp value, orders the
+rows according to the sequence number.
+</p>
+</li></ol>
+</td></tr>
+<tr valign="top"><td><code>seq.max</code></td>
+<td>
+<p>Optional Argument.<br />
+Used only when the argument 'sequence.column' is specified and 'df' must be saved
+as a PTI table.<br />
+Specifies the maximum number of data rows that can have the same timestamp.
+It takes a positive integer from 1 to 2147483647. If the argument is NULL,
+Advanced SQL Engine creates the table with seq.max as 20000.<br />
+Default : NULL<br />
+Types : numeric</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Other parameters passed to methods.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A 'tbl' object with a multiset PTI/non-PTI table present in the remote database.
+</p>
+
+
+<h3>PTI Usage</h3>
+
+
+<ol>
+<li><p> PTI table creation is only supported with Teradata SQL Driver for R.
+</p>
+</li>
+<li><p> When the argument <code>timecode.column.info</code> is specified, <code>copy_to</code> attempts to
+create a PTI table. This argument is not required when a non-PTI table is to be created. If
+this argument is specified, <code>primary.index</code> argument is ignored.
+</p>
+</li>
+<li><p> The arguments <code>pti.name</code>, <code>timezero.date</code>, <code>timebucket.duration</code>,
+<code>pti.columns</code>, <code>sequence.column</code>, <code>seq.max</code> are not required or used when the
+table to be created is non-PTI table. These arguments are ignored if specified without the
+argument <code>timecode.column.info</code>.
+</p>
+</li>
+<li><p> Choose PTI related arguments that will identify each row to result in the most even
+distribution of time series data among the AMPs in the map used by the table. Include columns
+in the argument <code>pti.columns</code> that are frequently queried to speed data access for those
+queries.
+</p>
+</li>
+<li><p> For more information on PTI tables, please refer to the documentation
+<a href="https://docs.teradata.com/">Teradata Vantage Time Series Tables and Operations</a>.
+</p>
+</li></ol>
+
+
+
+<h3>See Also</h3>
+
+<p><code>td_fastload</code>, <code>collect</code> function in the dplyr package, which downloads
+the data from a remote tbl into a local tbl.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Examples 1 through 16 demonstrates how to create non-PTI table.
+
+# Create a dataframe.
+df &lt;- data.frame(column1 = c(1,2,3), column2 = c('teradata','vantage','release'),
+                 column3 = c(TRUE,FALSE,TRUE))
+
+# Example 1: Create table from R dataframe "df" and collect statistics.
+copy_to(con, df, name = "test_table", analyze = TRUE, overwrite = TRUE)
+
+# Example 2: Append dataframe to an already created table.
+copy_to(con, df, name = "test_table", append = TRUE)
+
+# Example 3: Append to a non-existent table. A new table will be created.
+copy_to(con, df, name = "test_table_append", append = TRUE)
+
+# Example 4: Overwrite existing table "test_table" table.
+copy_to(con, df, name = "test_table", overwrite = TRUE)
+
+# Example 5: Create table in a different database using dbplyr::in_schema.
+copy_to(con, df, name = dbplyr::in_schema(td_get_context()$temp.database, "table_in_schema"))
+
+# Example 6: Create temporary(Teradata volatile) table.
+copy_to(con, df, name = "table_temp", temporary = TRUE)
+
+# Example 7: Creating PI table.
+copy_to(con, df, name = "table_PI", table.type = "PI", primary.index = c("column1","column2"))
+
+# Example 8: Create NOPI table.
+copy_to(con, df, name = "table_NOPI", table.type = "NOPI")
+
+# Example 9: Create table with row_names of dataframe.
+copy_to(con, df, name = "table_row_names", row.names = TRUE)
+
+# Example 10: Create table by specifying column types as unnamed character vector.
+copy_to(con, df, name = "table_coltypes", types = c("integer","varchar(10)","integer"))
+
+# Example 11: Create table by specifying column types as named character vector.
+copy_to(con, df, name = "table_coltypes1", types = c(column1="integer", column3="byteint"))
+
+# Get the tbl_teradata whose data is to be copied to new table.
+test_table &lt;- tbl(con,"test_table")
+
+# Example 12: Create table from tbl_teradata.
+copy_to(con, test_table, name = "table_tbl")
+
+# Example 13: Create NOPI table from tbl_teradata.
+copy_to(con, test_table, name = "table_tbl_nopi", table.type = "NOPI")
+
+# Example 14: Create PI table from tbl_teradata - primary.index uses the first column
+# by default.
+copy_to(con, test_table, name = "table_tbl_pi", table.type = "PI")
+
+# Example 15: Create temporary(Teradata volatile) table from tbl_teradata.
+copy_to(con, test_table, name = "table_tbl_temp", temporary = TRUE)
+
+# Example 16: Create table using "%&gt;%" operator.
+# This creates a temporay table with a randomly generated name, and the table will be dropped
+# when the current session ends.
+test_table_temp &lt;- test_table %&gt;% copy_to(con,df = .)
+
+## Working on PTI tables.
+
+loadExampleData("sessionize_example", "sessionize_table")
+df_tbl &lt;- tbl(con, "sessionize_table")
+df1 &lt;- as.data.frame(df_tbl)
+
+# Example 17 : Using R dataframe to create a non-PTI table. Note that the argument
+# 'timecode.column.info' is not used here. Other PTI related arguments are ignored.
+copy_to(con, df1, name = "df_to_nonpti_table", timebucket.duration = "2h",
+        timezero.date = "2008-01-01", sequence.column = "adid", seq.max = 200)
+
+# Example 18 : Using R dataframe to create a SEQUENCED PTI table with column 'clicktime'
+# (TIMESTAMP type) having timecode information and column 'adid' having sequence information.
+# Without seq.max, largest value that sequence column can hold is 20000 (by default).
+copy_to(con, df1, name = "df_to_pti_table", overwrite = TRUE, timebucket.duration = "2h",
+        timecode.column.info = c("clicktime" = "TIMESTAMP(3)"), timezero.date = "2008-01-01",
+        sequence.column = "adid")
+
+# Example 19 : Using R dataframe to create a NONSEQUENCED TEMPORARY PTI table with column
+# 'clicktime' (TIMESTAMP type) having timecode information. By providing 'types' argument, the
+# column 'partition_id' is created with BIGINT datatype. The argument 'sequence.column' should
+# not be provided for creating non-sequenced PTI tables.
+copy_to(con, df1, name = "df_to_temp_pti_table", timebucket.duration = "2h", temporary = TRUE,
+        timecode.column.info = c("clicktime" = "TIMESTAMP(6)"), timezero.date = "2008-01-01",
+        types = c("partition_id" = "BIGINT"))
+
+# Append to the same table using types argument.
+copy_to(con, df1, name = "df_to_temp_pti_table", types = c("partition_id" = "BIGINT"),
+timecode.column.info = c("clicktime" = "TIMESTAMP(6)"), append = TRUE)
+
+
+# Example 20 : Using non-PTI tbl_teradata to create a SEQUENCED PTI table with column
+# 'clicktime' (TIMESTAMP type) having timecode information and with sequence column taking
+# largest value of 1000.
+copy_to(con, df_tbl, name = "dftbl_to_seq_pti_table", timebucket.duration = "2h",
+        timecode.column.info = c("clicktime" = "TIMESTAMP(6)"), sequence.column = "adid",
+        seq.max = 1000)
+
+# Example 21 : Create a non-PTI table using PTI tbl_teradata. Note that there are no PTI
+# related arguments specified.
+
+# Load sequenced PTI table, if not exists.
+loadExampleData("time_series_example", "ocean_buoys_seq")
+
+# Create tbl_teradata from PTI table.
+df2 &lt;- tbl(con, "ocean_buoys_seq")
+
+# Copies data of PTI table to non-PTI table.
+copy_to(con, df2, "pti_to_nonpti_table")
+
+# Example 22 : Create a non-sequenced PTI table from sequenced PTI table with modified
+# time series specifications. The source PTI table is sequenced, has time zero of
+# DATE '2012-01-01' and timebucket duration of HOURS(1). The target PTI table is non-sequenced
+# (the column of TD_SEQNO of source table is no longer generated column), has time zero of
+# DATE '2010-01-01' and timebucket duration of HOURS(2). Note that the TD_TIMECODE column's
+# timestamp precision cannot be increased/decreased, i.e., the SQL type of TD_TIMECODE column
+# cannotbe modified. When the PTI related arguments of target table are same as that of source
+# PTI table, then target PTI table is exact same copy as that of source PTI table.
+copy_to(con, df2, "pti_to_modified_pti_table", timebucket.duration = "2h",
+        timecode.column.info = c("TD_TIMECODE" = "TIMESTAMP(6)"), timezero.date = "2010-01-01")
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

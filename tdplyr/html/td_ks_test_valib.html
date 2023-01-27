@@ -1,0 +1,386 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Kolmogorov-Smirnoff Tests</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_ks_test_valib {tdplyr}"><tr><td>td_ks_test_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Kolmogorov-Smirnoff Tests</h2>
+
+<h3>Description</h3>
+
+<p>Statistical tests of this type attempt to determine the likelihood that two 
+distribution functions represent the same distribution. Two empirical 
+distribution functions are mapped against each other, or a single empirical 
+function is mapped against a hypothetical (e.g., Normal) distribution. 
+Conclusions are then drawn about the likelihood the two distributions are 
+the same.<br />
+Performs following tests:
+</p>
+
+<ol>
+<li><p> Kolmogorov-Smirnov Test (One Sample)
+</p>
+</li>
+<li><p> Lilliefors Test
+</p>
+</li>
+<li><p> Shapiro-Wilk Test
+</p>
+</li>
+<li><p> D'Agostino and Pearson Test
+</p>
+</li>
+<li><p> Smirnov Test
+</p>
+</li></ol>
+
+<p>Detailed information about each test can be found in 
+<b>'Statistical Tests offered'</b> section.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_ks_test_valib(data, dependent.column, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to run statistical tests.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>dependent.column</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the numeric column that is 
+tested to have a normal distribution.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described 
+in the '<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_ks_test_valib&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies a categorical variable with two values that 
+indicate the distribution to which the &quot;dependent.column&quot; 
+belongs.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Used only by the Smirnov test.
+</p>
+</li></ul>
+
+<p>Types: Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>fallback</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether the FALLBACK is requested as in the 
+output result or not.<br />
+Default Value: FALSE (Not requested)<br />
+Types: logical
+</p>
+
+
+
+<h4>group.columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) for grouping
+so that a separate result is produced for each value
+or combination of values in the specified column or
+columns.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>allow.duplicates</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether duplicates are allowed in the
+output or not.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>stats.database</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the database where the statistical test 
+metadata tables are installed. If not specified, 
+the source database is searched for these metadata 
+tables.<br />
+Types: character
+</p>
+
+
+
+<h4>style</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the test style.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> 'ks' - Kolmogorov-Smirnov test.
+</p>
+</li>
+<li><p> 'l' - Lilliefors test.
+</p>
+</li>
+<li><p> 'sw' - Shapiro-Wilk test.
+</p>
+</li>
+<li><p> 'p' - D'Agostino and Pearson test.
+</p>
+</li>
+<li><p> 's' - Smirnov test.
+</p>
+</li></ol>
+                   
+<p>Default Value: 'ks'<br />
+Types: character
+</p>
+
+
+
+<h4>probability.threshold</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the threshold probability, i.e.,
+alpha probability, below which the null 
+hypothesis is rejected.<br />
+Default Value: 0.05<br />
+Types: numeric
+</p>
+
+
+
+<h3>Statistical Tests offered</h3>
+
+
+
+<h4>Kolmogorov-Smirnov Test (One Sample)</h4>
+
+<p>The Kolmogorov-Smirnov Test (One Sample) test determines if a dataset matches 
+a particular distribution (for this test, the normal distribution). The test 
+has the advantage of making no assumption about the distribution of data 
+(non-parametric and distribution-free). Note that this generality comes at 
+some cost: other tests (e.g., the Student's t-test) may be more sensitive if 
+the data meet the requirements of the test. The Kolmogorov-Smirnov test is 
+generally less powerful than the tests specifically designed to test for 
+normality. This is especially true when the mean and variance are not 
+specified in advance for the Kolmogorov-Smirnov test, which then becomes 
+conservative. Further, the Kolmogorov-Smirnov test will not indicate the type 
+of nonnormality, e.g., whether the distribution is skewed or heavy-tailed. 
+Examination of the skewness and kurtosis, and of the histogram, boxplot, and 
+normal probability plot for the data may show why the data failed the 
+Kolmogorov-Smirnov test.<br />
+<br />
+You can specify group by variables (GBVs) so a separate test will be done for 
+every unique set of values of the GBVs.<br />
+</p>
+
+
+
+<h4>Lilliefors Test</h4>
+
+<p>The Lilliefors test determines whether a dataset matches a particular 
+distribution. This test is a modification of the Kolmogorov-Smirnov test in 
+that a conversion to Z-scores is made. The Lilliefors test computes the 
+Lilliefors statistic and checks its significance. Exact tables of the 
+quantiles of the test statistic are computed from random numbers in computer 
+simulations, and the computed value of the test statistic is compared with 
+the quantiles of the statistic.<br />
+<br />
+When the test is for the normal distribution, the null hypothesis is that the 
+distribution function is normal with unspecified mean and variance. The 
+alternative hypothesis is that the distribution function is nonnormal. The 
+empirical distribution of X is compared with a normal distribution with the 
+same mean and variance as X. It is similar to the Kolmogorov-Smirnov test, 
+but it adjusts for the fact that the parameters of the normal distribution 
+are estimated from X rather than specified in advance.<br />
+<br />
+You can specify GBVs so a separate test will be done for every unique set of 
+values of the GBVs.<br />
+</p>
+
+
+
+<h4>Shapiro-Wilk Test</h4>
+
+<p>The Shapiro-Wilk test detects departures from normality without requiring 
+that the mean or variance of the hypothesized normal distribution be 
+specified in advance. It is considered to be one of the best omnibus tests of 
+normality. The function is based on the approximations and code given by 
+Royston (1982a, b). and can be used in samples as large as 2,000 or as small 
+as 3. Royston (1982b) gives approximations and tabled values that can be used 
+to compute the coefficients, and obtains the significance level of the 
+W statistic. Small values of W are evidence of departure from normality. This 
+test has done very well in comparison studies with other goodness of fit 
+tests.<br />
+<br />
+Either the Shapiro-Wilk or D'Agostino-Pearson test is a powerful overall test 
+for normality. As omnibus tests, however, they will not indicate the type of 
+nonnormality, e.g., whether the distribution is skewed as opposed to 
+heavy-tailed (or both). Examination of the calculated skewness and kurtosis, 
+and of the histogram, boxplot, and normal probability plot for the data may 
+provide clues as to why the data failed the Shapiro-Wilk or 
+D'Agostino-Pearson test.<br />
+<br />
+The standard algorithm for the Shapiro-Wilk test only applies to sample sizes 
+from 3 to 2000. The test statistic is based on the Kolmogorov-Smirnov 
+statistic for a normal distribution with the same mean and variance as the 
+sample mean and variance.<br />
+</p>
+
+
+
+<h4>D'Agostino and Pearson Test</h4>
+
+<p>Either the Shapiro-Wilk or D'Agostino-Pearson test is a powerful overall test 
+for normality. These tests are designed to detect departures from normality 
+without requiring that the mean or variance of the hypothesized normal 
+distribution be specified in advance. Though these tests cannot indicate the 
+type of nonnormality, they tend to be more powerful than the 
+Kolmogorov-Smirnov test.<br />
+<br />
+The D'Agostino-Pearson K squared statistic has approximately a chi-squared 
+distribution with 2 df when the population is normally distributed.<br />
+</p>
+
+
+
+<h4>Smirnov Test</h4>
+
+<p>The Smirnov test (&quot;two-sample Kolmogorov-Smirnov test&quot;) checks whether two 
+datasets have a significantly different distribution. The tests have the 
+advantage of making no assumption about the distribution of data 
+(non-parametric and distribution free).<br />
+Note:
+</p>
+
+<ul>
+<li><p> This generality comes at some cost: other tests (e.g., the Student's 
+t-test) may be more sensitive if the data meet the test requirements.
+</p>
+</li></ul>
+
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 
+#      'val.install.location' to the database name where Vantage analytic 
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+#   3. The Statistical Test metadata tables must be loaded into the database 
+#      where Analytics Library is installed.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+custanly &lt;- tbl(con, "customer_analysis")
+print(custanly)
+
+# Example 1: A Kolmogorov-Smirnov test by providing "group.columns".
+obj &lt;- td_ks_test_valib(data=custanly, 
+                        dependent.column="income", 
+                        group.columns="years_with_bank", 
+                        style="ks")
+
+# Print the results.
+print(obj$result)
+
+# Example 2: A Lilliefors test by providing "group.columns".
+obj &lt;- td_ks_test_valib(data=custanly, 
+                        dependent.column="income", 
+                        group.columns="years_with_bank", 
+                        style="l")
+
+# Print the results.
+print(obj$result)
+
+# Example 3: A Shapiro-Wilk test by providing "group.columns".
+obj &lt;- td_ks_test_valib(data=custanly, 
+                        dependent.column="income", 
+                        group.columns="years_with_bank", 
+                        style="sw")
+
+# Print the results.
+print(obj$result)
+
+# Example 4: A D'Agostino and Pearson test by providing "group.columns".
+obj &lt;- td_ks_test_valib(data=custanly, 
+                        dependent.column="income", 
+                        group.columns="years_with_bank", 
+                        style="p")
+
+# Print the results.
+print(obj$result)
+
+# Example 5: A Smirnov test by providing "group.columns".
+obj &lt;- td_ks_test_valib(data=custanly, 
+                        columns="gender",
+                        dependent.column="income", 
+                        group.columns="years_with_bank", 
+                        style="s")
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: KNNRecommenderTrain</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_knn_recommender_mle {tdplyr}"><tr><td>td_knn_recommender_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+KNNRecommenderTrain
+</h2>
+
+<h3>Description</h3>
+
+<p>The KNNRecommender function trains a interpolation weight model 
+based on weighted collaborative filtering approach. It uses the 
+input user ratings data to create three model tables: the weights
+model table, the bias model table and the optional nearest items
+or neighbors table. These tables are then used to predict the
+ratings or preferences that users assign to entities like books,
+songs, movies, and other products.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_knn_recommender_mle (
+      rating.table = NULL,
+      userid.column = NULL,
+      itemid.column = NULL,
+      rating.column = NULL,
+      k = 20,
+      learning.rate = 0.001,
+      max.iternum = 10,
+      threshold = 2.0E-4,
+      item.similarity = "Pearson",
+      rating.table.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>rating.table</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the user ratings.
+</p>
+</td></tr>
+<tr valign="top"><td><code>userid.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the user id column in the argument &quot;rating.table&quot;. 
+The default is the first column in the &quot;rating.table&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>itemid.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the item id column in the argument &quot;rating.table&quot;.
+The default is the second column in the &quot;rating.table&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>rating.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the rating column in the argument &quot;rating.table&quot;.
+The default is the third column in the rating table.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>k</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of nearest neighbors used in the calculation of the 
+interpolation weights.<br />
+Default Value: 20<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>learning.rate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the initial learning rate. The learning rate adjusts automatically during 
+training based on changes in the RMSE.<br />
+Default Value: 0.001<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.iternum</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>threshold</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the function stops when the RMSE drops below this level.<br />
+Default Value: 0.0002.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>item.similarity</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the method used to calculate item similarity.<br />
+Default Value: &quot;Pearson&quot;<br />
+Permitted Values: AdjustedCosine, Pearson<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>rating.table.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;rating.table&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_knn_recommender_mle&quot; which is 
+a named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> weight.model.table</p>
+</li>
+<li> 
+<p>bias.model.table</p>
+</li>
+<li><p> nearest.items</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("knnrecommender_example", "ml_ratings")
+    
+    # The ml_ratings table has movie ratings from 50 users on 
+    # approximately 2900 movies, with an average of about 150 ratings 
+    # for each user. The 10 possible ratings range from 0.5 to 5
+    # in steps of 0.5. A higher number indicates a better rating.
+    ml_ratings &lt;- tbl(con, "ml_ratings")
+    
+    # Example 1 - Train the KNN Recommender system on the user ratings data
+    td_knn_recommender_out &lt;- td_knn_recommender_mle(rating.table = ml_ratings,
+                                                 userid.column = "userid",
+                                                 itemid.column = "itemid",
+                                                 rating.column = "rating"
+                                                 )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

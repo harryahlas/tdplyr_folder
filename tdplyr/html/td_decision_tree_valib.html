@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Gain Ratio Decision Tree</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_decision_tree_valib {tdplyr}"><tr><td>td_decision_tree_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Gain Ratio Decision Tree</h2>
+
+<h3>Description</h3>
+
+<p>The Gain Ratio Extreme Decision Tree function performs decision tree modeling and
+returns an object of class tbl_teradata containing one row with two columns. The second column
+contains an XML string representing the resulting decision tree model described in
+Predictive Model Markup Language (PMML).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_decision_tree_valib(data, columns, response.column, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to be used for decision tree modeling.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the column(s) to be used in decision
+tree building. Occasionally, it can also accept permitted strings
+to specify all columns, all numeric columns or all character columns.<br />
+Permitted Values:<br />
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;.
+</p>
+</li>
+<li><p> Pre-defined strings:
+</p>
+
+<ol>
+<li><p> 'all' - all columns
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns
+</p>
+</li>
+<li><p> 'allcharacter' - all character columns
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>response.column</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of a column whose values are being
+predicted.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the 
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_decision_tree_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>algorithm</h4>
+
+<p>Optional Argument.<br />
+Specifies the name of the algorithm that the decision tree uses
+during building.<br />
+Permitted Values: &quot;gainratio&quot;<br />
+Default Value: &quot;gainratio&quot;<br />
+Types: character
+</p>
+
+
+
+<h4>binning</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to perform binning on the continuous independent
+variables automatically. When set to TRUE, continuous data is
+separated into one hundred bins. If the column has fewer than one
+hundred distinct values, this argument is ignored.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>exclude.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) to exclude from the
+decision tree building. If 'all', 'allnumeric' or 'allcharacter'
+is used in the &quot;columns&quot; argument, this argument can be used
+to exclude specific columns from tree building.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>max.depth</h4>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of levels the tree can grow.<br />
+Default Value: 100<br />
+Types: integer
+</p>
+
+
+
+<h4>num.splits</h4>
+
+<p>Optional Argument.<br />
+Specifies how far the decision tree can be split. Unless a node
+is pure (meaning it has only observations with the same dependent
+value) it splits if each branch that can come off this node
+contains at least this many observations. The default is a minimum
+of two cases for each branch.<br />
+Types: integer
+</p>
+
+
+
+<h4>operator.database</h4>
+
+<p>Optional Argument.<br />
+Specifies the database where the table operators called by
+Vantage Analytic Library reside. If not specified, the
+library searches the standard search path for table
+operators, including the current database.<br />
+Types: character
+</p>
+
+
+
+<h4>pruning</h4>
+
+<p>Optional Argument.<br />
+Specifies the style of pruning to use after the tree is fully built.<br />
+Permitted Values: &quot;gainratio&quot;, &quot;none&quot; (no pruning)<br />
+Default Value: &quot;gainratio&quot;<br />
+Types: character
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 'val.install.location' to
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer_analysis")
+print(df)
+
+# Run td_decision_tree_valib() on columns "age", "income" and "nbr_children", with
+# dependent variable "gender".
+obj &lt;- td_decision_tree_valib(data=df,
+                              columns=c("age", "income", "nbr_children"),
+                              response.column="gender",
+                              algorithm="gainratio",
+                              binning=FALSE,
+                              max.depth=5,
+                              num.splits=2,
+                              pruning="gainratio")
+# Print the results.
+print(obj$result)
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

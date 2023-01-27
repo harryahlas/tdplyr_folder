@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: ConfusionMatrix</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_confusion_matrix_mle {tdplyr}"><tr><td>td_confusion_matrix_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+ConfusionMatrix
+</h2>
+
+<h3>Description</h3>
+
+<p>The ConfusionMatrix function shows how often a classification
+algorithm correctly classifies items. The function takes an input
+tbl_teradata that includes two columns, one containing the observed class of
+an item and the other containing the class predicted by the algorithm,
+and outputs three tbl_teradata objects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_confusion_matrix_mle (
+      data = NULL,
+      reference = NULL,
+      prediction = NULL,
+      classes = NULL,
+      prevalence = NULL,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata that is used to generate Confusion Matrix.
+</p>
+</td></tr>
+<tr valign="top"><td><code>reference</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the observed 
+class.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>prediction</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the predicted 
+class.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>classes</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the classes to output in output tbl_teradata.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>prevalence</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the prevalences for the classes to output in 
+third output tbl_teradata which contains statistics for each class.
+Therefore, if you specify prevalence, then you must
+also specify classes, and for every class, you must specify a 
+prevalence.<br />
+Types: numeric OR vector of numerics
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_confusion_matrix_mle&quot; which 
+is a named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> counttable</p>
+</li>
+<li><p> stattable
+</p>
+</li>
+<li><p> accuracytable</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("confusionmatrix_example", "iris_category_expect_predict")
+
+    # Create object(s) of class "tbl_teradata".
+    iris_category_expect_predict &lt;- tbl(con, "iris_category_expect_predict")
+
+    # Example 1 -
+    confusion_matrix_out &lt;- td_confusion_matrix_mle(data = iris_category_expect_predict,
+                                  reference = "expected_value",
+                                  prediction = "predicted_value"
+                                  )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

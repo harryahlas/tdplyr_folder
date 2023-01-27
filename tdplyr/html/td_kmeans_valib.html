@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: K-Means Clustering.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_kmeans_valib {tdplyr}"><tr><td>td_kmeans_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>K-Means Clustering.</h2>
+
+<h3>Description</h3>
+
+<p>The function performs fast K-Means clustering algorithm and returns cluster 
+means and averages. Specifically, the rows associated with positive cluster 
+IDs in output contain the average values of each of the clustered columns 
+along with the count for each cluster ID. The rows associated with negative 
+cluster IDs contain the variance of each of the clustered columns for each 
+cluster ID.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This function is applicable only on columns containing numeric data.<br />
+</p>
+</li></ul>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_kmeans_valib(data, columns, centers, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data on which K-Means clustering is to be performed.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the column(s) to be used in clustering.
+Occasionally, it can also accept permitted strings to specify 
+all columns or all numeric columns.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;.
+</p>
+</li>
+<li><p> Pre-defined strings:
+</p>
+
+<ol>
+<li><p> 'all' - all columns
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>centers</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the number of clusters to be contained in the cluster 
+model.<br />
+Types: integer</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_kmeans_valib&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>exclude.columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) to exclude from the 
+clustering analysis.<br />
+If 'all' or 'allnumeric' is used in the &quot;columns&quot; argument, 
+this argument can be used to exclude specific columns from the 
+analysis.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>centroids.data</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the tbl_teradata containing 
+clustering output, which is used as initial value 
+for clustering algorithm, instead of using random 
+values. If this argument is not specified or NULL, 
+the function starts with random values.<br />
+Note:<br />
+</p>
+
+<ul>
+<li><p> If the argument &quot;centroids.data&quot; is specified,
+then &quot;centroids.data&quot; tbl_teradata object is
+overwritten by the result tbl_teradata of kmeansObj.
+</p>
+</li></ul>
+
+<p>Types: tbl_teradata
+</p>
+
+
+
+<h4>max.iter</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations to perform 
+during clustering.<br />
+Default Value: 50<br />
+Types: integer
+</p>
+
+
+
+<h4>operator.database</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the database where the table operators 
+called by Vantage Analytic Library reside. If not 
+specified, the library searches the standard 
+search path for table operators, including the 
+current database.<br />
+Types: character
+</p>
+
+
+
+<h4>threshold</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the value which determines if the algorithm 
+has converged based on how much the cluster centroids 
+change from one iteration to the next.<br />
+Default Value: 0.001<br />
+Types: numeric
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 
+#      'val.install.location' to the database name where Vantage analytic 
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+custanly &lt;- tbl(con, "customer_analysis")
+print(custanly)
+
+# Example 1: Run KMeans clustering on the tbl_teradata 'customer_analysis' 
+#            with initial random values. The function uses 'all' for "columns" 
+#            argument and excludes all non-numeric columns.
+obj &lt;- td_kmeans_valib(data=custanly,
+                       columns='all',
+                       exclude.columns=c("cust_id", "gender", "marital_status", 
+                       "city_name", "state_code"),
+                       centers=3)
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Run KMeans clustering on the tbl_teradata 'customer_analysis' with 
+#            pre-existing result tbl_teradata in "centroids.data" argument.
+obj &lt;- td_kmeans_valib(data=custanly,
+                       columns=c("avg_cc_bal", "avg_ck_bal", "avg_sv_bal"),
+                       centers=3,
+                       max.iter=5,
+                       threshold=0.1)
+# Use KMeans result tbl_teradata (from above step) in "centroids.data" argument.
+obj1 &lt;- td_kmeans_valib(data=custanly,
+                       columns=c("avg_cc_bal", "avg_ck_bal", "avg_sv_bal"),
+                       centers=3,
+                       max.iter=5,
+                       threshold=0.1,
+                       centroids.data=obj$result)
+# Print the results.
+print(obj1$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

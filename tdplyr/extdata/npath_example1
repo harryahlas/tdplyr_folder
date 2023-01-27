@@ -1,0 +1,2 @@
+--loadByTypes--
+bank_web_clicks2::int,int,varchar(30),timestamp

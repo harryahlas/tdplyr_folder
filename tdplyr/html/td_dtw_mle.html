@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: DTW</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_dtw_mle {tdplyr}"><tr><td>td_dtw_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+DTW
+</h2>
+
+<h3>Description</h3>
+
+<p>The DTW function performs dynamic time warping (DTW), which measures 
+the similarity (warp distance) between two time series that vary in 
+time or speed. You can use DTW to analyze any data that can be 
+represented linearly, for example, video, audio, and graphics.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_dtw_mle (
+      data = NULL,
+      template.data = NULL,
+      mapping.data = NULL,
+      input.columns = NULL,
+      template.columns = NULL,
+      timeseries.id = NULL,
+      template.id = NULL,
+      radius = 10,
+      dist.method = "EuclideanDistance",
+      warp.path = FALSE,
+      data.sequence.column = NULL,
+      template.data.sequence.column = NULL,
+      mapping.data.sequence.column = NULL,
+      data.partition.column =NULL,
+      mapping.data.partition.column = NULL,
+      data.order.column = NULL,
+      template.data.order.column = NULL,
+      mapping.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata object which contains the time series information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for argument &quot;data&quot;.<br />
+Values to this argument can be provided as vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for argument &quot;data&quot;.<br />
+Values to this argument can be provided as vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>template.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata object which contains the
+template information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>template.data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for argument &quot;template.data&quot;.<br />
+Values to this argument can be provided as vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>mapping.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata object which contains the mapping between
+the rows in the tbl_teradata specified in &quot;data&quot; argument and the rows
+in the tbl_teradata specified in &quot;template.data&quot; argument.
+</p>
+</td></tr>
+<tr valign="top"><td><code>mapping.data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for argument &quot;mapping.data&quot;.<br />
+Values to this argument can be provided as vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>mapping.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for argument &quot;mapping.data&quot;.<br />
+Values to this argument can be provided as vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns that contain the values and 
+timestamps of the time series. <br />
+Note: If these columns contain NaN or infinity values then,  
+they should be removed.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>template.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns from &quot;template.data&quot; object that contain the
+values and timestamps of the time series.<br />
+Note: If these columns contain NaN or infinity values then they should 
+be removed.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>timeseries.id</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns by which the tbl_teradata specified in
+&quot;data&quot; argument is partitioned. These columns comprise the unique
+id for a time series specified in argument &quot;data&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>template.id</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns by which the tbl_teradata specified in
+&quot;template.data&quot; argument is ordered. These columns comprise the
+unique id for a time series in &quot;template.data&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>radius</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the integer value that determines the projected warp path 
+from a previous resolution. <br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>dist.method</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the metric for computing the warping distance.
+The supported case-sensitive values are:
+</p>
+<ol>
+<li><p> EuclideanDistance (default),</p>
+</li>
+<li><p> ManhattanDistance, 
+</p>
+</li>
+<li><p> BinaryDistance</p>
+</li></ol>
+
+<p>Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>warp.path</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Determines whether to output the warping path. <br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>template.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;template.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>mapping.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;mapping.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_dtw_mle&quot; which is a named 
+list containing objects of class &quot;tbl_teradata&quot;.
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("dtw_example", "timeseriesdata", "templatedata", "mappingdata")
+    
+    # Create object(s) of class "tbl_teradata".
+    timeseriesdata &lt;- tbl(con, "timeseriesdata")
+    templatedata &lt;- tbl(con, "templatedata")
+    mappingdata &lt;- tbl(con, "mappingdata")
+    
+    # Example 1 -
+    # This example compares multiple time series to both a common template and each other.
+    # Each time series represents stock prices and the template represents a series
+    # of stock index prices.
+    td_dtw_mle_out &lt;- td_dtw_mle(data = timeseriesdata,
+                                 data.partition.column = c("timeseriesid"),
+                                 data.order.column = c("timestamp1"),
+                                 template.data = templatedata,
+                                 template.data.order.column = c("timestamp2"),
+                                 mapping.data = mappingdata,
+                                 mapping.data.partition.column = c("timeseriesid"),
+                                 input.columns = c("stockprice", "timestamp1"),
+                                 template.columns = c("indexprice", "timestamp2"),
+                                 timeseries.id = "timeseriesid",
+                                 template.id = "templateid"
+                                 )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

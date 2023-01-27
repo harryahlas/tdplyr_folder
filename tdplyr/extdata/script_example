@@ -1,0 +1,4 @@
+--loadByTypes--
+barrier::integer, varchar(25)
+--loadByTypes--
+barrier_new::integer, varchar(25)

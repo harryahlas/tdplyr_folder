@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Loading example data for tdplyr functions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for loadExampleData {tdplyr}"><tr><td>loadExampleData {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Loading example data for tdplyr functions</h2>
+
+<h3>Description</h3>
+
+<p>Function to load the example data to a specified table.<br />
+This is used only in loading example data for trying examples for the tdplyr functions.<br /><br />
+Note: This function<br />
+</p>
+
+<ol>
+<li><p> can be used in restricted way in that it can only accept predefined values as can
+be found only in the examples provided in the function reference guide and the user guide;
+</p>
+</li>
+<li><p> creates new table(s) in Vantage. If required, the user must drop them manually;
+</p>
+</li>
+<li><p> will skip creation of the table and loading of the data to it if a table with the name
+provided already exists.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+loadExampleData(fileName, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>fileName</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the file in inst/extdata directory for data load.<br />
+Note: This argument must be used to specify values only as specified in the
+calls to the function in the example sections of the tdplyr functions.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the table(s) to create and load the example data to.<br />
+Note: The name(s) of table(s) provided with this argument must have corresponding data
+(CSV) file(s) present in the inst/extdata directory.<br />
+Types: character</p>
+</td></tr>
+</table>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Example 1 - Loading single table used in the example for "td_glm_mle".
+# Load example data.
+loadExampleData("glm_example", "admissions_train")
+
+# Create object of class "tbl_teradata" based on the data loaded to use as input.
+admissions_train &lt;- tbl(con, "admissions_train")
+
+# Example 2 - Loading multiple tables used in the examples for "td_glm_predict_mle".
+loadExampleData("glmpredict_example", "admissions_test", "housing_test")
+
+# Create objects of class "tbl_teradata" based on the data loaded to use as inputs.
+admissions_test &lt;- tbl(con, "admissions_test")
+housing_test &lt;- tbl(con, "housing_test")
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

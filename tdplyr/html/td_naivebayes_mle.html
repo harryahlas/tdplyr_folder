@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: NaiveBayes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_naivebayes_mle {tdplyr}"><tr><td>td_naivebayes_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+NaiveBayes
+</h2>
+
+<h3>Description</h3>
+
+<p>The NaiveBayes function (NaiveBayesMap and NaiveBayesReduce functions combined) 
+generate a model from training data. A tbl_teradata of training data is input to the
+NaiveBayesMap function and its output is the input to the NaiveBayesReduce function 
+which outputs the model.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_naivebayes_mle (
+      formula = NULL,
+      data = NULL,
+      data.sequence.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+
+<p>Required Argument.<br />
+An object of class &quot;formula&quot;. Specifies the model to be fitted. Only 
+basic formula of the (col1 ~ col2 + col3 +...) form are supported and 
+all variables must be from the same tbl_teradata object. The 
+response should be a column of type real, numeric, integer or logical.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata defining the input training data.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_naivebayes_mle&quot; which is a named
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("naivebayes_example1", "nb_iris_input_train")
+    
+    # Create object(s) of class "tbl_teradata".
+    nb_iris_input_train &lt;- tbl(con, "nb_iris_input_train")
+
+    # Example 1 - Run the NaiveBayes train function with only required arguments.
+    naivebayes_train &lt;- td_naivebayes_mle(formula = (species ~ petal_length + sepal_width + 
+                                                     petal_width + sepal_length), 
+                                          data = nb_iris_input_train)
+  
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

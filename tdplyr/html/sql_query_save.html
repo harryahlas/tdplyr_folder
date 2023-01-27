@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Builds a create table query from a SQL</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for sql_query_save.Teradata {tdplyr}"><tr><td>sql_query_save.Teradata {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Builds a create table query from a SQL</h2>
+
+<h3>Description</h3>
+
+<p>This function builds a create table query to be used by <code>db_save_query</code>
+to create the table.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'Teradata'
+sql_query_save(
+  con,
+  sql,
+  name,
+  temporary = FALSE,
+  table.type = "PI",
+  primary.index = NULL,
+  ...
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>con</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies remote data source.</p>
+</td></tr>
+<tr valign="top"><td><code>sql</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies a query from which new table is to be created.<br />
+Types : sql OR character</p>
+</td></tr>
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies name of the new remote table.<br />
+Types : character</p>
+</td></tr>
+<tr valign="top"><td><code>temporary</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to create a temporary remote table(TRUE)
+or not(FALSE).<br />
+Default : FALSE<br />
+Types : logical</p>
+</td></tr>
+<tr valign="top"><td><code>table.type</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies type of remote table.<br />
+Permitted Values: NOPI(No Primary Index),
+PI(Primary Index).<br />
+Default : PI<br />
+Types : character</p>
+</td></tr>
+<tr valign="top"><td><code>primary.index</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the name of the primary index column. When
+&quot;primary.index&quot; is not specified and &quot;table.type&quot; is
+'PI', the behavior is specified by the
+&quot;PrimaryIndexDefault&quot; field in DBS Control.<br />
+Default : NULL<br />
+Types : character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Other parameters passed to methods.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Returns the query of the table that is to be created.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>db_compute()</code>, <code>db_save_query()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Save iris dataset into table 'sql_query_save_test'.
+iris2 &lt;-  copy_to(con, iris, name = "sql_query_save_test", overwrite = FALSE)
+
+sql_query &lt;- "select * from sql_query_save_test"
+
+# Get the SQL query for the PI table from the result set of "sql_query".
+sql_query_save(con, sql_query, "db_save_query_test1", temporary = FALSE,
+               table.type = "PI",
+               primary.index = c("Petal.Length","Species"))
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

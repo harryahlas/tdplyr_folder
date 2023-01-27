@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: td_publish_model</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_publish_model {tdplyr}"><tr><td>td_publish_model {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>td_publish_model</h2>
+
+<h3>Description</h3>
+
+<p>Function to publish a saved model.<br />
+It can be used to update the access level from PRIVATE to PUBLIC or TEAM.<br />
+It can also be used to update the status of the model to one of the permitted values.<br />
+A model can only be published by its creator.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_publish_model(name, grantee = NULL, status = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the model to be published.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>grantee</code></td>
+<td>
+<p>Optional Argument. Must be specified when &quot;status&quot; is not specified.<br />
+Specifies a user or role (including PUBLIC) to update the
+model's access level to.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>status</code></td>
+<td>
+<p>Optional Argument. Must be specified when &quot;grantee&quot; is not specified.<br />
+Specifies a status to set the the model's status to.<br />
+Permitted Values: &quot;ACTIVE&quot;, &quot;RETIRED&quot;, &quot;CANDIDATE&quot;, &quot;PRODUCTION&quot;,
+&quot;IN-DEVELOPMENT&quot;<br />
+Types: character</p>
+</td></tr>
+</table>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load example data.
+loadExampleData("glm_example", "admissions_train")
+
+# Create object of class "tbl_teradata" to use as input.
+admissions_train &lt;- tbl(con, "admissions_train")
+
+# Create the GLM model.
+td_glm_out1 &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                          family = "LOGISTIC",
+                          linkfunction = "LOGIT",
+                          data = admissions_train,
+                          weights = "1",
+                          threshold = 0.01,
+                          maxit = 25,
+                          step = FALSE,
+                          intercept = TRUE
+)
+
+# Save this generated model.
+td_save_model(model = td_glm_out1, name = "glm_model", description = "GLM test")
+
+# Example 1 - Update only the access.
+td_publish_model('glm_model', grantee='john')
+
+# Example 2 - Update only the status.
+td_publish_model('glm_model', status='Active')
+
+# Example 3 - Update both the access and status.
+# This example does not apply to the model we just saved, as we can update
+# the access only when the current access is 'Private'.
+# We save the model again with another name for this example.
+td_save_model(model = td_glm_out1, name = "glm_model_2", description = "GLM test 2")
+
+td_publish_model('glm_model_2', grantee='PUBLIC', status='Production')
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

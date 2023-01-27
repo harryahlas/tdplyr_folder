@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TextClassifierTrainer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_text_classifier_trainer_mle {tdplyr}"><tr><td>td_text_classifier_trainer_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+TextClassifierTrainer
+</h2>
+
+<h3>Description</h3>
+
+<p>The TextClassifierTrainer function trains a machine learning classifier for text 
+classification and installs the model file on Vantage. The model file can then 
+be input to TextClassifier (<code>td_text_classifier_mle</code>) function.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_text_classifier_trainer_mle (
+      data = NULL,
+      text.column = NULL,
+      category.column = NULL,
+      classifier.type = "maxEnt",
+      classifier.parameters = NULL,
+      nlp.parameters = NULL,
+      feature.selection = NULL,
+      model.file = NULL,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the documents to 
+use to train the model.
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the text of the 
+training documents.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>category.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the category of the 
+training documents.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>classifier.type</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the classifier type of the model, KNN algorithm or Maximum 
+Entropy model.<br />
+Default Value: &quot;MaxEnt&quot;<br />
+Permitted Values: MaxEnt, KNN<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>classifier.parameters</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Applies only if the classifier type of the model is KNN. Specifies 
+parameters for the classifier. The name must be &quot;compress&quot; and value 
+must be in the range (0, 1). The n training documents are clustered 
+into value*n groups (for example, if there are 100 training 
+documents and 'compress:0.6' is specified in this argument, then the 
+function clusters them into 60 groups), and the model uses the center 
+of each group as the feature vector.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>nlp.parameters</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Natural Language Processing (NLP) parameters for 
+preprocessing the text data and produce tokens. Each 'name:value' pair 
+must be one of the following:
+</p>
+
+<ul>
+<li><p> tokenDictFile: token_file - token_file is the name 
+of a Vantage file in which each line contains a phrase, 
+followed by a space, followed by the token for the phrase 
+(and nothing else).
+</p>
+</li>
+<li><p> stopwordsFile:stopword_file - stopword_file is the 
+name of a Vantage file in which each line contains exactly 
+one stop word (a word to ignore during tokenization, such as
+a, an, or the).
+</p>
+</li>
+<li><p> useStem:true|false - specifies whether the function
+stems the tokens. The default value is &quot;false&quot;.
+</p>
+</li>
+<li><p> stemIgnoreFile:stem_ignore_file - stem_ignore_file is 
+the name of a Vantage file in which each line contains 
+exactly one word to ignore during stemming. Specifying this parameter 
+with &quot;useStem:false&quot; causes an exception.
+</p>
+</li>
+<li><p> useBgram: true | false  - specifies whether the function uses 
+Bigram, which considers the proximity of adjacent tokens when analyzing 
+them. The default value is &quot;false&quot;.
+</p>
+</li>
+<li><p> language: en | zh_CN | zh_TW  - specifies the language
+of the input text - English (en), Simplified Chinese (zh_CN), 
+or Traditional Chinese (zh_TW). The default value is &quot;en&quot;. For the 
+values zh_CN and zh_TW, the function ignores the parameters useStem 
+and stemIgnoreFile.
+</p>
+</li></ul>
+
+<p>Example:<br />
+nlp.parameters &lt;- c(&quot;tokenDictFile:token_dict.txt&quot;, 
+&quot;stopwordsFile:fileName&quot;, 
+&quot;useStem:true&quot;, 
+&quot;stemIgnoreFile:fileName&quot;, 
+&quot;useBgram:true&quot;, 
+&quot;language:zh_CN&quot;
+)<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>feature.selection</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the feature selection method, DF (document frequency). The 
+values min and max must be in the range (0, 1). The function selects 
+only the tokens that appear in at least min*n documents and at most 
+max*n documents, where n is the number of training documents. For 
+example, specifying &quot;DF:[0.1:0.9]&quot; in this argument causes the function to 
+select only the tokens that appear in at least 10% but no more 
+than 90% of the training documents. If min exceeds max, the 
+function uses min as max and max as min.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>model.file</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the model file to be generated.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_text_classifier_trainer_mle&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("text_classifier_trainer_example", "texttrainer_input")
+    
+    # Create object(s) of class "tbl_teradata".
+    texttrainer_input &lt;- tbl(con, "texttrainer_input")
+    
+    # Example - The function outputs a binary model file with the name
+    # specified by "model.file" argument.
+    td_text_classifier_trainer_mle_out &lt;- td_text_classifier_trainer_mle(data=texttrainer_input,
+                                              text.column='content',
+                                              category.column='category',
+                                              classifier.type='knn',
+                                              model.file='knn.bin',
+                                              classifier.parameters='compress:0.9',
+                                              nlp.parameters=c('useStem:true',
+                                                               'stopwordsFile:stopwords.txt'),
+                                              feature.selection='DF:[0.1:0.99]',
+                                              data.sequence.column='id'
+                                              )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

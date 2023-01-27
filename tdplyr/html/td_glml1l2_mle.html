@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: GLML1L2</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_glml1l2_mle {tdplyr}"><tr><td>td_glml1l2_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+GLML1L2
+</h2>
+
+<h3>Description</h3>
+
+<p>The GLML1L2 function differs from the GLM function in these ways:
+</p>
+
+<ol>
+<li><p> GLML1L2 supports the regularization models Ridge, LASSO, and 
+Elastic Net.
+</p>
+</li>
+<li><p> GLML1L2 outputs a model tbl_teradata and, optionally, a 
+factor tbl_teradata (GLM outputs only a model).</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_glml1l2_mle (
+      formula = NULL,
+      data = NULL,
+      alpha = 0.0,
+      lambda = 0,
+      max.iter.num = 10000,
+      stop.threshold = 1.0E-7,
+      family = "Gaussian",
+      randomization = FALSE,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+
+<p>Required Argument.<br />
+An object of class &quot;formula&quot;. Specifies the model to be fitted. Only 
+basic formula of the (col1 ~ col2 + col3 +...) form are supported and 
+all variables must be from the same tbl_teradata object. The 
+response should be a column of type numeric or logical.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the input data.
+</p>
+</td></tr>
+<tr valign="top"><td><code>alpha</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to use Lasso, Ridge or Elastic Net. If the value is 
+0, Ridge is used. If the value is 1, Lasso is used. For any value 
+between 0 and 1, Elastic Net is applied.<br />
+Default Value: 0.0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>lambda</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the parameter that controls the magnitude of the regularization
+term. The value of &quot;lambda&quot; must be in the range [0.0, 100.0].
+A value of zero disables regularization.<br />
+Default Value: 0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.iter.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations over the data.
+The parameter &quot;max.iter.num&quot; must be a positive numeric value in the
+range [1, 100000].<br />
+Default Value: 10000<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>stop.threshold</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the convergence threshold.<br />
+Default Value: 1.0E-7<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>family</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the distribution exponential family.<br />
+Default Value: &quot;Gaussian&quot;<br />
+Permitted Values: Binomial, Gaussian<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>randomization</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to randomize the input tbl_teradata data.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_glml1l2_mle&quot; which is a named 
+list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> factor.data</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+<p>Note: <br />
+</p>
+
+<ol>
+<li><p> When argument randomization is TRUE or if any categorical columns
+are provided in formula argument, then and only then the output
+tbl_teradata object factor.data is created.
+</p>
+</li>
+<li><p> factor.data can be used as the input (data) for future GLML1L2
+function calls, thereby saving the function from repeating the
+categorical-to-numerical conversion or randomization.</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("glml1l2_example", "admissions_train", "housing_train")
+
+    # Create object(s) of class "tbl_teradata".
+    admissions_train &lt;- tbl(con, "admissions_train")
+    housing_train &lt;- tbl(con, "housing_train")
+
+    # Example 1 -
+    # Ridge Regression, family = 'Binomial'.
+    # Because the response variable is binary (the admitted column has
+    # two possible values), the call specifies family = 'Binomial'.
+    # alpha = 0 indicates L2 (ridge regression) regularization.
+    td_glml1l2_mle_out1 &lt;- td_glml1l2_mle(formula = (admitted ~ stats + gpa + masters
+                                                     + programming),
+                                          data = admissions_train,
+                                          alpha = 0,
+                                          lambda = 0.02,
+                                          family = "Binomial",
+                                          randomization = TRUE
+                                         )
+
+    # Example 2 -
+    # factor.data (from Example 1) as input data.
+    # Because Randomization was TRUE in the function call that created
+    # the factor.data input, this call does not need it.
+    td_glml1l2_mle_out2 &lt;- td_glml1l2_mle(formula = (admitted ~ masters_yes + stats_novice
+                                                     + programming_novice + stats_beginner
+                                                     + programming_beginner + gpa),
+                                          data = td_glml1l2_mle_out1$factor.data,
+                                          alpha = 0,
+                                          lambda = 0.02,
+                                          family = "Binomial"
+                                         )
+
+    # Example 3 -
+    # LASSO, family = 'Gaussian'.
+    # Because the response variable has a Gaussian distribution, the call specifies
+    # family = 'Gaussian'.
+    # alpha = 1 indicates L1 (LASSO) regularization.
+    td_glml1l2_mle_out3 &lt;- td_glml1l2_mle(formula = (price ~ lotsize + bedrooms + gashw + driveway
+                                                     + stories + recroom + garagepl + bathrms
+                                                     + homestyle + fullbase + airco + prefarea),
+                                          data = housing_train,
+                                          alpha = 1,
+                                          lambda = 0.02,
+                                          family = "Gaussian",
+                                          randomization = TRUE
+                                         )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

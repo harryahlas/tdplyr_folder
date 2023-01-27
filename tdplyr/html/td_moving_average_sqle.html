@@ -1,0 +1,288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: MovingAverage</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_moving_average_sqle {tdplyr}"><tr><td>td_moving_average_sqle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+MovingAverage
+</h2>
+
+<h3>Description</h3>
+
+<p>The MovingAverage function calculates the moving average of the 
+target columns based on the moving average types argument (&quot;mvgtype&quot;).<br />
+Possible moving average types:<br />
+</p>
+
+<ul>
+<li><p> 'C' - Cumulative moving average.
+</p>
+</li>
+<li><p> 'E' - Exponential moving average.
+</p>
+</li>
+<li><p> 'M' - Modified moving average.
+</p>
+</li>
+<li><p> 'S' - Simple moving average.
+</p>
+</li>
+<li><p> 'T' - Triangular moving average.
+</p>
+</li>
+<li><p> 'W' - Weighted moving average.
+</p>
+</li></ul>
+
+<p>Note: This function is only available when tdplyr is connected
+to Vantage 1.1 or later versions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_moving_average_sqle (
+      data = NULL,
+      target.columns = NULL,
+      alpha = 0.1,
+      start.rows = 2,
+      window.size = 10,
+      include.first = FALSE,
+      mavgtype = "C",
+      data.partition.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the columns.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the input column names for which the moving average is to 
+be computed. If you omit this argument, then the function copies 
+every input column to the output tbl_teradata but does not compute 
+moving average.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>alpha</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the damping factor, a value in the range [0, 1], which 
+represents a percentage in the range [0, 100]. For example, if alpha 
+is 0.2, then the damping factor is 20%. A higher alpha discounts 
+older observations faster. Only used if &quot;mavgtype&quot; is E.
+For other moving average types this value will be ignored.<br />
+Default Value: 0.1<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>start.rows</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of rows at the beginning of the time series that 
+the function skips before it begins the calculation of the 
+exponential moving average. The function uses the arithmetic average 
+of these rows as the initial value of the exponential moving average.
+Only used if &quot;mavgtype&quot; is E. For other moving average types 
+this value will be ignored.
+The value n must be an integer.<br />
+Default Value: 2<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>window.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of previous values to include in the computation 
+of the moving average if &quot;mavgtype&quot; is M, S, T, and W.
+For other moving average types this value will be ignored.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>include.first</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the first starting rows should be included in the 
+output or not. Only used if &quot;mavgtype&quot; is S, M, W, E, T.
+For cumulative moving average types this value will be ignored.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>mavgtype</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specify the moving average type that needs to be used for computing 
+moving averages of &quot;target.columns&quot;.<br />
+Following are the different type of averages calculated by MovingAverage 
+<code>td_moving_average_sqle</code> function:<br />
+</p>
+
+<ul>
+<li><p> &quot;S&quot;: The MovingAverage function computes the simple
+moving average of points in a series.
+</p>
+</li>
+<li><p> &quot;W&quot;: The MovingAverage function computes the weighted
+moving average the average of points in a time series, applying 
+weights to older values. The weights for the older values decrease 
+arithmetically.
+</p>
+</li>
+<li><p> &quot;E&quot;: The MovingAverage function computes the exponential
+moving average of the points in a time series, exponentially decreasing 
+the weights of older values.
+</p>
+</li>
+<li><p> &quot;C&quot;: The MovingAverage function computes the cumulative
+moving average of a value from the beginning of a series.
+</p>
+</li>
+<li><p> &quot;M&quot;: The MovingAverage function computes moving average
+of points in series.
+</p>
+</li>
+<li><p> &quot;T&quot;: The MovingAverage function computes double-smoothed
+average of points in series.
+</p>
+</li></ul>
+
+<p>Default Value: &quot;C&quot;<br />
+Permitted Values: C, S, M, W, E, T<br />
+Types: character
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_moving_average_sqle&quot; which is 
+a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("exponentialmovavg_example", "ibm_stock")
+    loadExampleData("weightedmovavg_example", "stock_vol")
+    
+    # Create object(s) of class "tbl_teradata".
+    ibm_stock &lt;- tbl(con, "ibm_stock")
+    
+    # Example 1: Compute the exponential moving average
+    td_exponential_mov_avg_out &lt;- td_moving_average_sqle(data = ibm_stock,
+                                                         data.partition.column = c("name"),
+                                                         data.order.column = c("period"),
+                                                         target.columns = c("stockprice"),
+                                                         start.rows = 10,
+                                                         include.first = TRUE,
+                                                         mavgtype = "E"
+                                                         )
+                                                         
+    # Example 2: Compute the cumulative moving average for "stockprice".
+    td_cumulative_mov_avg_out &lt;- td_moving_average_sqle(data = ibm_stock,
+                                                       data.partition.column = c("name"),
+                                                       data.order.column = c("period"),
+                                                       target.columns = c("stockprice"),
+                                                       mavgtype = "C"
+                                                       ) 
+     
+    # Example 3: Compute the simple moving average for "stockprice".
+    td_simple_mov_avg_out &lt;- td_moving_average_sqle(data = ibm_stock,
+                                           data.partition.column = "name",
+                                           data.order.column = "period",
+                                           target.columns = "stockprice",
+                                           include.first = TRUE,
+                                           window.size = 10,
+                                           mavgtype = "S"
+                                           )
+                                           
+    # The input table, stock_vol, contains hypothetical stock price and volume data of three
+    # companies between 17 May 1961 and 21 June 1961.
+    stock_vol &lt;- tbl(con, "stock_vol")
+      
+    # Example 4: This example computes the weighted moving average for stockprice and volume
+    # for three companies.
+    td_weighted_mov_avg_out &lt;- td_moving_average_sqle(data = stock_vol,
+                                                   data.partition.column = c("id"),
+                                                   data.order.column = c("name"),
+                                                   target.columns = c("stockprice","volume"),
+                                                   include.first = TRUE,
+                                                   window.size = 5,
+                                                   mavgtype = "W"
+                                                   )  
+                                                   
+    # Example 5: Triangular Moving Average
+    td_triangular_mov_avg_out &lt;- td_moving_average_sqle(data = stock_vol,
+                                                   data.partition.column = "name",
+                                                   data.order.column = "period",
+                                                   target.columns = c("stockprice"),
+                                                   include.first = TRUE,
+                                                   window.size = 3,
+                                                   mavgtype = "T"
+                                                   )
+                                                   
+     # Example 6: Modified Moving Average.
+     td_modified_mov_avg_out &lt;- td_moving_average_sqle(data = stock_vol,
+                                                   data.partition.column = "name",
+                                                   data.order.column = "period",
+                                                   target.columns = c("stockprice"),
+                                                   include.first = TRUE,
+                                                   window.size = 3,
+                                                   mavgtype = "M"
+                                                   )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

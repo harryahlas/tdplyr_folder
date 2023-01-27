@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: nGrams</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_ngramsplitter_mle {tdplyr}"><tr><td>td_ngramsplitter_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+nGrams
+</h2>
+
+<h3>Description</h3>
+
+<p>The nGrams function tokenizes (splits) an input
+stream of text and outputs n multigrams (called n-grams) based on the
+specified delimiter and reset parameters. nGrams provides more 
+flexibility than standard tokenization when performing text analysis.
+Many two-word phrases carry important meaning 
+(for example, &quot;machine learning&quot;) that unigrams (single-word tokens) do not
+capture. This, combined with additional analytical techniques, can 
+be useful for performing sentiment analysis, topic identification, and document 
+classification.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_ngramsplitter_mle (
+      data = NULL,
+      text.column = NULL,
+      delimiter = "[\\s]+",
+      grams = NULL,
+      overlapping = TRUE,
+      to.lower.case = TRUE,
+      punctuation = "[`~#^&amp;*()-]",
+      reset = "[.,?!]",
+      total.gram.count = FALSE,
+      total.count.column = "totalcnt",
+      accumulate = NULL,
+      n.gram.column = "ngram",
+      num.grams.column = "n",
+      frequency.column = "frequency",
+      data.sequence.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies input tbl_teradata where each row of the input contains a document 
+to be tokenized. The input tbl_teradata can have additional rows, some or all of 
+which the function returns in the output tbl_teradata.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the input text. Input columns 
+must contain string SQL types.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a regular expression that matches the character or string that 
+separates words in the input text. The default value is the set of 
+all whitespace characters which includes the characters for space, 
+tab, newline, carriage return and some others.<br />
+Default Value: &quot;[\s]+&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>grams</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies a list of integers or ranges of integers that specify the length, in 
+words, of each n-gram (that is, the value of n). The range of values has 
+the syntax &quot;integer1-integer2&quot;, where integer1 &lt;= integer2. The values 
+of n, integer1, and integer2 must be positive.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>overlapping</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function allows overlapping n-grams. When this value is 
+TRUE, each word in each sentence starts an n-gram, if enough words follow 
+it (in the same sentence) to form a whole n-gram of the specified size. For 
+information on sentences, see the description of the &quot;reset&quot; argument.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>to.lower.case</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function converts all letters in the input text to lowercase.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>punctuation</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a regular expression that matches the punctuation characters for 
+the function to remove before evaluating the input text.<br />
+Default Value: &quot;['~#^&amp;*()-]&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>reset</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a regular expression that matches the character or string that ends 
+a sentence. At the end of a sentence, the function discards any partial n-grams and 
+searches for the next n-gram at the beginning of the next sentence. 
+An n-gram cannot span two sentences.<br />
+Default Value: &quot;[.,?!]&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>total.gram.count</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function returns the total number of n-grams in the document, 
+i.e., in the row. If this value is TRUE, then the name of the column returned is 
+specified by the &quot;total.count.column&quot; argument.<br />
+Note: The total number of n-grams is not necessarily the number of unique 
+n-grams.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>total.count.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column to return if the value of the &quot;total.gram.count&quot; 
+argument is TRUE.<br />
+Default Value: &quot;totalcnt&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the columns to return for each n-gram. These columns 
+cannot have the same names as those specified by the arguments &quot;n.gram.column&quot;, 
+&quot;num.grams.column&quot;, and &quot;total.count.column&quot;. By default, the function 
+returns all input columns for each n-gram.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>n.gram.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains the generated n-grams.<br /> 
+Default Value: &quot;ngram&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>num.grams.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that is to contain the length of n-gram (in 
+words). <br />
+Default Value: &quot;n&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>frequency.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains the count of each unique 
+n-gram (that is, the number of times that each unique n-gram appears 
+in the document). <br />
+Default Value: &quot;frequency&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_ngramsplitter_mle&quot; which 
+is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("ngram_example", "paragraphs_input")
+    
+    # Create object(s) of class "tbl_teradata".
+    paragraphs_input &lt;- tbl(con, "paragraphs_input")
+    
+    # Example 1 - Find total number of overlapping n-grams.
+    td_ngramsplitter_out1 &lt;- td_ngramsplitter_mle(data = paragraphs_input,
+                                                  text.column = "paratext",
+                                                  delimiter = " ",
+                                                  grams = c("4-6"),
+                                                  overlapping = TRUE,
+                                                  to.lower.case = TRUE,
+                                                  total.gram.count = TRUE,
+                                                  accumulate = c("paraid","paratopic")
+                                                  )
+    
+    # Example 2 - Find non-overlapping n-grams.
+    td_ngramsplitter_out2 &lt;- td_ngramsplitter_mle(data = paragraphs_input,
+                                                  text.column = "paratext",
+                                                  delimiter = " ",
+                                                  grams = c("4-6"),
+                                                  overlapping = FALSE,
+                                                  to.lower.case = TRUE,
+                                                  total.gram.count = FALSE,
+                                                  accumulate = c("paraid","paratopic")
+                                                  )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

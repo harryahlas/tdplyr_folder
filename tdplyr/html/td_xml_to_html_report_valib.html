@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Transform Vantage Analytic Library XML reports to HTML...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_xml_to_html_report_valib {tdplyr}"><tr><td>td_xml_to_html_report_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Transform Vantage Analytic Library XML reports to HTML reports.</h2>
+
+<h3>Description</h3>
+
+<p>Several Analytic Algorithms and Scoring functions output columns of XML. 
+This function transforms the XML to HTML, which is easier to view.<br />
+Function outputs the HTML in a column of type Teradata XML. You can copy 
+the HTML into a text file, give the text file a name ending in &quot;.html&quot;, 
+and view it in a browser.<br />
+Alternatively, you can view the HTML in a Jupyter notebook by double-clicking
+the cell that contains HTML to display it in web view.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This function is available in Vantage Analytic Library 2.0.0.3 or 
+later.
+</p>
+</li></ul>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_xml_to_html_report_valib(data, analysis.type, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to run statistical tests.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>analysis.type</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the class name of the function or a SQL
+function name whose XML you want the function 
+to translate to HTML.<br />
+Function outputs different reports in HTML format
+depending on the values passed to the argument.
+Permitted Values:
+</p>
+
+<ul>
+<li><p> 'decisiontree', 'td_decision_tree_valib' <br />
+Outputs HTML report for:
+</p>
+
+<ul>
+<li><p> Decision Tree Summary
+</p>
+</li>
+<li><p> Variables
+</p>
+</li>
+<li><p> Text Tree
+</p>
+</li></ul>
+
+</li>
+<li><p> 'decisiontreescore', 
+'td_decision_tree_evaluator_valib'<br />
+Outputs HTML report for:
+</p>
+
+<ul>
+<li><p> Decision Tree Scoring Summary - Confusion Matrix
+</p>
+</li></ul>
+
+</li>
+<li><p> 'factor', 'td_pca_valib'<br />
+Outputs HTML report for:
+</p>
+
+<ul>
+<li><p> Factor Analysis Summary
+</p>
+</li>
+<li><p> Variable Statistics
+</p>
+</li>
+<li><p> Eigenvalues
+</p>
+</li>
+<li><p> PCLoadings
+</p>
+</li>
+<li><p> Variance and Absolute Difference
+</p>
+</li>
+<li><p> Near Dependency Report
+</p>
+</li>
+<li><p> Group-by Columns
+</p>
+</li></ul>
+
+</li>
+<li><p> 'factorscore', 'td_pca_evaluator_valib'<br />
+Outputs HTML report for:
+</p>
+
+<ul>
+<li><p> Factor Analysis Scoring Summary
+</p>
+</li></ul>
+
+</li>
+<li><p> 'linear', 'td_lin_reg_valib'<br />
+Outputs HTML report for:
+</p>
+
+<ul>
+<li><p> Linear Regression Summary
+</p>
+</li>
+<li><p> Group-by Columns
+</p>
+</li>
+<li><p> Near Dependency Report
+</p>
+</li></ul>
+
+</li>
+<li><p> 'logistic', 'td_log_reg_valib'<br />
+Outputs HTML report for:
+</p>
+
+<ul>
+<li><p> Prediction Success Table
+</p>
+</li>
+<li><p> Multithreshold Success Table
+</p>
+</li>
+<li><p> Lift Table
+</p>
+</li>
+<li><p> Near Dependency Report
+</p>
+</li>
+<li><p> Group-by Columns
+</p>
+</li>
+<li><p> Variable Statistics
+</p>
+</li></ul>
+
+</li>
+<li><p> 'logisticscore', 'td_log_reg_evaluator_valib'<br />
+Outputs HTML report for:
+</p>
+
+<ul>
+<li><p> Prediction Success Table
+</p>
+</li>
+<li><p> Multithreshold Success Table
+</p>
+</li>
+<li><p> Lift Table
+</p>
+</li></ul>
+
+</li></ul>
+
+<p>Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described 
+in the '<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_xml_to_html_report_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>filter</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the clause to filter rows selected for 
+analysis.<br />
+For example,<br />
+filter = &quot;cust_id &gt; 0&quot;<br />
+This parameter is useful only when the function 
+&quot;analysis.type&quot; (which outputs the input table name for 
+the report function) specified its &quot;group.columns&quot; 
+argument and generated multiple XML models.<br />
+Multiple XML models in input table name can cause the 
+function to run out of memory. In that case, limit the 
+rows selected for analysis with this argument.
+Types: character
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 
+#      'val.install.location' to the database name where Vantage analytic 
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+#   3. The Statistical Test metadata tables must be loaded into the database 
+#      where Analytics Library is installed.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example: Shows the Near Dependency Report is requested with related 
+#          options. Convert the XML reports from the output of this 
+#          function to HTML format.
+lrobj &lt;- td_log_reg_valib(data=df, 
+                          columns=c("age", "years_with_bank", "income"), 
+                          response.column="nbr_children", 
+                          response.value=1,
+                          cond.ind.threshold=3,
+                          variance.prop.threshold=0.3)
+
+# Print the results.
+print(lrobj$model)
+print(lrobj$statistical.measures)
+print(lrobj$xml.reports)
+
+obj &lt;- td_xml_to_html_report_valib(data=lrobj$model,
+                                   analysis.type="logistic")
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

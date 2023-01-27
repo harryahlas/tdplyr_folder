@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: AdaBoost</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_adaboost_mle {tdplyr}"><tr><td>td_adaboost_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+AdaBoost
+</h2>
+
+<h3>Description</h3>
+
+<p>The AdaBoost function takes a training data set and a single decision
+tree and uses adaptive boosting to produce a strong classifying model
+that can be input to the function AdaBoostPredict (<code>td_adaboost_predict_mle</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_adaboost_mle (
+      attribute.data = NULL,
+      attribute.name.columns = NULL,
+      attribute.value.column = NULL,
+      categorical.attribute.data = NULL,
+      response.data = NULL,
+      id.columns = NULL,
+      response.column = NULL,
+      iter.num = 20,
+      num.splits = 10,
+      approx.splits = TRUE,
+      split.measure = "gini",
+      max.depth = 3,
+      min.node.size = 100,
+      output.response.probdist = FALSE,
+      categorical.encoding = "graycode",
+      attribute.data.sequence.column = NULL,
+      response.data.sequence.column = NULL,
+      categorical.attribute.data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>attribute.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the attributes
+and values of the data.
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.name.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the columns of attribute tbl_teradata that contain
+the data attributes.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.value.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the columns of attribute tbl_teradata that contain
+the data values.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.attribute.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the tbl_teradata that contains the names of the
+categorical attributes.
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the responses
+(labels) of the data.
+</p>
+</td></tr>
+<tr valign="top"><td><code>id.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns in the response and attribute
+tables that specify the identifier of the instance.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the response tbl_teradata column that contains
+the responses (labels) of the data.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>iter.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of iterations to boost the weak classifiers,
+which is also the number of weak classifiers in the ensemble of classifiers.
+The iterations must an integer in the range [2, 200].<br />
+Default Value: 20<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>num.splits</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of splits to try for each attribute in the node
+splitting.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>approx.splits</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to use approximate percentiles.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>split.measure</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the type of measure to use in node splitting.<br />
+Default Value: &quot;gini&quot;<br />
+Permitted Values: GINI, ENTROPY<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.depth</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum depth of the tree. The &quot;max.depth&quot; must
+be in the range [1, 10].<br />
+Default Value: 3<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>min.node.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the minimum size of any particular node within each
+decision tree.<br />
+Default Value: 100<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.response.probdist</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a flag to enable or disable output of probability distribution for
+output labels.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.encoding</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the encoding method to be used for categorical variables.<br />
+Note: &quot;categorical.encoding&quot; is only available when tdplyr is connected to
+Vantage 1.1 or later versions.<br />
+Default Value: &quot;graycode&quot;<br />
+Permitted Values: graycode, hashing<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;attribute.data&quot;. The argument is used to
+ensure deterministic results for functions which produce results that
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;response.data&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.attribute.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;categorical.attribute.data&quot;. The argument is
+used to ensure deterministic results for functions which produce
+results that vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_adaboost_mle&quot; which is a
+named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator
+using following names:</p>
+<ol>
+<li><p> model.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    # Load the data to run the example
+    loadExampleData("adaboost_example", "housing_train", "housing_cat", "housing_train_response",
+                    "iris_attribute_train", "iris_response_train")
+
+    # Create object(s) of class "tbl_teradata".
+    housing_train &lt;- tbl(con, "housing_train")
+    housing_cat &lt;- tbl(con, "housing_cat")
+    housing_train_response &lt;- tbl(con, "housing_train_response")
+    iris_attribute_train &lt;- tbl(con, "iris_attribute_train")
+    iris_response_train &lt;- tbl(con, "iris_response_train")
+
+    # Example 1 - This example uses home sales data to create a model that predicts home
+    # style when input to td_adaboost_predict_mle() function.
+    #
+    # Input description:
+    # housing_train               (attribute.data) : tbl_teradata containing real estate
+    #                                                sales data. There are six numerical
+    #                                                predictors and six categorical
+    #                                                predictors. The response variable
+    #                                                is 'homestyle'.
+    # housing_cat     (categorical.attribute.data) : tbl_teradata that lists all the
+    #                                                categorical predictors.
+    # housing_response             (response.data) : tbl_teradata that lists the responses
+    #                                                for each instance in 'attribute.data' as
+    #                                                specified by 'id.columms'.
+    td_unpivot_out &lt;- td_unpivot_mle(data = housing_train,
+                                     unpivot = c("price", "lotsize", "bedrooms", "bathrms",
+                                                 "stories","driveway", "recroom", "fullbase",
+                                                 "gashw", "airco", "garagepl", "prefarea"),
+                                     accumulate = "sn")
+
+    td_adaboost_out1 &lt;- td_adaboost_mle(attribute.data = td_unpivot_out$result,
+                                        attribute.name.columns = "attribute",
+                                        attribute.value.column = "value_col",
+                                        categorical.attribute.data = housing_cat,
+                                        response.data = housing_train_response,
+                                        id.columns = "sn",
+                                        response.column = "response",
+                                        iter.num = 20,
+                                        num.splits = 10,
+                                        max.depth = 3,
+                                        min.node.size = 100)
+
+
+    # Example 2 - This example uses the iris flower dataset to create a model that predicts
+    # the species when input to td_adaboost_predict_mle().
+    #
+    # Input description:
+    # iris_attribute_train  (attribute.data) : tbl_teradata containing the iris flower
+    #                                          dataset in the sparse format.
+    # iris_response_train    (response.data) : tbl_teradata specifying the response variable
+    #                                          for each instance.
+    td_adaboost_out2 &lt;- td_adaboost_mle(attribute.data = iris_attribute_train,
+                                        attribute.name.columns = "attribute",
+                                        attribute.value.column = "attrvalue",
+                                        response.data = iris_response_train,
+                                        id.columns = "pid",
+                                        response.column = "response",
+                                        iter.num = 5,
+                                        num.splits = 10,
+                                        max.depth = 3,
+                                        min.node.size = 5,
+                                        output.response.probdist = TRUE,
+                                        approx.splits = FALSE)
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

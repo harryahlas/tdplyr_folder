@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: tdplyr: Model Predictions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for predict {tdplyr}"><tr><td>predict {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>tdplyr: Model Predictions</h2>
+
+<h3>Description</h3>
+
+<p>Generic predict function for performing predictions using results of 
+model fitting functions, such as 
+</p>
+
+<ol>
+<li> <p><code>td_adaboost_mle()</code>
+</p>
+</li>
+<li> <p><code>td_arima_mle()</code>
+</p>
+</li>
+<li> <p><code>td_decision_forest_mle()</code>
+</p>
+</li>
+<li> <p><code>td_decision_tree_mle()</code>
+</p>
+</li>
+<li> <p><code>td_decision_tree_valib()</code>
+</p>
+</li>
+<li> <p><code>td_glm_mle()</code>
+</p>
+</li>
+<li> <p><code>td_glml1l2_mle()</code>
+</p>
+</li>
+<li> <p><code>td_knn_recommender_mle()</code>
+</p>
+</li>
+<li> <p><code>td_lin_reg_mle()</code>
+</p>
+</li>
+<li> <p><code>td_lin_reg_valib()</code>
+</p>
+</li>
+<li> <p><code>td_log_reg_valib()</code>
+</p>
+</li>
+<li> <p><code>td_naivebayes_mle()</code>
+</p>
+</li>
+<li> <p><code>td_naivebayes_textclassifier_mle()</code>
+</p>
+</li>
+<li> <p><code>td_pca_valib()</code>
+</p>
+</li>
+<li> <p><code>td_svm_sparse_mle()</code>
+</p>
+</li>
+<li> <p><code>td_xgboost_mle()</code>
+</p>
+</li></ol>
+
+<p>This function invokes respective predict methods, 
+based on the class of the the model (first argument).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  predict(object, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+
+<p>Required Argument.<br />
+Model object can be one of the following class:
+</p>
+
+<ol>
+<li><p><code><a href="td_adaboost_mle.html">td_adaboost_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_glm_mle.html">td_glm_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_glml1l2_mle.html">td_glml1l2_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_decision_forest_mle.html">td_decision_forest_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_decision_tree_mle.html">td_decision_tree_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_decision_tree_valib.html">td_decision_tree_valib</a></code>
+</p>
+</li>
+<li><p><code><a href="td_naivebayes_mle.html">td_naivebayes_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_naivebayes_textclassifier_mle.html">td_naivebayes_textclassifier_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_svm_sparse_mle.html">td_svm_sparse_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_svm_dense_mle.html">td_svm_dense_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_arima_mle.html">td_arima_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_lar_mle.html">td_lar_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_lin_reg_valib.html">td_lin_reg_valib</a></code>
+</p>
+</li>
+<li><p><code><a href="td_log_reg_valib.html">td_log_reg_valib</a></code>
+</p>
+</li>
+<li><p><code><a href="td_pca_valib.html">td_pca_valib</a></code>
+</p>
+</li>
+<li><p><code><a href="td_xgboost_mle.html">td_xgboost_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_knn_recommender_mle.html">td_knn_recommender_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_lin_reg_mle.html">td_lin_reg_mle</a></code>
+</p>
+</li></ol>
+
+<p>It is usually created using the following methods:<br />
+</p>
+
+<ol>
+<li><p><code><a href="td_adaboost_mle.html">td_adaboost_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_glm_mle.html">td_glm_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_glml1l2_mle.html">td_glml1l2_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_decision_forest_mle.html">td_decision_forest_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_decision_tree_mle.html">td_decision_tree_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_decision_tree_valib.html">td_decision_tree_valib</a></code>
+</p>
+</li>
+<li><p><code><a href="td_naivebayes_mle.html">td_naivebayes_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_naivebayes_textclassifier_mle.html">td_naivebayes_textclassifier_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_svm_sparse_mle.html">td_svm_sparse_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_svm_dense_mle.html">td_svm_dense_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_arima_mle.html">td_arima_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_lar_mle.html">td_lar_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_lin_reg_valib.html">td_lin_reg_valib</a></code>
+</p>
+</li>
+<li><p><code><a href="td_log_reg_valib.html">td_log_reg_valib</a></code>
+</p>
+</li>
+<li><p><code><a href="td_pca_valib.html">td_pca_valib</a></code>
+</p>
+</li>
+<li><p><code><a href="td_xgboost_mle.html">td_xgboost_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_knn_recommender_mle.html">td_knn_recommender_mle</a></code>
+</p>
+</li>
+<li><p><code><a href="td_lin_reg_mle.html">td_lin_reg_mle</a></code>
+</p>
+</li></ol>
+
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>Additional arguments useful for predictions.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Return value from predict depends on the class of the object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Please visit individual predict in-line documentation for more examples.
+    # help(predict.td_adaboost_mle)
+    # help(predict.td_glm_mle)
+    # help(predict.td_glml1l2_mle)
+    # help(predict.td_decision_forest_mle)
+    # help(predict.td_decision_tree_mle)
+    # help(predict.td_decision_tree_valib)
+    # help(predict.td_lin_reg_valib)
+    # help(predict.td_log_reg_valib)
+    # help(predict.td_naivebayes_mle)
+    # help(predict.td_naivebayes_textclassifier_mle)
+    # help(predict.td_pca_valib)
+    # help(predict.td_svm_sparse_mle)
+    # help(predict.td_svm_dense_mle)
+    # help(predict.td_arima_mle)
+
+    
+    #### GLM Predict Example ####
+    # Get the current context/connection.
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("glm_example", "admissions_train")
+    loadExampleData("glmpredict_example", "admissions_test")
+    
+    # Create remote tibble objects.
+    admissions_test &lt;- tbl(con, "admissions_test")
+    admissions_train &lt;- tbl(con, "admissions_train")
+    
+    # Example 1 -
+    # First train the data, i.e., create a GLM Model
+    td_glm_out &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                         family = "LOGISTIC",
+                         linkfunction = "LOGIT",
+                         data = admissions_train,
+                         weights = "1",
+                         threshold = 0.01,
+                         maxit = 25,
+                         step = FALSE,
+                         intercept = TRUE
+    )
+    
+    # Run predict on the output of GLM.
+    glm_predict_out &lt;- predict(td_glm_out,
+                             newdata = admissions_test,
+                             terms = c("id","masters","gpa","stats","programming","admitted"),
+                             family = "LOGISTIC",
+                             linkfunction = "LOGIT"
+    )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

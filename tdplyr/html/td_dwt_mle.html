@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: DWT</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_dwt_mle {tdplyr}"><tr><td>td_dwt_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+DWT
+</h2>
+
+<h3>Description</h3>
+
+<p>The DWT function implements Mallat's algorithm (an iterate algorithm 
+in the Discrete Wavelet Transform field) and applies wavelet 
+transform on multiple sequences simultaneously.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_dwt_mle (
+      data = NULL,
+      input.columns = NULL,
+      sort.column = NULL,
+      wavelet = NULL,
+      wavelet.filter = NULL,
+      level = NULL,
+      extension.mode = "sym",
+      partition.columns = NULL,
+      data.sequence.column = NULL,
+      wavelet.filter.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata contains the
+sequences to be transformed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns in the input tbl_teradata
+contains the data to be transformed. These columns must contain
+numeric values between -1e308 and 1e308. The function treats NULL as 
+0.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>sort.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that defines the order of samples in 
+the sequences to be transformed. In a time series sequence, the 
+column can consist of timestamp values.<br />
+Note: If &quot;sort.column&quot; has duplicate elements in a sequence 
+(i.e, in a partition), then sequence order can vary, and the function
+can produce different transform results for the sequence.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>wavelet</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Required if &quot;wavelet.filter&quot; argument is not specified.<br />
+Specifies a wavelet filter name. Refer table below to find
+wavelet family and its supported wavelet names. <br />
+</p>
+
+<ol>
+<li><p> Daubechies    : 'db1' or 'haar', 'db2', .... ,'db10'
+</p>
+</li>
+<li><p> Coiflets      : 'coif1', ... , 'coif5'
+</p>
+</li>
+<li><p> Symlets       : 'sym1', ... ,' sym10'
+</p>
+</li>
+<li><p> Discrete Meyer: 'dmey'
+</p>
+</li>
+<li><p> Biorthogonal  : 'bior1.1', 'bior1.3', 'bior1.5', 'bior2.2', 'bior2.4', 'bior2.6',
+'bior2.8', 'bior3.1', 'bior3.3', 'bior3.5', 'bior3.7', 'bior3.9',
+'bior4.4', 'bior5.5'
+</p>
+</li>
+<li><p> Reverse Biorthogonal: 'rbio1.1', 'rbio1.3', 'rbio1.5' 'rbio2.2', 'rbio2.4',
+'rbio2.6', 'rbio2.8', 'rbio3.1', 'rbio3.3', 'rbio3.5',
+'rbio3.7','rbio3.9', 'rbio4.4', 'rbio5.5'</p>
+</li></ol>
+<p><br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>wavelet.filter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Required if &quot;wavelet&quot; argument is not specified.
+Specifies the name of the tbl_teradata object that contains the coefficients.
+of the wave filters.
+</p>
+</td></tr>
+<tr valign="top"><td><code>level</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the wavelet transform level. The value of this argument must be an
+integer in the range [1, 1000].<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>extension.mode</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the method for handling border distortion. The value level must be an integer 
+in the range [1, 1000].<br />
+Supported Extension Modes are :
+</p>
+<ol>
+<li><p> sym  : (Default) Symmetrically replicate boundary values, mirroring the points
+near the boundaries.<br />
+For example : 4 4 3 2 1 | 1 2 3 4 | 4 3 21 1
+</p>
+</li>
+<li><p> zpd  : Zero-pad boundary values with zero.<br />
+For example: 0 0 0 0 0 | 12 3 4 | 0 0 0 0 0
+</p>
+</li>
+<li><p> ppd   : Periodic extension, fill boundary values as the input 
+sequence is a periodic one.<br /> For example: 4 1 2 3 4 | 12 3 4 | 12 3 4 1</p>
+</li></ol>
+
+<p>Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>partition.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the &quot;partition.columns&quot;, which identify the 
+sequences. Rows with the same &quot;partition.columns&quot; values belong to the 
+same sequence. If you specify multiple &quot;partition.columns&quot;, then the 
+function treats the first one as the distribute key of the output and 
+meta tbl_teradata. By default, all rows belong to one sequence, and the
+function generates a distribute key column named &quot;dwt_idrandom_name&quot; in 
+both the output tbl_teradata and the meta tbl_teradata. In both tbl_teradata,
+every cell of &quot;dwt_idrandom_name&quot; has the value 1.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>wavelet.filter.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;wavelet.filter&quot;. The argument is used to 
+ensure deterministic results for functions which produce results that 
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_dwt_mle&quot; which is a named list 
+containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> coefficient</p>
+</li>
+<li> 
+<p>meta.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    # This example uses hourly climate data for five cities on a given day.
+    loadExampleData("dwt_example", "ville_climatedata")
+    
+    # Create object(s) of class "tbl_teradata".
+    ville_climatedata &lt;- tbl(con, "ville_climatedata")
+    
+    # Example 1 - The function creates the coefficient model tbl_teradata and the meta tbl_teradata.
+    td_dwt_out &lt;- td_dwt_mle(data = ville_climatedata,
+                         input.columns = c('temp_f','pressure_mbar','dewpoint_f'),
+                         sort.column = "period",
+                         wavelet = "db2",
+                         partition.columns = c("city"),
+                         level=2
+                         )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

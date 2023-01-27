@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Histogram</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_histogram_mle {tdplyr}"><tr><td>td_histogram_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Histogram
+</h2>
+
+<h3>Description</h3>
+
+<p>Histograms are useful for assessing the shape of a data distribution. 
+The Histogram function calculates the frequency distribution of a 
+data set using sophisticated binning techniques that can automatically 
+calculate the bin width and number of bins. The function maps each input 
+row to one bin and returns the frequency (row count) and proportion 
+(percentage of rows) of each bin.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_histogram_mle (
+      data = NULL,
+      auto.bin = NULL,
+      custom.bin.table = NULL,
+      custom.bin.column = NULL,
+      bin.size = NULL,
+      start.value = NULL,
+      end.value = NULL,
+      value.column = NULL,
+      inclusion = "left",
+      groupby.columns = NULL,
+      data.sequence.column = NULL,
+      custom.bin.table.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the input data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>auto.bin</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies either the algorithm to be used for selecting bin 
+boundaries or the approximate number of bins to be found. The 
+permitted values are STURGES, SCOTT, or a positive integer which 
+should be within quotes. If this argument is present, arguments 
+&quot;custom.bin.table&quot;, &quot;custom.bin.column&quot;, &quot;start.value&quot;, &quot;bin.size&quot;, 
+and &quot;end.value&quot; cannot be present.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>custom.bin.table</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata containing the boundary points between bins. If this 
+argument is present, &quot;custom.bin.column&quot; must also be present, and arguments 
+&quot;auto.bin&quot;, &quot;start.value&quot;, &quot;bin.size&quot;, and &quot;end.value&quot; cannot be present.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>custom.bin.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the column in the &quot;custom.bin.table&quot; containing the boundary values. 
+Input columns must contain numeric SQL types. If this argument is 
+present, &quot;custom.bin.table&quot; must also be present; &quot;auto.bin&quot;, 
+&quot;start.value&quot;, &quot;bin.size&quot;, and &quot;end.value&quot; cannot be present.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>bin.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the bin size. For equally sized bins, a double value specifying the 
+width of the bin. Omit this argument if you are not using equally sized bins. 
+The input value must be greater than 0.0. If this argument is present, 
+&quot;start.value&quot; and &quot;end.value&quot; must also be present, and arguments &quot;auto.bin&quot;, 
+&quot;custom.bin.table&quot; and &quot;custom.bin.column&quot; cannot be present.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>start.value</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the smallest value to be used in binning. If this argument is 
+present, &quot;bin.size&quot; and &quot;end.value&quot; must also be present, and arguments 
+&quot;auto.bin&quot;, &quot;custom.bin.table&quot; and &quot;custom.bin.column&quot; cannot be present.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>end.value</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the largest value to be used in binning. If this argument is present, 
+&quot;start.value&quot; and &quot;bin.size&quot; must also be present, and arguments &quot;auto.bin&quot;, 
+&quot;custom.bin.table&quot; and &quot;custom.bin.column&quot; cannot be present.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>value.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the column in the input tbl_teradata for which statistics will be 
+computed. Column must contain a numeric SQL types (integer, bigint, 
+real, double precision, numeric, decimal, smallint).<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>inclusion</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether points on bin boundaries should be included in the 
+bin on the left or the bin on the right.<br />
+Default Value: &quot;left&quot;<br />
+Permitted Values: left, right<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>groupby.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the columns in the input tbl_teradata used to group values 
+for binning. These columns cannot contain floating point values.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>custom.bin.table.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;custom.bin.table&quot;. The argument is used to 
+ensure deterministic results for functions which produce results that 
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_histogram_mle&quot; which is a 
+named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> output.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    library(ggplot2)
+    
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("histogram_example", "cars_hist", "bin_breaks")
+
+    # The cars_hist table has the cylinder (cyl) and horsepower (hp) data for 
+    # different car models.
+    cars_hist &lt;- tbl(con, "cars_hist")
+    # The bin_breaks table has the boundary values for the custom bins to be 
+    # used while generating the histogram
+    bin_breaks &lt;- tbl(con, "bin_breaks")
+
+    # Example 1: Generate histogram based on the cars horsepower using STURGES rule.
+    td_histogram_out &lt;- td_histogram_mle(data = cars_hist,
+                                         auto.bin = "Sturges",
+                                         value.column = "hp"
+                                        )
+                                        
+    # Plot showing the percentage of cars in each histogram bin
+    ggplot(as.data.frame(td_histogram_out$output.table),
+           aes(x=bin_end, y=bin_percent))
+    geom_bar(stat = "identity", fill = "#FF6666")
+    labs(x="Horsepower", y="Percentage")
+
+    # Example 2: Generate histogram based on the cars horsepower by setting 
+    # custom bin size, start and end values.
+    td_histogram_out &lt;- td_histogram_mle(data = cars_hist,
+                                         bin.size = 50,
+                                         start.value = 20,
+                                         end.value = 400,
+                                         value.column = "hp",
+                                         inclusion = "right",
+                                         groupby.columns = c("cyl")
+                                         )
+
+    # Example 3: Generate histogram using custom bins from a custom tbl_teradata. 
+    # Here cylinder (cyl) column is also used to group the input data.
+    td_histogram_out &lt;- td_histogram_mle(data = cars_hist,
+                                         custom.bin.table = bin_breaks,
+                                         custom.bin.column = "break_values",
+                                         value.column = "hp",
+                                         groupby.columns = c("cyl")
+                                         )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

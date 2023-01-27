@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Unpack</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_unpack_sqle {tdplyr}"><tr><td>td_unpack_sqle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Unpack
+</h2>
+
+<h3>Description</h3>
+
+<p>The Unpack function unpacks data from a single packed column into 
+multiple columns. The packed column is composed of multiple virtual 
+columns, which become the output columns. To determine the virtual 
+columns, the function must have either the delimiter that separates 
+them in the packed column or their lengths.<br />
+Note: This function is only available when tdplyr is connected to Vantage 1.1
+or later versions.  
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_unpack_sqle (
+      data = NULL,
+      input.column = NULL,
+      output.columns = NULL,
+      output.datatypes = NULL,
+      delimiter = ",",
+      column.length = NULL,
+      regex = "(.*)",
+      regex.set = 1,
+      exception = FALSE,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the input attributes.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the packed 
+data.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names to give to the output columns, in the order in 
+which the corresponding virtual columns appear in &quot;input.column&quot;.If you 
+specify fewer output column names than there are virtual input 
+columns, the function ignores the extra virtual input columns. That 
+is, if the packed data contains x+y virtual columns and the 
+&quot;output.columns&quot; argument specifies x output column names, the function 
+assigns the names to the first x virtual columns and ignores the 
+remaining y virtual columns. <br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.datatypes</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the datatypes of the unpacked output columns. Supported 
+values for this argument are VARCHAR, integer, numeric, TIME, DATE, and 
+TIMESTAMP. If &quot;output.datatypes&quot; specifies only one value and 
+&quot;output.columns&quot; specifies multiple columns, then the specified value 
+applies to every &quot;output.column&quot;. If &quot;output.datatypes&quot; specifies 
+multiple values, then it must specify a value for each &quot;output.column&quot;. 
+The nth datatype corresponds to the nth &quot;output.column&quot;.The function 
+can output only 16 VARCHAR columns.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the delimiter (a string) that separates the virtual 
+columns in the packed data. The default delimiter is comma (,). If the 
+virtual columns are separated by a delimiter, then specify the 
+delimiter with this argument; otherwise, specify the &quot;column.length&quot; 
+argument. Do not specify both this argument and the &quot;column.length&quot; 
+argument.<br />
+Default Value: &quot;,&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>column.length</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the lengths of the virtual columns; therefore, to use this 
+argument, you must know the length of each virtual column. If 
+&quot;column.length&quot; specifies only one value and &quot;output.columns&quot; specifies 
+multiple columns, then the specified value applies to every 
+output column. If &quot;column.length&quot; specifies multiple values, then it
+must specify a value for each output column. The nth datatype
+corresponds to the nth output column. However, the last &quot;column.name&quot;
+can be an asterisk (*), which represents a single virtual column that 
+contains the remaining data. For example, if the first three virtual 
+columns have the lengths 2, 1, and 3, and all remaining data belongs 
+to the fourth virtual column, you can specify column.length (&quot;2&quot;, 
+&quot;1&quot;, &quot;3&quot;, *). If you specify this argument, you must omit the 
+delimiter argument.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>regex</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a regular expression that describes a row of packed data, 
+enabling the function to find the data values. A row of packed data 
+contains one data value for each virtual column, but the row might 
+also contain other information (such as the virtual column name). In 
+this argument &quot;regex&quot;, each data value is enclosed in parentheses. 
+For example, suppose that the packed data has two virtual columns, 
+age and sex, and that one row of packed data is: age:34,sex:male, the
+&quot;regex&quot; that describes the row is &quot;.*:(.*)&quot;. The &quot;.*:&quot; 
+matches the virtual column names, age and sex, and the &quot;(.*)&quot; matches 
+the values, 34 and male. The default &quot;regex&quot; is &quot;(.*)&quot; 
+which matches the whole string (between delimiters, if any). When 
+applied to the preceding sample row, the default &quot;regex&quot; 
+causes the function to return &quot;age:34&quot; and &quot;sex:male&quot; as data values. 
+To represent multiple data groups in &quot;regex&quot;, use multiple 
+pairs of parentheses. By default, the last data group in 
+&quot;regex&quot; represents the data value (other data groups are 
+assumed to be virtual column names or unwanted data). If a different 
+data group represents the data value, specify its group number with 
+the &quot;regex.set&quot; argument.<br />
+Default Value: &quot;(.*)&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>regex.set</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the ordinal number of the data group in &quot;regex&quot; 
+that represents the data value in a virtual column. By default, the 
+last data group in &quot;regex&quot; represents the data value. For 
+example, suppose that &quot;regex&quot; is: &quot;([a-zA-Z]*):(.*)&quot; If 
+group_number is &quot;1&quot;, then &quot;([a-zA-Z]*)&quot; represents the data value. If 
+group_number is &quot;2&quot;, then &quot;(.*)&quot; represents the data value.<br />
+Default Value: 1<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>exception</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function ignores rows that contain invalid 
+data; that is, it continues without outputting them, which causes the 
+function to fail if it encounters a row with invalid data.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_unpack_sqle&quot; which is a named 
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("unpack_example", "ville_tempdata", "ville_tempdata1")
+    
+    # Create object(s) of class "tbl_teradata".
+    ville_tempdata &lt;- tbl(con, "ville_tempdata")
+    ville_tempdata1 &lt;- tbl(con, "ville_tempdata1")
+    
+    # Example 1 - Using the delimiter argument.
+    td_unpack_out1 &lt;- td_unpack_sqle(data = ville_tempdata,
+                        input.column = "packed_temp_data",
+                        output.columns = c("city","state","temp_F"),
+                        output.datatypes = c("varchar","varchar","real"),
+                        delimiter = ",",
+                        regex = '(.*)',
+                        regex.set = 1,
+                        exception = TRUE
+                        )
+    
+    # Example 2 - Using column.length argument
+    td_unpack_out2 &lt;- td_unpack_sqle(data = ville_tempdata1,
+                        input.column = "packed_temp_data",
+                        output.columns = c("city","state","temp_F"),
+                        output.datatypes = c("varchar","varchar","real"),
+                        column.length = c("9","9","4"),
+                        regex = '(.*)',
+                        regex.set = 1,
+                        exception = TRUE
+                        )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

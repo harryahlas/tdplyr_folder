@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Get SQL query</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for show_query.td_analytics_valib {tdplyr}"><tr><td>show_query.td_analytics_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Get SQL query</h2>
+
+<h3>Description</h3>
+
+<p>Function to return the underlying SQL query.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'td_analytics_valib'
+show_query(obj)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>obj</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies a tdplyr valib function object of class &quot;td_analytics_valib&quot;.<br />
+Types: td_analytics_valib</p>
+</td></tr>
+</table>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 'val.install.location' to
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer_analysis")
+print(df)
+
+# Run td_decision_tree_valib() on columns "age", "income" and "nbr_children", with
+# dependent variable "gender".
+obj &lt;- td_decision_tree_valib(data=df,
+                              columns=c("age", "income", "nbr_children"),
+                              response.column="gender",
+                              algorithm="gainratio",
+                              binning=FALSE,
+                              max.depth=5,
+                              num.splits=2,
+                              pruning="gainratio")
+# Print the SQL query.
+print(obj %&gt;% show_query())
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Setup Sandbox Environment</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_setup_sandbox_env {tdplyr}"><tr><td>td_setup_sandbox_env {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Setup Sandbox Environment</h2>
+
+<h3>Description</h3>
+
+<p>Function to either load sandbox image and start a new docker container by
+passing the &quot;sandbox.image.location&quot; and &quot;sandbox.image.name&quot; or start an
+existing container using the argument &quot;container&quot;.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Teradata recommends to run this function once before running
+<code>td_test_script()</code> on object of class &quot;ScriptTableOperator&quot;.
+</p>
+</li>
+<li><p> Sandbox image loading on user's system is skipped if the image with
+the same name is already loaded.
+</p>
+</li>
+<li><p> There can be only one container started from within tdplyr at any
+given point.
+</p>
+</li>
+<li><p> At the end of the session, image loaded and/or container started by the
+function is cleaned up. If the image loading is skipped, then the image is
+not cleaned up.
+</p>
+</li>
+<li><p> Use <code>td_cleanup_sandbox_env()</code> to manually cleanup image/container
+started by the function. If the image loading is skipped, then the image is
+not cleaned up.
+</p>
+</li>
+<li><p> User should be careful while providing &quot;sandbox.image.location&quot;
+and &quot;sandbox.image.name&quot;. If an incorrect &quot;sandbox.image.name&quot; (that does
+not match the name and/or tag of the image) is provided, then:
+</p>
+
+<ol>
+<li><p> The image will not be loaded. User should re-run the function with
+correct &quot;sandbox.image.name&quot;.
+</p>
+</li>
+<li><p> If the user's system already has an image with the image name and tag
+same as the image specified in &quot;sandbox.image.location&quot;, then image loading
+is skipped.
+</p>
+</li></ol>
+
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_setup_sandbox_env(
+  sandbox.image.location = NULL,
+  sandbox.image.name = NULL,
+  container = NULL
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>sandbox.image.location</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the path to the sandbox image on
+user's system.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Refer to Teradata Package for R User
+Guide for location to download sandbox image.
+</p>
+</li>
+<li><p> After loading the image, a container is
+created and started.
+</p>
+</li>
+<li><p> &quot;sandbox.image.location&quot; and
+&quot;sandbox.image.name&quot; must be specified
+together.
+</p>
+</li></ol>
+
+<p>Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>sandbox.image.name</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the name of the sandbox image that should
+be used for generating the image. This is used for
+starting a container.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> &quot;sandbox.image.location&quot; and
+&quot;sandbox.image.name&quot; must be specified together.
+</p>
+</li>
+<li><p> If the &quot;sandbox.image.name&quot; is incorrect,
+then the image is not loaded.
+</p>
+</li></ol>
+
+<p>Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>container</code></td>
+<td>
+<p>Optional Argument. Required if &quot;sandbox.image.location&quot;
+and &quot;sandbox.image.name&quot; are not specified.<br />
+Specifies the name/id of an existing docker container.<br />
+Note:
+</p>
+
+<ul>
+<li><p> User should be careful while specifying this
+argument. If this argument is specified to start the
+container, then this container is cleaned up at the end
+of the session.
+</p>
+</li></ul>
+
+<p>Types: character</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>TRUE, invisibly.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Example 1: Load the image from the location specified in
+#            "sandbox.image.location" argument and start a container.
+#            This is useful when the user wants to run user scripts in a new
+#            container created from a new docker image.
+td_setup_sandbox_env(sandbox.image.location = "&lt;path_to_docker_image&gt;",
+                     sandbox.image.name = "rstosandbox:1.0")
+
+# Example 2: Start an existing container specified in "container" argument.
+#            This is useful when the user wants to run user script in an
+#            existing container.
+td_setup_sandbox_env(container = "&lt;container_name_or_id&gt;")
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

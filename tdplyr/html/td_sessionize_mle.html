@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Sessionize</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_sessionize_mle {tdplyr}"><tr><td>td_sessionize_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Sessionize
+</h2>
+
+<h3>Description</h3>
+
+<p>The Sessionize function maps each click in a session to a unique
+session identifier. A session is defined as a sequence of clicks by
+one user that are separated by at most n seconds.<br />
+Note: This function is only available when tdplyr is connected to Vantage 1.1
+or later versions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_sessionize_mle (
+      data = NULL,
+      time.column = NULL,
+      time.out = NULL,
+      click.lag = NULL,
+      emit.null = FALSE,
+      data.sequence.column = NULL,
+      data.partition.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the click 
+times.<br />
+Note: The &quot;time.column&quot; must also be an &quot;data.order.column&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.out</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the number of seconds at which the session times out. If 
+session timeout seconds elapse after a click, then the next click 
+starts a new session.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>click.lag</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the minimum number of seconds between clicks for the 
+session user to be considered human. If clicks are more frequent, 
+indicating that the user is a &quot;bot,&quot; the function ignores the 
+session. The &quot;click.lag&quot; must be less than &quot;time.out&quot; value.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>emit.null</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to output rows that have NULL values in their 
+session id and rapid fire columns, even if their &quot;time.column&quot; has 
+a NULL value. <br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_sessionize_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("sessionize_example", "sessionize_table")
+
+    # Create object(s) of class "tbl_teradata".
+    # contains web clickstream data recorded as a user navigates through a web site.
+    # Events, view, click etc are recorded with a timestamp.
+    sessionize_table &lt;- tbl(con, "sessionize_table")
+
+    # Example
+    td_sessionize_out &lt;- td_sessionize_mle(data = sessionize_table,
+                                           data.partition.column = c("partition_id"),
+                                           data.order.column = c("clicktime"),
+                                           time.column = "clicktime",
+                                           time.out = 60,
+                                           click.lag = 0.2
+                                           )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

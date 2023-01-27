@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: GLM</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_glm_mle {tdplyr}"><tr><td>td_glm_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+GLM
+</h2>
+
+<h3>Description</h3>
+
+<p>The generalized linear model (GLM) is an extension of the linear 
+regression model that enables the linear equation to be related to 
+the dependent variables by a link function. GLM performs linear 
+regression analysis for distribution functions using a user-specified 
+distribution family and link function. GLM selects the link function 
+based upon the distribution family and the assumed nonlinear 
+distribution of expected outcomes. The table in background describes 
+the supported link function combinations.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_glm_mle (
+      formula = NULL,
+      family = "gaussian",
+      linkfunction = "CANONICAL",
+      data = NULL,
+      weights = "1.0",
+      threshold = 0.01,
+      maxit = 25,
+      step = FALSE,
+      intercept = TRUE,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+
+<p>Required Argument.<br />
+An object of class &quot;formula&quot;. Specifies the model to be fitted. Only 
+basic formula of the (col1 ~ col2 + col3 +...) form are supported and 
+all variables must be from the same tbl_teradata object. The 
+response should be column of type numeric or logical.
+</p>
+</td></tr>
+<tr valign="top"><td><code>family</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the distribution exponential family.<br />
+Default Value: &quot;gaussian&quot;<br />
+Permitted Values: LOGISTIC, BINOMIAL, POISSON, GAUSSIAN, GAMMA, 
+INVERSE_GAUSSIAN, NEGATIVE_BINOMIAL<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>linkfunction</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the canonical link functions (default link functions) and the link 
+functions that are allowed.<br />
+Default Value: &quot;CANONICAL&quot;<br />
+Permitted Values: CANONICAL, IDENTITY, INVERSE, LOG, 
+COMPLEMENTARY_LOG_LOG, SQUARE_ROOT, INVERSE_MU_SQUARED, LOGIT, 
+PROBIT, CAUCHIT<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the columns.
+</p>
+</td></tr>
+<tr valign="top"><td><code>weights</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of an input tbl_teradata column that contains the 
+weights to assign to responses. You can use non-NULL weights to 
+indicate that different observations have different dispersions 
+(with the weights being inversely proportional to the 
+dispersions). Equivalently, when the weights are positive 
+integers wi, each response yi is the mean of wi unit-weight 
+observations. A binomial GLM uses prior weights to give the number of 
+trials when the response is the proportion of successes. A Poisson 
+GLM rarely uses weights. If the weight is less than the response 
+value, then the function throws an exception. Therefore, if the 
+response value is greater than 1 (the default weight), then you must 
+specify a weight that is greater than or equal to the response value.<br />
+Default Value: &quot;1.0&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>threshold</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the convergence threshold.<br />
+Default Value: 0.01<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>maxit</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations that the algorithm runs 
+before quitting, if the convergence threshold is not met.<br />
+Default Value: 25<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>step</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function uses a step. If the function uses a 
+step, then it runs with the GLM model that has the lowest Akaike 
+information criterion (AIC) score, drops one predictor from the 
+current predictor group, and repeats this process until no predictor 
+remains.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>intercept</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function uses an intercept. For example, in 
+B0+B1*X1+B2*X2+ ....+BpXp, the intercept is B0.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_glm_mle&quot; which is a named 
+list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> coefficients</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("glm_example", "admissions_train", "housing_train")
+
+    # Create object(s) of class "tbl_teradata".
+    admissions_train &lt;- tbl(con, "admissions_train")
+    housing_train &lt;- tbl(con, "housing_train")
+
+    # Example 1 -
+    td_glm_out1 &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                              family = "LOGISTIC",
+                              linkfunction = "LOGIT",
+                              data = admissions_train,
+                              weights = "1",
+                              threshold = 0.01,
+                              maxit = 25,
+                              step = FALSE,
+                              intercept = TRUE
+                              )
+
+    # Example 2 -
+    td_glm_out2 &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                              family = "LOGISTIC",
+                              linkfunction = "LOGIT",
+                              data = admissions_train,
+                              weights = "1",
+                              threshold = 0.01,
+                              maxit = 25,
+                              step = TRUE,
+                              intercept = TRUE
+                              )
+
+    # Example 3 -
+    td_glm_out3 &lt;- td_glm_mle(formula = (price  ~ recroom  + lotsize  + stories  + garagepl + gashw
+                                + bedrooms  + driveway  + airco  + homestyle + bathrms  + fullbase
+                                + prefarea),
+                              family = "GAUSSIAN",
+                              linkfunction = "IDENTITY",
+                              data = housing_train,
+                              weights = "1",
+                              threshold = 0.01,
+                              maxit = 25,
+                              step = FALSE,
+                              intercept = TRUE
+                              )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

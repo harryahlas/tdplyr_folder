@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: FastExport to extract data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_fastexport {tdplyr}"><tr><td>td_fastexport {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>FastExport to extract data</h2>
+
+<h3>Description</h3>
+
+<p>The <code>td_fastexport</code> function extracts data from Teradata Vantage into 
+csv or R data.frame as specified by the user using FastExport protocol.<br />
+<br />
+Usage Notes:
+</p>
+
+<ol>
+<li><p> The function cannot be used to extract data from  a volatile or
+global temporary table.
+</p>
+</li>
+<li><p> Do not use the function to fetch only a few rows, because it opens
+extra connections to the database, which is time consuming.
+</p>
+</li>
+<li><p> Only use this function to fetch many rows (at least 100,000 rows) so
+that the row-fetching performance gain exceeds the overhead of opening
+additional connections.
+</p>
+</li>
+<li><p> The function does not support all Teradata Database data types. For
+example, BLOB and CLOB are not supported.
+</p>
+</li>
+<li><p> For best results, do not use <code>group_by</code> or <code>arrange</code> with
+<code>td_fastexport</code> function.
+</p>
+</li>
+<li><p> The result set ordering behavior with <code>td_fastexport</code> may differ
+from the ordering without <code>td_fastexport</code>. In particular, an object of
+class &quot;tbl_teradata&quot; containing an ordered analytic function may not produce
+an ordered result set. Use <code>arrange</code> to guarantee result set order.
+</p>
+</li></ol>
+
+<p><br />
+For additional information about fastexport protocol through teradatasql
+driver, please refer the FastExport section of
+<a href="https://github.com/Teradata/r-driver#FastExport">terdatasql driver documentation</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_fastexport(df, catch.errors.warnings = TRUE, export.to = "DF", ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>df</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the data to be extracted.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>catch.errors.warnings</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to catch errors and warnings
+(if any) raised by fastexport protocol while
+converting tbl_teradata to R dataframe.<br />
+Default Value: TRUE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>export.to</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to extract data to a CSV or a R data frame.<br />
+Permitted Values: &quot;CSV&quot;, &quot;DF&quot; <br />
+Default Value: &quot;DF&quot; <br />
+Types: String</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies additional arguments required for future enhancements.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;FastExport&quot; which is a
+named list containing the following objects:<br />
+</p>
+
+<ol>
+<li><p> result : A R dataframe containing the data.
+</p>
+</li>
+<li><p> errors (only if &quot;catch.errors.warnings&quot; is set to TRUE):
+</p>
+
+<ol>
+<li><p> If there are no errors, this contains NULL.
+</p>
+</li>
+<li><p> If there are errors, this contains a R dataframe containing
+the errors raised by fastexport protocol.
+</p>
+</li></ol>
+
+</li>
+<li><p> warnings (only if &quot;catch.errors.warnings&quot; is set to TRUE):
+</p>
+
+<ol>
+<li><p> If there are no warnings, this contains NULL.
+</p>
+</li>
+<li><p> If there are errors, this contains a R dataframe containing
+the warnings raised by fastexport protocol.
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Named list member can be referenced directly with the &quot;$&quot; operator.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_fastload</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Note: Connection must be established before running td_fastexport().
+
+# Load the required tables.
+loadExampleData("time_series_example", "ocean_buoys_seq")
+
+# Create object(s) of class "tbl_teradata".
+df_seq &lt;- tbl(con, "ocean_buoys_seq")
+
+# Example 1: Export the data in a data.frame along with the errors and
+#            warnings, if any, while fetching the data.
+val &lt;- td_fastexport(df = df_seq)
+
+# Print 10 rows of the fetched dataframe.
+head(val$result, 10)
+
+# Print the errors dataframe; NULL if there are no errors.
+val$errors
+
+# Print the warnings dataframe; NULL if there are no warnings.
+val$warnings
+
+# Example 2: Export the data without errors and warnings.
+val &lt;- td_fastexport(df = df_seq,
+                     catch.errors.warnings = FALSE)
+
+# Print the "FastExport" object.
+print(val)
+
+# Example 3: Export the data in a csv file, catch the errors and warnings,
+#            if any.
+val &lt;- td_fastexport(df = df_seq,
+                     export.to = "CSV",
+                     csv.file.name ="test.csv")
+
+# Print the errors dataframe; NULL if there are no errors.
+val$errors
+
+# Print the warnings dataframe; NULL if there are no warnings.
+val$warnings
+
+# Example 4: Export the data in a csv file using the specified 
+#             field.quote.char and field.separator.
+td_fastexport(df = df_seq,
+              export.to = "CSV",
+              csv.file.name = "test.csv",
+              field.separator = ";",
+              field.quote.char = "'",
+              catch.errors.warnings = FALSE)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

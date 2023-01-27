@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Copy files from container</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_copy_files_from_container {tdplyr}"><tr><td>td_copy_files_from_container {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Copy files from container</h2>
+
+<h3>Description</h3>
+
+<p>Function to copy file(s) from container, specified by &quot;container&quot; argument
+or container indicated by the option 'sandbox.container', to local
+filesystem.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Files are copied to a directory &quot;.tdplyr&quot; directory in user's home
+directory. The user can get home directory using <code>Sys.getenv("HOME")</code>.
+If this is not present, then user can find the files in R home directory
+which can be obtained using <code>Sys.getenv("R_HOME")</code>.
+</p>
+</li>
+<li><p> User is responsible for cleaning up this directory.
+</p>
+</li>
+<li><p> If copying succeeds for one or more files, the list of files for which
+copying is successful and the location in which files are copied are
+displayed in console output.
+</p>
+</li>
+<li><p> If copying fails for one or more files, then the failed file names
+and the reasons for failure are displayed in the console output.
+</p>
+</li>
+<li><p> If there are duplicate elements in the argument &quot;files.to.copy&quot;,
+then all the duplicated elements are copied only once.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_copy_files_from_container(files.to.copy, container = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>files.to.copy</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the file name(s) to be copied from the
+container.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Files should be in &quot;/home/tdatuser&quot; inside the
+container.
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings</p>
+</td></tr>
+<tr valign="top"><td><code>container</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the container from which files are to be copied.
+If not specified, then files are copied from container
+specified in the option &quot;sandbox.container&quot;.<br />
+Types: character</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>TRUE, invisibly.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Example 1: Copy files from container started by tdplyr to local client.
+td_copy_files_from_container(files.to.copy = "&lt;file1.txt&gt;")
+
+# Example 2: Copy files from container, specified by the argument
+#            "container", to local client.
+td_copy_files_from_container(files.to.copy = c("&lt;file1.txt&gt;", "&lt;file2.txt&gt;"),
+                             container = "&lt;container_id&gt;")
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

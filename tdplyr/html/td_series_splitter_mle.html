@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: SeriesSplitter</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_series_splitter_mle {tdplyr}"><tr><td>td_series_splitter_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+SeriesSplitter
+</h2>
+
+<h3>Description</h3>
+
+<p>The SeriesSplitter function splits partitions into subpartitions 
+(called splits) to balance the partitions for time series 
+manipulation. The function creates an additional column that contains 
+split identifiers. Each row contains the identifier of the split 
+to which the row belongs. Optionally, the function also copies a 
+specified number of boundary rows to each split.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_series_splitter_mle (
+      data = NULL,
+      partition.columns = NULL,
+      duplicate.rows.count = 1,
+      order.by.columns = NULL,
+      split.count = 4,
+      rows.per.split = 1000,
+      accumulate = NULL,
+      split.id.column = "split_id",
+      return.stats.table = TRUE,
+      values.before.first = "-1",
+      values.after.last = NULL,
+      duplicate.column = NULL,
+      partial.split.id = FALSE,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata to be split.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>partition.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the partitioning columns of input tbl_teradata &quot;data&quot;. These columns 
+determine the identity of a partition. For data type restrictions of 
+these columns, see the ML Engine Documentation.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>duplicate.rows.count</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of rows to duplicate across split boundaries. By 
+default, the function duplicates one row from the previous partition 
+and one row from the next partition. If you specify only one value v1,
+then the function duplicates v1 rows from the previous partition and 
+v1 rows from the next partition. If you specify two values v1 and v2,
+then the function duplicates v1 rows from the previous partition and
+v2 rows from the next partition. Each argument value must be 
+non-negative integer less than or equal to 1000.<br /> 
+Default Value: 1<br />
+Types: numeric OR vector of numerics
+</p>
+</td></tr>
+<tr valign="top"><td><code>order.by.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the ordering columns of input tbl_teradata. These columns 
+establish the order of the rows and splits. Without this argument, 
+the function can split the rows in any order.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>split.count</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the desired number of splits in a partition of the output 
+tbl_teradata. The value of &quot;split.count&quot; must be a positive integer, and its
+upper bound is the number of rows in the partition.<br />
+Note: If input tbl_teradata has multiple partitions, then you cannot specify
+&quot;split.count&quot;. Instead, specify &quot;rows.per.split&quot;. Base the value of 
+&quot;split.count&quot; on the desired amount of parallelism. <br />
+For example, for a cluster with 10 vworkers, make &quot;split.count&quot; a multiple 
+of 10. If the number of rows in input tbl_teradata (n) is not exactly
+divisible by &quot;split.count&quot;, then the function estimates the number of 
+splits in the partition, using this formula:<br /> 
+<em>ceiling (n / ceiling (n / split_count) )</em><br />
+Default Value: 4<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>rows.per.split</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the desired maximum number of rows in each split in the 
+output tbl_teradata. If the number of rows in input tbl_teradata is not exactly
+divisible by &quot;rows.per.split&quot;, then the last split contains fewer 
+than &quot;rows.per.split&quot; rows, but no row contains more than &quot;rows.per.split&quot;
+rows. The value of &quot;rows.per.split&quot; must be a positive integer.<br />
+Note: If input tbl_teradata has multiple partitions, then specify
+&quot;rows.per.split&quot; instead of &quot;split.count&quot;.<br />
+Default Value: 1000<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of input tbl_teradata columns (other than those 
+specified by &quot;partition.columns&quot; and &quot;order.by.columns&quot;) to copy to the 
+output tbl_teradata. By default, only the columns specified by 
+&quot;partition.columns&quot; and &quot;order.by.columns&quot; are copied to the output 
+tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>split.id.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name for the output tbl_teradata column to contain the split
+identifiers. If the output tbl_teradata has another column name as that
+specified in &quot;split.id.column&quot;, the function returns an error. 
+Therefore, if the output tbl_teradata has a column named 'split_id' (specified
+by &quot;accumulate&quot;, &quot;partition.columns&quot;, or &quot;order.by.columns&quot;), you must use 
+&quot;split.id.column&quot; to specify a different value.<br />
+Default Value: &quot;split_id&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>return.stats.table</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function returns the data in &quot;stats.table&quot;. When
+this value is FALSE, the function returns only the data in &quot;output.table&quot;.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>values.before.first</code></td>
+<td>
+
+<p>Optional Argument.<br />
+If &quot;duplicate.rows.count&quot; is non-zero and &quot;order.by.columns&quot; is specified, 
+then &quot;values.before.first&quot; specifies the values to be stored in the 
+ordering columns that precede the first row of the first split in a 
+partition as a result of duplicating rows across split boundaries. <br />
+If &quot;values.before.first&quot; specifies only one value and &quot;order.by.columns&quot; 
+specifies multiple ordering columns, then the specified value is 
+stored in every ordering column. <br />
+If &quot;values.before.first&quot; specifies multiple values, then it must 
+specify a value for each ordering column. The value and the ordering 
+column must have the same data type. For the data type VARCHAR, the 
+values are case-insensitive. The default values for different data 
+types are: 
+</p>
+
+<ol>
+<li><p> Numeric: -1
+</p>
+</li>
+<li><p> CHAR(n) or VARCHAR : &quot;-1&quot;
+</p>
+</li>
+<li><p> Date- or time-based: 1900-01-01 0:00:00
+</p>
+</li>
+<li><p> CHARACTER: &quot;0&quot;
+</p>
+</li>
+<li><p> Bit: 0
+</p>
+</li>
+<li><p> Boolean: &quot;false&quot;
+</p>
+</li>
+<li><p> IP4 : 0.0.0.0
+</p>
+</li>
+<li><p> UUID: 0000-0000-0000-0000-0000-0000-0000-0000
+</p>
+</li></ol>
+
+<p>Default Value: &quot;-1&quot;<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>values.after.last</code></td>
+<td>
+
+<p>Optional Argument.<br />
+If &quot;duplicate.rows.count&quot; is non-zero and &quot;order.by.columns&quot; is specified, 
+then &quot;values.after.last&quot; specifies the values to be stored in the 
+ordering columns that follow the last row of the last split in a 
+partition as a result of duplicating rows across split boundaries. <br />
+If &quot;values.after.last&quot; specifies only one value and &quot;order.by.columns&quot; 
+specifies multiple ordering columns, then the specified value is 
+stored in every ordering column. <br />
+If &quot;values.after.last&quot; specifies multiple values, then it must specify
+a value for each ordering column. The value and the ordering column must
+have the same data type.  For the data type VARCHAR, the values are 
+case-insensitive. <br />
+Default Value: NULL<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>duplicate.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that indicates whether a row is 
+duplicated from the neighboring split. If the row is duplicated, this 
+column contains 1; otherwise it contains 0.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>partial.split.id</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether &quot;split.id.column&quot; contains only the numeric split 
+identifier. If the value is TRUE, then &quot;split.id.column&quot; contains a 
+numeric representation of the split identifier that is unique for 
+each partition. To distribute the output tbl_teradata by split, use a 
+combination of all partition columns and &quot;split_id_column&quot;. If the 
+value is FALSE, then &quot;split.id.column&quot; contains a string 
+representation of the split that is unique across all partitions. The 
+function generates the string representation by concatenating the 
+partitioning columns with the order of the split inside the partition 
+(the numeric representation). In the string representation, hyphens 
+separate partitioning column names from each other and from the 
+order. For example, &quot;pcol1-pcol2-3&quot;. <br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_series_splitter_mle&quot; which is 
+a named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> output.table</p>
+</li>
+<li> 
+<p>stats.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("seriessplitter_example", "ibm_stock1")
+
+    # Create object(s) of class "tbl_teradata".
+    ibm_stock1 &lt;- tbl(con, "ibm_stock1")
+
+    # Example 1: This examples splits the time series stock data into subpartitions.
+    td_series_splitter_out &lt;- td_series_splitter_mle(data = ibm_stock1,
+                                                     partition.columns = c("id"),
+                                                     order.by.columns = c("period"),
+                                                     accumulate = c("stockprice")
+                                                    )
+
+    # Example 2: Specifying the use of different arguments.
+    td_series_splitter_out1 &lt;- td_series_splitter_mle(data=ibm_stock1,
+                                                      partition.columns='id',
+                                                      order.by.columns = 'period',
+                                                      split.count = 9,
+                                                      split.id.column = 'split_id',
+                                                      duplicate.rows.count = c(1,1),
+                                                      return.stats.table = FALSE,
+                                                      accumulate = 'stockprice',
+                                                      values.after.last = NULL,
+                                                      values.before.first = '1991-01-01',
+                                                      partial.split.id = FALSE
+                                                     )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,4 @@
+--loadByTypes--
+scale_stat::varchar(32),real,real,real,real,real
+--loadByTypes--
+scale_housing_test::varchar(20),int,real,real,real,real,real

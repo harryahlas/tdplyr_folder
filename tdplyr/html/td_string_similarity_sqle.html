@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: StringSimilarity</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_string_similarity_sqle {tdplyr}"><tr><td>td_string_similarity_sqle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+StringSimilarity
+</h2>
+
+<h3>Description</h3>
+
+<p>The StringSimilarity function calculates the similarity between two
+strings, using either the Jaro, Jaro-Winkler, N-Gram, or
+Levenshtein distance. The similarity is a value in the range [0, 1].<br />
+Note: This function is only available when tdplyr is connected to Vantage 1.1
+or later versions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_string_similarity_sqle (
+      data = NULL,
+      comparison.columns = NULL,
+      case.sensitive = NULL,
+      accumulate = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the relation that contains the string pairs to be compared.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>comparison.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies pairs of input tbl_teradata columns that contain strings to
+be compared (column1 and column2), how to compare them
+(comparison type), and (optionally) a constant and the name of the
+output column for their similarity (output column). The similarity is
+a value in the range [0, 1]. For comparison type, use one of these
+values:  </p>
+
+<ol>
+<li><p> &quot;jaro&quot;: Jaro distance.
+</p>
+</li>
+<li><p> &quot;jaro_winkler&quot;: Jaro-Winkler
+distance (1 for an exact match, 0 otherwise). If you specify this
+comparison type, you can specify the value of factor p with constant.
+0 ≤ p ≤ 0.25. Default: p = 0.1.
+</p>
+</li>
+<li><p> &quot;n_gram&quot;: N-gram similarity. If you specify this comparison type,
+you can specify the value of N with a constant.
+</p>
+</li>
+<li><p> &quot;LD&quot;: Levenshtein distance. (the number of edits needed to
+transform one string into the other, Possible edits are insertions,
+deletions, or substitutions of individual characters.
+</p>
+</li>
+<li><p> &quot;LDWS&quot;: Levenshtein distance without substitution. Number of edits
+needed to transform one string into the other using only insertions or
+deletions of individual characters.
+</p>
+</li>
+<li><p> &quot;OSA&quot;: Optimal string alignment distance. Number of edits needed
+to transform one string into the other. Possible edits are insertions,
+deletions, substitutions, or transpositions of characters. A substring
+can be edited only once.
+</p>
+</li>
+<li><p> &quot;DL&quot;: Damerau-Levenshtein distance. Similar to OSA, except that a
+substring can be edited any number of times.
+</p>
+</li>
+<li><p> &quot;hamming&quot;: Hamming distance. For strings of equal length, it is the
+number of positions where corresponding characters differ (that is,
+minimum number of substitutions needed to transform one string into the
+other). For strings of unequal length, -1.
+</p>
+</li>
+<li><p> &quot;LCS&quot;: The longest common substring. Length of longest substring
+common to both strings.
+</p>
+</li>
+<li><p> &quot;jaccard&quot;: Jaccard indexed-based comparison.
+</p>
+</li>
+<li><p> &quot;cosine&quot;: Cosine similarity.
+</p>
+</li>
+<li><p> &quot;soundexcode&quot;: Only for English strings: -1 if either string
+has a non-English character; otherwise, 1 if their soundex codes
+are the same and 0 otherwise.
+</p>
+</li></ol>
+
+<p>You can specify a different comparison type for every pair of
+columns. The default output_column is &quot;sim_i&quot;, where i is the
+sequence number of the column pair.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>case.sensitive</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether string comparison is case-sensitive. You can
+specify one value for all pairs or one value for each pair.
+If you specify one value for each pair, then the ith value applies
+to the ith pair.<br />
+Default Value: FALSE<br />
+Types: logical OR vector of logicals
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of input tbl_teradata columns to be copied to the
+output tbl_teradata<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_string_similarity_sqle&quot; which
+is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("stringsimilarity_example", "strsimilarity_input")
+
+    # Create object(s) of class "tbl_teradata".
+    strsimilarity_input &lt;- tbl(con, "strsimilarity_input")
+
+    # Example 1 - Using "jaro" comparison type with a default output column.
+    td_string_similarity_sqle_out &lt;- td_string_similarity_sqle(data = strsimilarity_input,
+                           case.sensitive = TRUE,
+                           comparison.columns = c("jaro (src_text2, tar_text) AS jaro2_case_sim"),
+                           accumulate = c("id","src_text1","tar_text")
+                           )
+
+    # Example 2 - Using multiple comparison types and with custom output columns.
+    td_string_similarity_sqle_out2 &lt;- td_string_similarity_sqle(data = strsimilarity_input,
+                                comparison.columns = c("jaro (src_text1, tar_text) AS jaro1_sim",
+                                "LD (src_text1, tar_text, 2) AS ld1_sim",
+                                "n_gram (src_text1, tar_text, 2) AS ngram1_sim",
+                                "jaro_winkler (src_text1, tar_text, 0.2) AS jw1_sim"),
+                                case.sensitive = TRUE,
+                                accumulate = c("id","src_text1","tar_text")
+                               )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

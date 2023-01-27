@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: td_save_model</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_save_model {tdplyr}"><tr><td>td_save_model {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>td_save_model</h2>
+
+<h3>Description</h3>
+
+<p>Function to save a tdplyr analytic function model to the Model Catalog.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_save_model(
+  model,
+  name,
+  description,
+  model.project = NULL,
+  entity.target = NULL,
+  performance.metrics = NULL
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>model</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the tdplyr analytic function model to be saved.<br />
+Types: Object of class td_analytics</p>
+</td></tr>
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the unique name to identify the model to be saved.<br />
+The maximum length of the &quot;name&quot; is 128 characters.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>description</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies a note describing the model to be saved.<br />
+The maximum length of the &quot;description&quot; is 1024
+characters.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>model.project</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies a project name that the model is
+associated with.<br />
+The maximum length of the &quot;model.project&quot; is 128
+characters.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>entity.target</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies a group or team that the model is associated
+with.<br />
+The maximum length of the &quot;entity.target&quot; is 128
+characters.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>performance.metrics</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the performance metrics for the
+model.<br />
+&quot;performance.metrics&quot; must be a named list of the
+following form:<br />
+list(&lt;metric&gt; = list(measure = &lt;value&gt;), ...)<br />
+For example:<br />
+list(AUC = list(measure = 0.5), ...)<br />
+The value should be of type numeric.<br />
+Types: Named list of numeric values</p>
+</td></tr>
+</table>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load example data.
+loadExampleData("glm_example", "admissions_train")
+
+# Create object of class "tbl_teradata" to use as input.
+admissions_train &lt;- tbl(con, "admissions_train")
+
+# Create the GLM model.
+td_glm_out1 &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                          family = "LOGISTIC",
+                          linkfunction = "LOGIT",
+                          data = admissions_train,
+                          weights = "1",
+                          threshold = 0.01,
+                          maxit = 25,
+                          step = FALSE,
+                          intercept = TRUE
+)
+
+# Save this generated model.
+td_save_model(model = td_glm_out1, name = "glm_model", description = "GLM test")
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

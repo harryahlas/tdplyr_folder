@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Descriptive Statistics Function: Text Field Analyzer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_text_analyzer_valib {tdplyr}"><tr><td>td_text_analyzer_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Descriptive Statistics Function: Text Field Analyzer</h2>
+
+<h3>Description</h3>
+
+<p>When working with character data it is useful to determine the data type 
+and what data can be stored in the database. The <code>td_text_analyzer()</code> 
+analyzes character data and distinguishes if the field is a numeric type, 
+date, time, timestamp, or character data and returns two output results, 
+one containing the analysis results and the second one containing the column 
+data type matrix having the progression of data type through the series of 
+steps (mentioned below).<br />
+<br />
+The function runs a series of tests to distinguish what the correct 
+underlying type of each selected column should be.<br />
+</p>
+
+<ol>
+<li><p> The first test performed on the column is the MIN and the MAX test. 
+The MIN and MAX values of a column are retrieved from the database and 
+tested to determine what type the values are. 
+</p>
+</li>
+<li><p> The next test is a sample test which retrieves a small sample of data 
+for each column and again assesses what type they should be. 
+</p>
+</li>
+<li><p> The next test, extended Numeric analysis, is for fields that were 
+determined to be numeric and it tries to classify them in a more specific 
+category if possible. For instance, a column that is considered a FLOAT type 
+after the first two tests might really be a DECIMAL type with 2 decimal
+places. 
+</p>
+</li>
+<li><p> In the next test, a date type is validated to make sure all values in 
+that column are truly dates. 
+</p>
+</li>
+<li><p> If requested, unicode columns are tested to see if they contain only 
+Latin characters. This test is called extended Unicode analysis.
+</p>
+</li></ol>
+
+<p><br />
+The function can be used on columns of any character data type. Columns of
+non-character data type are passed along to the output as defined in the 
+input data.<br />
+Note:<br />
+</p>
+
+<ul>
+<li><p> This function is available in Vantage Analytic Library 2.0.0.2 or 
+later.
+</p>
+</li></ul>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_text_analyzer_valib(data, columns, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to perform text analysis.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the column(s) to analyze. 
+Occasionally, it can also accept permitted strings to specify 
+all columns, or all character columns.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;.
+</p>
+</li>
+<li><p> Pre-defined strings:
+</p>
+
+<ol>
+<li><p> 'all' - all columns
+</p>
+</li>
+<li><p> 'allcharacter' - all character columns
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described 
+in the '<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_text_analyzer_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator
+using name:
+</p>
+
+<ol>
+<li><p> result
+</p>
+</li>
+<li><p> data.type.matrix
+</p>
+</li></ol>
+
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>exclude.columns</h4>
+
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) to exclude
+from the analysis, if a column specifier such as 
+'all', 'allcharacter' is used in the &quot;columns&quot; 
+argument.<br />
+Types: character OR vector of Strings (character) 
+</p>
+
+
+
+<h4>analyze.numerics</h4>
+
+<p>Optional Argument.<br /> 
+Specifies whether to process specific numeric 
+types. If TRUE, the function processes numeric 
+types.<br />
+Default Value: TRUE<br />
+Types: logical 
+</p>
+
+
+
+<h4>analyze.unicode</h4>
+
+<p>Optional Argument.<br /> 
+Specifies whether a column declared to contain 
+Unicode characters actually contains only Latin 
+characters. If TRUE, Unicode analysis is 
+performed.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 
+#      'val.install.location' to the database name where Vantage analytic 
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Perform text analysis on all columns with only required 
+#            arguments and default values for "analyze.numerics" and 
+#            "analyze.unicode" arguments.
+obj &lt;- td_text_analyzer_valib(data=df,
+                              columns="all")
+
+# Print the results.
+print(obj$result)
+print(obj$data.type.matrix)
+
+# Example 2: Perform text analysis, including numeric and unicode analysis, 
+#            on columns 'cust_id', 'gender' and 'marital_status'.
+obj &lt;- td_text_analyzer_valib(data=df,
+                              columns=c("cust_id","gender","marital_status"),
+                              analyze.numerics=TRUE,
+                              analyze.unicode=TRUE)
+
+# Print the results.
+print(obj$result)
+print(obj$data.type.matrix)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

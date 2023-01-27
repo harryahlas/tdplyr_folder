@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Rescale values using MinMaxScalar</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for tdMinMaxScalar {tdplyr}"><tr><td>tdMinMaxScalar {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Rescale values using MinMaxScalar</h2>
+
+<h3>Description</h3>
+
+<p><code>tdMinMaxScalar()</code> allows rescaling to limit the upper and lower
+boundaries of the data in a continuous numeric column using a linear
+rescaling function based on maximum and minimum data values. Rescaling is
+useful with algorithms that require or work better with data within a
+certain range. <code>tdMinMaxScalar()</code> is only valid on numeric columns,
+and not columns of type date.<br />
+The rescale transformation formulas are shown in the following examples.<br />
+The <em>l</em> denotes the left bound and <em>r</em> denotes the right bound.
+</p>
+
+<ol>
+<li><p> When both the lower and upper bounds are specified:<br />
+<i>f(x,l,r) = (l+(x-min(x))(r-l))/(max(x)-min(x))</i>
+</p>
+</li>
+<li><p> When only the lower bound is specified:<br />
+<i>f(x,l) = x-min(x)+l</i>
+</p>
+</li>
+<li><p> When only the upper bound is specified:<br />
+<i>f(x,r) = x-max(x)+r</i>
+</p>
+</li></ol>
+
+<p>Note:
+</p>
+
+<ul>
+<li><p> Output of this function is passed to &quot;rescale&quot; argument of
+<code>td_transform_valib()</code>.<br />
+</p>
+</li></ul>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+tdMinMaxScalar(columns, lbound=NULL,ubound=NULL, datatype=NULL,
+               fillna=NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies name(s) of column(s) containing the input and
+output column names, where key is the name of the column to
+perform transformation on and value contains the name of the
+transformed output column. When only key is specified then
+output column name is the name of input column.<br />
+Types: character OR list of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>lbound</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the lower bound value required for rescaling the
+numeric data. If only the lower boundary value is specified,
+the variable is aligned to this value. This can be achieved by
+passing NULL to &quot;ubound&quot; argument.
+Default Value: 0
+Types: numeric</p>
+</td></tr>
+<tr valign="top"><td><code>ubound</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the upper bound value required for rescaling the
+numeric data. If only an upper boundary value is specified,
+the variable is aligned to this value. This can be achieved by
+passing NULL to &quot;lbound&quot; argument.
+Default Value: 1
+Types: numeric</p>
+</td></tr>
+<tr valign="top"><td><code>datatype</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the name of the intended datatype of the output
+column.<br />
+Intended data types for the output column can be specified
+using the permitted strings below:
+</p>
+
+<table summary="Rd table">
+<tr>
+ <td style="text-align: left;">
+------------------------------------ </td><td style="text-align: left;"> ---------------------------------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+<b>If intended SQL Data Type is</b> </td><td style="text-align: left;"> <b>Permitted Value to be passed is</b></td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+------------------------------------ </td><td style="text-align: left;"> ---------------------------------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+bigint </td><td style="text-align: left;"> bigint</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+byteint </td><td style="text-align: left;"> byteint</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+char(n) </td><td style="text-align: left;"> char,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+date </td><td style="text-align: left;"> date</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+decimal(m,n) </td><td style="text-align: left;"> decimal,m,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+float </td><td style="text-align: left;"> float</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+integer </td><td style="text-align: left;"> integer</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+number(<code>*</code>) </td><td style="text-align: left;"> number</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+number(n) </td><td style="text-align: left;"> number,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+number(<code>*</code>,n) </td><td style="text-align: left;"> number,<code>*</code>,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+number(n,n) </td><td style="text-align: left;"> number,n,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+smallint </td><td style="text-align: left;"> smallint</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+time(p) </td><td style="text-align: left;"> time,p</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+timestamp(p) </td><td style="text-align: left;"> timestamp,p</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+varchar(n) </td><td style="text-align: left;"> varchar,n
+</td>
+</tr>
+
+</table>
+
+<p>Notes:
+</p>
+
+<ol>
+<li><p> Argument is ignored if &quot;columns&quot; argument is not used.
+</p>
+</li>
+<li><p> char without a size is not supported.
+</p>
+</li>
+<li><p> number(<code>*</code>) does not include the * in its datatype format.
+</p>
+</li></ol>
+
+<p>Examples:
+</p>
+
+<ol>
+<li><p> If intended datatype for the output column is &quot;bigint&quot;,
+then pass string &quot;bigint&quot; to the argument as shown below:<br />
+<code>datatype="bigint"</code>
+</p>
+</li>
+<li><p> If intended datatype for the output column is
+&quot;decimal(3,5)&quot;, then pass string &quot;decimal,3,5&quot; to the
+argument as shown below:<br />
+<code>datatype="decimal,3,5"</code>
+</p>
+</li></ol>
+
+<p>Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>fillna</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether the null replacement/missing value treatment
+should be performed with rescale or not. Output of
+<code>tdFillNa()</code> can be passed to this argument.<br />
+Note:
+</p>
+
+<ul>
+<li><p> If the tdFillNa object is created with its arguments
+&quot;columns&quot;, and &quot;datatype&quot;, then values passed in
+<code>tdFillNa()</code> arguments are ignored. Only nullstyle
+information is captured from the same.
+</p>
+</li></ul>
+
+<p>Types: tdFillNa</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>An object of tdMinMaxScalar class.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+Notes:
+# 1. To run any transformation, user needs to use td_transform_valib()
+#    function.
+# 2. To do so set option 'val.install.location' to the database name where
+#    Vantage analytic library functions are installed.
+
+# Get the current context/connection
+con &lt;- td_get_context()$connection
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Load example data.
+loadExampleData("val_example", "sales")
+
+# Create object(s) of class "tbl_teradata".
+sales &lt;- tbl(con, "sales")
+sales
+
+# Example 1: Rescale values in column 'Feb', using the default bounds, which
+#            is with "lbound" as 0 and "ubound" as 1.
+# Create tdMinMaxScalar object.
+rs &lt;- tdMinMaxScalar(columns="Feb")
+
+# Perform the rescale transformation using td_transform_valib() function.
+obj &lt;- td_transform_valib(data=sales, rescale=rs)
+obj$result
+
+# Example 2: Rescale values in column 'Feb', using only "lbound" as -1.
+# Create tdMinMaxScalar object.
+rs &lt;- tdMinMaxScalar(columns="Feb", lbound=-1, ubound=NULL)
+
+# Perform the rescale transformation using td_transform_valib() function.
+obj &lt;- td_transform_valib(data=sales, rescale=rs)
+obj$result
+
+# Example 3: Rescale values in columns 'Jan' and 'Apr', using only
+#            "ubound" as 10. To use only "ubound", one must pass NULL to
+#            "lbound". Rescaling is combined with missing value
+#            treatment. Missing values are replaced with "mode" null
+#            style replacement.
+# Create tdFillNa object.
+fn &lt;- tdFillNa(style="mode")
+
+# Create tdMinMaxScalar object.
+rs &lt;- tdMinMaxScalar(columns=list("Jan", "Apr"), lbound=NULL, ubound=10,
+                    fillna=fn)
+
+# Perform the rescale transformation using td_transform_valib() function.
+obj &lt;- td_transform_valib(data=sales, rescale=rs, key.columns="accounts")
+obj$result
+
+# Example 4: Combine multiple ways of rescaling in one td_transform_valib()
+#            call.
+# Rescale values in column 'Feb' using "lbound" as -1 and "ubound" as 1.
+# Name the output column as 'Feb1'.
+rs_1 &lt;- tdMinMaxScalar(columns=list("Feb"="Feb1"), lbound=-1, ubound=1)
+
+# Rescale values in column 'Feb' using only "ubound" as 1 and default value
+# of "lbound" which is 0.
+# Name the output column as 'FebU'.
+rs_2 &lt;- tdMinMaxScalar(columns=list("Feb"="FebU"), ubound=1)
+
+# Rescale values in column 'Feb' using only "lbound" as 0 (default value).
+# Name the output column as 'FebL'.
+rs_3 &lt;- tdMinMaxScalar(columns=list("Feb"="FebL"), ubound=NULL)
+
+# Rescale values in columns 'Jan' and 'Apr' using default bounds.
+# Name the output columns as 'Jan1' and 'Apr1'.
+# Combine with missing value treatment, with literal null replacement.
+fn_1 &lt;- tdFillNa(style="literal", value=0)
+rs_4 &lt;- tdMinMaxScalar(columns=list("Jan"="Jan1", "Apr"="Apr1"), fillna=fn_1)
+
+# Rescale values in columns 'Jan' and 'Apr' using default bounds.
+# Name the output columns as 'Jan2' and 'Apr2.'
+# Combine with missing value treatment, with median null replacement.
+fn_2 &lt;- tdFillNa(style="median")
+rs_5 &lt;- tdMinMaxScalar(columns=list("Jan"="Jan2", "Apr"="Apr2"), fillna=fn_2)
+
+# Perform the rescale transformation using td_transform_valib() function.
+obj &lt;- td_transform_valib(data=sales, rescale=c(rs_1, rs_2, rs_3, rs_4, rs_5),
+                         key.columns="accounts")
+obj$result
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

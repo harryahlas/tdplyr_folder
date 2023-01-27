@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: ScaleSummary</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_scale_summary_mle {tdplyr}"><tr><td>td_scale_summary_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+ScaleSummary
+</h2>
+
+<h3>Description</h3>
+
+<p>The ScaleSummary function takes the ScaleMap (<code>td_scale_map_mle</code>) output 
+(statistics assembled at the vworker level) as input and outputs global 
+statistical information for the entire input data set.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_scale_summary_mle (
+    object = NULL,
+    object.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+
+<p>Required Argument.
+Specifies the output of <code>td_scale_map_mle</code> function.
+</p>
+</td></tr>
+<tr valign="top"><td><code>object.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;object&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_scale_summary_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("scale_example", "scale_stat")
+
+    # Create object(s) of class "tbl_teradata".
+    scale_stat_input &lt;- tbl(con, "scale_stat")
+
+    # Example 1 - This function takes the ScaleMap output (scale_stat) as input
+    # and outputs global statistical information for the entire input data set.
+    td_scale_summary_out &lt;- td_scale_summary_mle(object = scale_stat_input)
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

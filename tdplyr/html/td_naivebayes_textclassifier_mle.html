@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: NaiveBayesTextClassifierTrainer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_naivebayes_textclassifier_mle {tdplyr}"><tr><td>td_naivebayes_textclassifier_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+NaiveBayesTextClassifierTrainer
+</h2>
+
+<h3>Description</h3>
+
+<p>The NaiveBayesTextClassifierTrainer function takes training data as input and outputs a 
+model tbl_teradata.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_naivebayes_textclassifier_mle (
+      data = NULL,
+      data.partition.column = NULL,
+      token.column = NULL,
+      doc.id.columns = NULL,
+      doc.category.column = NULL,
+      model.type = "MULTINOMIAL",
+      categories.data = NULL,
+      category.column = "[0:0]",
+      prediction.categories = NULL,
+      stopwords.data = NULL,
+      stopwords.column = NULL,
+      stopwords.list = NULL,
+      data.sequence.column = NULL,
+      stopwords.data.sequence.column = NULL,
+      categories.data.sequence.column = NULL,
+      data.order.column = NULL,
+      stopwords.data.order.column = NULL,
+      categories.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata defining the training tokens.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>token.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column in &quot;data&quot; tbl_teradata, that contains the tokens 
+to be classified.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>doc.id.columns</code></td>
+<td>
+
+<p>Optional Argument. Required when &quot;model.type&quot; is 'BERNOULLI'.<br />
+Specifies the names of the columns, in &quot;data&quot; tbl_teradata, that contain the 
+document identifier.<br />
+Note: This argument should not be provided when &quot;model.type&quot; is 'MULTINOMIAL'.<br />
+Otherwise, an exception is raised.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>doc.category.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column in &quot;data&quot; tbl_teradata, that contains the 
+document category.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>model.type</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the model type of the text classifier.<br />
+Default Value: &quot;MULTINOMIAL&quot;<br />
+Permitted Values: MULTINOMIAL, BERNOULLI<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>categories.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata defining allowed categories.
+</p>
+</td></tr>
+<tr valign="top"><td><code>categories.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;categories.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>category.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column in &quot;categories.data&quot; tbl_teradata, that contains the 
+prediction categories. The default value is the first column of &quot;categories.data&quot; 
+tbl_teradata.<br />
+Default Value: &quot;[0:0]&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>prediction.categories</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the prediction categories. <br />
+Note: Specify either this argument or the &quot;categories.data&quot; argument, but not both.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>stopwords.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata defining stop words.
+</p>
+</td></tr>
+<tr valign="top"><td><code>stopwords.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;stopwords.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>stopwords.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column in &quot;stopwords.data&quot; tbl_teradata, that contains the 
+stop words. The default value is the first column of &quot;stopwords.data&quot; tbl_teradata.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>stopwords.list</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies words to ignore (such as a, an, and the).<br />
+Note: Specify either this argument or the &quot;stopwords.data&quot; argument, but not both.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>stopwords.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;stopwords.data&quot;. The argument is used to 
+ensure deterministic results for functions which produce results that 
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>categories.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;categories.data&quot;. The argument is used to 
+ensure deterministic results for functions which produce results that 
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_naivebayes_textclassifier_mle&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("naivebayes_textclassifier_example", "token_table")
+    
+    # Create object(s) of class "tbl_teradata".
+    token_table &lt;- tbl(con, "token_table")
+    
+    # Example 1 -
+    naivebayes_textclassifier_out &lt;- td_naivebayes_textclassifier_mle(
+                                           data = token_table,
+                                           data.partition.column = c("category"),
+                                           token.column = "token",
+                                           doc.id.columns = c("doc_id"),
+                                           doc.category.column = "category",
+                                           model.type = "Bernoulli"
+                                           )
+  
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

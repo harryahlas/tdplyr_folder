@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: DWT2D</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_dwt2d_mle {tdplyr}"><tr><td>td_dwt2d_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+DWT2D
+</h2>
+
+<h3>Description</h3>
+
+<p>The DWT2D function implements Mallat's algorithm (an iterate 
+algorithm in the Discrete Wavelet Transform field) on 2-dimensional 
+matrices and applies wavelet transform on multiple sequences 
+simultaneously.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_dwt2d_mle (
+      data = NULL,
+      input.columns = NULL,
+      index.columns = NULL,
+      range = NULL,
+      wavelet = NULL,
+      wavelet.filter = NULL,
+      level = NULL,
+      extension.mode = "sym",
+      compact.output = TRUE,
+      partition.columns = NULL,
+      data.sequence.column = NULL,
+      wavelet.filter.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the 
+sequences to be transformed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns in the input tbl_teradata
+that contains the data to be transformed. These columns must contain 
+numeric values between -1e308 and 1e308. The function treats NULL as 
+0.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>index.columns</code></td>
+<td>
+<p><br />
+Required Argument.
+Specifies the columns that contain the indexes of the input 
+sequences. For a matrix, this takes a vector of two elements,
+the first element is the column containing the x coordinates 
+and second element is the column containing the y coordinates.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>range</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the start and end indexes of the input data, all of which 
+must be integers. <br />
+The default values for each sequence are: </p>
+
+<ol>
+<li><p> starty: minimum y index 
+</p>
+</li>
+<li><p> startx: minimum x index
+</p>
+</li>
+<li><p> endy: maximum y index 
+</p>
+</li>
+<li><p> endx: maximum x index. </p>
+</li></ol>
+<p><br />
+Specify the argument value in the format '(startx,starty),(endx,endy)'.
+The function treats any NULL value as 0. The 
+range can specify a maximum of 1,000,000 cells.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>wavelet</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Required if &quot;wavelet.filter&quot; argument is not specified.
+Specifies a wavelet filter name. Refer table below to find
+wavelet family and its supported wavelet names.<br />
+</p>
+
+<ol>
+<li><p> Daubechies    : 'db1' or 'haar', 'db2', .... ,'db10'
+</p>
+</li>
+<li><p> Coiflets      : 'coif1', ... , 'coif5'
+</p>
+</li>
+<li><p> Symlets       : 'sym1', ... ,' sym10'
+</p>
+</li>
+<li><p> Discrete Meyer: 'dmey'
+</p>
+</li>
+<li><p> Biorthogonal  : 'bior1.1', 'bior1.3', 'bior1.5', 'bior2.2', 'bior2.4', 'bior2.6',
+'bior2.8', 'bior3.1', 'bior3.3', 'bior3.5', 'bior3.7', 'bior3.9',
+'bior4.4', 'bior5.5'
+</p>
+</li>
+<li><p> Reverse Biorthogonal: 'rbio1.1', 'rbio1.3', 'rbio1.5' 'rbio2.2', 'rbio2.4',
+'rbio2.6', 'rbio2.8', 'rbio3.1', 'rbio3.3', 'rbio3.5',
+'rbio3.7','rbio3.9', 'rbio4.4', 'rbio5.5'</p>
+</li></ol>
+<p><br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>wavelet.filter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Required if &quot;wavelet&quot; argument is not specified.
+Specifies the name of the tbl_teradata that contains the coefficients 
+of the wavelet filters.
+</p>
+</td></tr>
+<tr valign="top"><td><code>level</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the wavelet transform level. The value of the
+wavelet transform level must be an integer in the range [1, 1000].<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>extension.mode</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the method for handling border distortion, an 
+extension mode from the supported extension modes specified below -
+<code><a href="td_dwt_mle.html">td_dwt_mle</a></code> &quot;extension.mode&quot; argument.<br />
+Default Value: &quot;sym&quot; <br />
+Permitted Values: sym, zpd, ppd <br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>compact.output</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to ignore rows in which all coefficient values have an
+absolute value less than 1e-12. For a sparse input matrix, ignoring such
+rows reduces the output tbl_teradata size.<br />
+Default Value: TRUE <br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>partition.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the &quot;partition.columns&quot;, which identify the
+sequences. Rows with the same &quot;partition.columns&quot; values belong to the
+same sequence. If you specify multiple &quot;partition.columns&quot;, then the
+function treats the first one as the distribute key of the output and 
+meta tbl_teradata. By default, all rows belong to one sequence, and the
+function generates a distribute key column named dwt_idrandom_name in 
+both the coefficient tbl_teradata and the meta tbl_teradata. In both tbl_teradata,
+every cell of dwt_idrandom_name has the value 1.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run. <br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>wavelet.filter.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;wavelet.filter&quot;. The argument is used to 
+ensure deterministic results for functions which produce results that 
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_dwt2d_mle&quot; which is a named list 
+containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> coefficient</p>
+</li>
+<li> 
+<p>meta.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    # dataset contains climate data in cities in California (CA), Texas (TX), and Washington (WA).
+    # The cities are represented by two-dimensional coordinates (latitude and longitude).
+    # The data are temperature (in degrees Fahrenheit), pressure (in Mbars), 
+    # and dew point (in degrees Fahrenheit).
+    loadExampleData("dwt2d_example", "twod_climate_data")
+    
+    # Create object(s) of class "tbl_teradata".
+    twod_climate_data &lt;- tbl(con, "twod_climate_data")
+    
+    # Example 1 - The function outputs a coefficient model tbl_teradata and a meta tbl_teradata.
+    td_dwt2d_out &lt;- td_dwt2d_mle(data = twod_climate_data,
+                             input.columns = c("temp_f","pressure_mbar","dewpoint_f"),
+                             index.columns = c("latitude","longitude"),
+                             wavelet = "db2",
+                             level = 2,
+                             compact.output = TRUE,
+                             partition.columns = c("state")
+                             )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

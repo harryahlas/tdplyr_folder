@@ -1,0 +1,4 @@
+--load--
+token_table
+--loadByTypes--
+complaints_tokens_test::integer, varchar(1024) CHARACTER SET UNICODE NOT CASESPECIFIC

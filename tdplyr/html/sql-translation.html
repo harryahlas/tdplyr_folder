@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: SQL Translation Extensions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for sql-translation {tdplyr}"><tr><td>sql-translation {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>SQL Translation Extensions</h2>
+
+<h3>Description</h3>
+
+<p>An important feature that 'dbplyr' provides is the ability
+to take expressions in R and map them to corresponding
+expressions in SQL. <a href="tdplyr-package.html">tdplyr</a> maps certain window, aggregate,
+and scalar functions to SQL expressions when <code>summarize</code>, <code>mutate</code>,
+or <code>filter</code> is used.
+</p>
+
+
+<h3>Details</h3>
+
+<p>See <code>vignette('sql-translation', package = 'tdplyr')</code> for a list of all the mappings.
+Note that functions not explicitly mapped above will be translated to sql literally.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+  translate_sql(mean(x, na.rm = TRUE), window = FALSE, con = dbplyr::simulate_teradata())
+  translate_sql(sdp(distinct(x), na.rm = TRUE), window = FALSE, con = dbplyr::simulate_teradata())
+
+  translate_sql(mean(x, na.rm = TRUE), con = dbplyr::simulate_teradata())
+  translate_sql(sdp(x, na.rm = TRUE), con = dbplyr::simulate_teradata())
+
+  # The DISTINCT clause is not permitted in window aggregate functions
+  tryCatch({
+    translate_sql(sum(distinct(x), na.rm = TRUE), con = dbplyr::simulate_teradata())
+  },error=function(e) {
+    geterrmessage()
+  })
+
+  # The DISTINCT clause is allowed in aggregate functions
+  translate_sql(sdp(distinct(x), na.rm = TRUE), window = FALSE, con = dbplyr::simulate_teradata())
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

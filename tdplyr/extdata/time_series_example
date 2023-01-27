@@ -1,0 +1,11 @@
+--loadPTI--
+ocean_buoys_nonseq::TIMESTAMP(6),integer,integer,integer::NON_SEQ$$TIMESTAMP(6), DATE '2012-01-01', HOURS(1), COLUMNS(buoyid), nonsequenced
+--loadPTI--
+ocean_buoys_seq::TIMESTAMP(6),integer,integer,integer,integer,date::SEQ$$TIMESTAMP(6), DATE '2012-01-01', HOURS(1), COLUMNS(buoyid), sequenced
+--loadByTypes--
+ocean_buoys_nonpti::TIMESTAMP(6),integer,integer,integer
+--loadPTI--
+package_tracking_pti::TIMESTAMP(6),integer,varchar(512)::NON_SEQ$$TIMESTAMP(6), DATE '2012-01-01', HOURS(1), COLUMNS(parcel_number), nonsequenced
+--loadByTypes--
+package_tracking_nonpti::integer,TIMESTAMP(6),varchar(512)
+

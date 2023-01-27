@@ -1,0 +1,2 @@
+--loadByTypes--
+strsimilarity_input::integer,varchar(30),varchar(30),varchar(30)

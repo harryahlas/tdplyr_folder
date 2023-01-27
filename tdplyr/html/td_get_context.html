@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Get the current context</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_get_context {tdplyr}"><tr><td>td_get_context {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Get the current context</h2>
+
+<h3>Description</h3>
+
+<p>Returns a named list of attributes in an existing Teradata context.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_get_context()
+</pre>
+
+
+<h3>Value</h3>
+
+<p>A named list containing attributes to the current context.
+NULL if a context does not exist.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_create_context </code>, <code>td_set_context</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+td_create_context(dsn = "TeradataDSN")
+context &lt;- td_get_context()
+
+# To retrieve the connection in the current context, use
+td_get_context()$connection
+
+# To retrieve the temorary database in the current context, use
+td_get_context()$temp.database
+
+# To retrieve the default database in the current context, use
+td_get_context()$database
+
+td_remove_context()
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

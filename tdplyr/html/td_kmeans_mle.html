@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: KMeans</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_kmeans_mle {tdplyr}"><tr><td>td_kmeans_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+KMeans
+</h2>
+
+<h3>Description</h3>
+
+<p>The KMeans function takes a data set and outputs the centroids of its 
+clusters and, optionally, the clusters themselves. The  algorithm 
+groups a set of observations into k clusters with each observation 
+assigned to the cluster with the nearest centroid, or mean.
+The algorithm minimizes an objective function; in the KMeans 
+function, the objective function is the total Euclidean distance of 
+all data points from the center of the cluster to which they are 
+assigned.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_kmeans_mle (
+      data = NULL,
+      centers = NULL,
+      iter.max = 10,
+      initial.seeds = NULL,
+      seed = NULL,
+      unpack.columns = FALSE,
+      centroids.table = NULL,
+      threshold = 0.0395,
+      data.sequence.column = NULL,
+      centroids.table.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the list of features by which we
+are clustering the data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>centers</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of clusters to generate from the data.<br />
+Note: With &quot;centers&quot;, the function uses a nondeterministic algorithm and
+the function supports up to 1543 dimensions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>iter.max</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations that the algorithm runs 
+before quitting if the convergence threshold has not been met.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>initial.seeds</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the initial seed means as strings of underscore-delimited 
+numeric values. For example, this clause initializes eight clusters
+in eight-dimensional space: Means(&quot;50_50_50_50_50_50_50_50&quot;,
+&quot;150_150_150_150_150_150_150_150&quot;, &quot;250_250_250_250_250_250_250_250&quot;, 
+&quot;350_350_350_350_350_350_350_350&quot;, &quot;450_450_450_450_450_450_450_450&quot;, 
+&quot;550_550_550_550_550_550_550_550&quot;, &quot;650_650_650_650_650_650_650_650&quot;, 
+&quot;750_750_750_750_750_750_750_750&quot;). The dimensionality of the means 
+must match the dimensionality of the data (that is, each mean must 
+have n numbers in it, where n is the number of input columns minus 
+one). By default, the algorithm chooses the initial seed means 
+randomly.<br />
+Note: With &quot;initial.seeds&quot;, the function uses a deterministic algorithm
+and the function supports up to 1596 dimensions.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a random seed for the algorithm.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>unpack.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the means for each centroid appear unpacked (that 
+is, in separate columns) in the &quot;clusters.centroids&quot; output tbl_teradata.
+By default, the function concatenates the means for the centroids
+and outputs the result in a single VARCHAR column.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>centroids.table</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that contains the initial seed means for the
+clusters. The schema of the &quot;centroids.table&quot; tbl_teradata depends on the
+value of the &quot;unpack.columns&quot; argument.<br />
+Note: With &quot;centroids.table&quot;, the function uses a deterministic algorithm
+and the function supports up to 1596 dimensions.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>threshold</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the convergence threshold. When the centroids move by less 
+than this amount, the algorithm has converged. <br />
+Default Value: 0.0395<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>centroids.table.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;centroids.table&quot;. The argument is used to 
+ensure deterministic results for functions which produce results that 
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_kmeans_mle&quot; which is a named 
+list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> clusters.centroids</p>
+</li>
+<li> 
+<p>clustered.output</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection.
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("kmeans_example", "computers_train1")
+    
+    # Create object(s) of class "tbl_teradata".
+    computers_train1 &lt;- tbl(con, "computers_train1")
+    
+    # These examples use different arguments to find clusters based on the five
+    # attributes of personal computers data in the input tbl_teradata.
+    
+    # Example 1 - Using "centers" to specify the number of clusters to generate.
+    td_kmeans_out1 &lt;- td_kmeans_mle(data = computers_train1,
+                                    centers = 8,
+                                    iter.max = 10,
+                                    threshold = 0.05
+                                    )
+    
+    # Example 2 - Using "centers" to specify the number of clusters to generate, and
+    # setting "unpack.columns" to TRUE to make sure the centroids appear unpacked in
+    # the "clusters.centroids" output tbl_teradata..
+    td_kmeans_out2 &lt;- td_kmeans_mle(data = computers_train1,
+                                    centers = 8,
+                                    iter.max = 10,
+                                    unpack.columns = TRUE,
+                                    threshold = 0.05
+                                    )
+    
+    # Example 3 - Using "initial.seeds" to specify the initial seed means.
+    td_kmeans_out3 &lt;- td_kmeans_mle(data = computers_train1,
+                                    initial.seeds = c("2249_51_408_8_14",
+                                                      "2165_51_398_7_14.6",
+                                                      "2182_51_404_7_14.6",
+                                                      "2204_55_372_7.19_14.6",
+                                                      "2419_44_222_6.6_14.3",
+                                                      "2394_44.3_277_7.3_14.5",
+                                                      "2326_43.6_301_7.11_14.3",
+                                                      "2288_44_325_7_14.4")
+                                    )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

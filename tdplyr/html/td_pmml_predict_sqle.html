@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: PMMLPredict</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_pmml_predict_sqle {tdplyr}"><tr><td>td_pmml_predict_sqle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+PMMLPredict
+</h2>
+
+<h3>Description</h3>
+
+<p>This function is used to score data in Vantage with a model that has been 
+created outside Vantage and exported to vantage using PMML format.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_pmml_predict_sqle (
+      modeldata = NULL,
+      newdata = NULL,
+      accumulate = NULL,
+      model.output.fields = NULL,
+      overwrite.cached.models = NULL,
+      newdata.partition.column = "ANY",
+      newdata.order.column = NULL,
+      modeldata.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>modeldata</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the model tbl_teradata to be used for scoring.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>modeldata.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;modeldata&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>newdata</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata that contains the data to be scored.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>newdata.partition.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Partition By columns for &quot;newdata&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Default Value: ANY<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>newdata.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;newdata&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of &quot;newdata&quot; columns to copy to the output 
+tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model.output.fields</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the columns of the json output that the user wants to 
+specify as individual columns instead of the entire json report.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>overwrite.cached.models</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the model name that needs to be removed from the cache. 
+Use * to remove all cached models.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_pmml_predict_sqle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection.
+    con &lt;- td_get_context()$connection
+    
+    # Create following table on vantage. 
+    crt_tbl &lt;- "CREATE SET TABLE pmml_models(model_id VARCHAR(40), model BLOB) 
+                PRIMARY INDEX (model_id);"
+    DBI::dbExecute(con, sql(crt_tbl))
+    
+    # Run the following query through BTEQ or Teradata Studio to load the 
+    # models. 'load_pmml_model.txt' and pmml files can be found under 
+    # 'inst/scripts' in tdplyr installation directory. This file and the pmml 
+    # models to be loaded should be in the same directory.  
+    
+    # .import vartext file load_pmml_model.txt
+    # .repeat *
+    # USING (c1 VARCHAR(40), c2 BLOB AS DEFERRED BY NAME) INSERT INTO pmml_models(:c1, :c2);
+    
+    # Load example data.
+    loadExampleData("pmmlpredict_example", "iris_train", "iris_test")
+    
+    # Create object(s) of class "tbl_teradata".
+    iris_train &lt;- tbl(con, "iris_train")
+    iris_test &lt;- tbl(con, "iris_test")
+    
+    # Example 1 - 
+    # This example runs a query with XGBoost model with no prediction values.
+    # It also uses "overwrite.cached.models" argument.
+    modeldata &lt;- tbl(con, "pmml_models") 
+    ml_name &lt;- "iris_db_xgb_model"  
+    pmml_predict_out &lt;- td_pmml_predict(modeldata = modeldata, 
+                                        newdata = iris_test, 
+                                        accumulate = "id", 
+                                        overwrite.cached.models = ml_name)
+    
+    # Example 2 - 
+    # This example runs a query with RandomForest model with prediction values.
+    # It also used "model.output.fields" argument.
+    modeldata &lt;- tbl(con, "pmml_models") 
+    ml_op_field &lt;- c('probability_0', 'probability_1', 'probability_2')
+    pmml_predict_out &lt;- td_pmml_predict(modeldata = modeldata, 
+                                        newdata = iris_test, 
+                                        accumulate = "id", 
+                                        model.output.fields = ml_op_field)
+    
+    # Example 3 - 
+    # This example runs a query with XGBoost model and 
+    # "overwrite.cached.models". This will erase entire cache.
+    modeldata &lt;- tbl(con, "pmml_models") 
+    pmml_predict_out &lt;- td_pmml_predict(modeldata = modeldata, 
+                                        newdata = iris_test, 
+                                        accumulate = "id", 
+                                        overwrite.cached.models = "*")
+    # Example 4 -
+    # This example assumes that the user is connected to another database where
+    # byom is not installed and runs a query with XGBoost model with no prediction
+    # values. It also uses "overwrite.cached.models" argument.
+    # Set the global option in order to point to the database (mldb in this case)
+    # where byom is installed.
+    options(byom.install.location="mldb")
+    modeldata &lt;- tbl(con, "pmml_models") 
+    ml_name &lt;- "iris_db_xgb_model"
+    pmml_predict_out &lt;- td_pmml_predict(modeldata = modeldata,
+                                        newdata = iris_test,
+                                        accumulate = "id",
+                                        overwrite.cached.models = ml_name)
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

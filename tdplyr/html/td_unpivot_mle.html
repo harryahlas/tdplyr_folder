@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Unpivot</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_unpivot_mle {tdplyr}"><tr><td>td_unpivot_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Unpivot
+</h2>
+
+<h3>Description</h3>
+
+<p>The Unpivot function pivots data that is stored in columns into rows, which is 
+the reverse of the function Pivot (<code>td_pivot_mle</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_unpivot_mle (
+    data = NULL,
+    unpivot = NULL,
+    input.types = FALSE,
+    attribute.column = "attribute",
+    value.column = "value_col",
+    accumulate = NULL,
+    data.sequence.column = NULL,
+    data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the data to be pivoted.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>unpivot</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the unpivot columns, which are the input columns to 
+unpivot (convert to rows).<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.types</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the unpivoted value column, in the output tbl_teradata, 
+has the same data type as its corresponding unpivot column (if 
+possible).<br />
+</p>
+
+<ol>
+<li><p> If you specify FALSE, then for each unpivoted column, the function outputs the values
+in a single VARCHAR column.
+</p>
+</li>
+<li><p> If you specify TRUE, then instead of one column for all attribute values, the function
+outputs each unpivoted value column in a separate column.
+</p>
+
+<ul>
+<li><p> If the unpivot column has a data type REAL, the unpivoted value column has
+the data type DOUBLE PRECISION.
+</p>
+</li>
+<li><p> If the unpivot column has a data type INTEGER, the unpivoted value column has
+the data type LONG.
+</p>
+</li>
+<li><p> If the unpivot column has any other data type, the unpivoted value column has
+the data type VARCHAR.
+</p>
+</li></ul>
+
+</li></ol>
+
+<p>Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the unpivoted attribute column in the output tbl_teradata.<br />
+Default Value: &quot;attribute&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>value.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the unpivoted value column in the output tbl_teradata.<br /> 
+Default Value: &quot;value_col&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of input columns other than unpivot columns, to
+copy to the output tbl_teradata. You must specify these columns in the same
+order that they appear in the input tbl_teradata.<br />
+Columns in &quot;accumulate&quot; argument can not be used in &quot;unpivot&quot; argument.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_unpivot_mle&quot; which is a named 
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("unpivot_example", "unpivot_input")
+
+    # Create object(s) of class "tbl_teradata".
+    unpivot_input &lt;- tbl(con, "unpivot_input")
+
+    # Example 1 : With "input.types" = FALSE there is only one value column and it has the
+    # data type VARCHAR and using default value for the arguments "attribute.column" 
+    # and "value.column".
+    td_unpivot_out1 &lt;- td_unpivot_mle(data = unpivot_input,
+                                      unpivot = c("temp","pressure","dewpoint"),
+                                      input.types = FALSE,
+                                      accumulate = c("sn","city","week")
+                                      )
+
+    # Example 2 : With "input.types" = TRUE, the output tbl_teradata has a separate 
+    # column prefixed by "value.column" for each value in the unpivot argument 
+    # (target column). The value colunms are suffixed by the datatype.
+    # Custom names are provided for "attribute.column" and "value.column" arguments.
+    td_unpivot_out2 &lt;- td_unpivot_mle(data = unpivot_input,
+                                      unpivot = c("temp","pressure","dewpoint"),
+                                      input.types = TRUE,
+                                      attribute.column = "climate_attributes",
+                                      value.column = "attributevalue",
+                                      accumulate = c("sn","city","week")
+                                      )
+
+    # Example 3 : Use the output of the td_pivot_mle() function as an input to the
+    # td_unpivot_mle() function.
+    loadExampleData("pivot_example", "pivot_input")
+    pivot_input &lt;- tbl(con, "pivot_input")
+    
+    # Create a td_pivot_out object for all three keys in the pivot column.
+    td_pivot_out &lt;- td_pivot_mle(data = pivot_input,
+                                 data.partition.column = c("sn","city","week"),
+                                 data.order.column = c("week","attribute"),
+                                 partition.columns = c("sn","city", "week"),
+                                 target.columns = c("value1"),
+                                 pivot.column = "attribute",
+                                 pivot.keys = c("temp","pressure","dewpoint")
+                                 )
+
+    # Use the tbl_teradata object td_pivot_out as input to the td_unpivot_mle() function.
+    td_unpivot_out3 &lt;- td_unpivot_mle(data = td_pivot_out$result,
+                                      unpivot = c("value1_temp", "value1_pressure",
+                                                  "value1_dewpoint"),
+                                      accumulate = c("sn","city","week"),
+                                      input.types = FALSE
+                                      )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

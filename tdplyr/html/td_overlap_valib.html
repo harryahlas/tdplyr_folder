@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Overlap</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_overlap_valib {tdplyr}"><tr><td>td_overlap_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Overlap</h2>
+
+<h3>Description</h3>
+
+<p>The function performs Overlap analysis by combining information from multiple
+inputs into an analytic data set by providing counts of overlapping key
+fields among pairs of inputs. For example, if an analytic data set is being
+built to describe customers, it is useful to know whether the customer,
+account, and transaction tables that provide information about customers
+refer to the same customers.<br />
+<br />
+Given inputs and corresponding column names, the Overlap analysis determines
+the number of instances of that column which each pair-wise combination of
+inputs has in common. The same can also be performed for multiple columns
+taken together.<br />
+<br />
+Overlap analysis is used to process any data type that is comparable except
+those containing byte data.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_overlap_valib(data1, columns1, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data1</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data containing the columns on which
+Overlap analysis is to be performed.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns1</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the column(s), in &quot;data1&quot; argument,
+to be used in Overlap analysis.<br />
+Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies the additional data and columns arguments that can be
+used with &quot;data1&quot; and &quot;columns1&quot; for Overlap analysis.
+</p>
+
+<ul>
+<li><p> data2, ..., dataN:<br />
+Optional Arguments.<br />
+Specifies the additional inputs containing the columns on
+which Overlap analysis is to be performed along with
+&quot;data1&quot; and &quot;columns1&quot;.<br />
+Types: tbl_teradata
+</p>
+</li>
+<li><p> columns2, ..., columnsN:<br />
+Optional Arguments.<br />
+Specifies the name(s) of the columns(s) of additional
+inputs to be used in the Overlap analysis along with
+&quot;data1&quot; and &quot;columns1&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+</li></ul>
+
+<p>Note:<br />
+</p>
+
+<ol>
+<li><p> The data and columns related arguments must be in a
+sequence starting from &quot;data2&quot; and &quot;columns2&quot; respectively.
+</p>
+</li>
+<li><p> For each data argument (data<em>i</em>), corresponding columns
+argument (columns<em>i</em>) must be specified and vice-versa.
+</p>
+</li>
+<li><p> The number of columns in each of the columns related
+arguments (including &quot;columns1&quot; argument) should be same.
+</p>
+</li></ol>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_overlap_valb&quot; which is a
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option
+#      'val.install.location' to the database name where Vantage analytic
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic
+#      Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create and print objects of class "tbl_teradata".
+customer &lt;- tbl(con, "customer")
+customer_analysis &lt;- tbl(con, "customer_analysis")
+checking_tran &lt;- tbl(con, "checking_tran")
+credit_tran &lt;- tbl(con, "credit_tran")
+savings_tran &lt;- tbl(con, "savings_tran")
+
+print(customer)
+print(customer_analysis)
+print(checking_tran)
+print(credit_tran)
+print(savings_tran)
+
+# Example 1: Run Overlap analysis on 'cust_id' column present in the
+#            input objects 'customer' and 'customer_analysis' of class
+#            "tbl_teradata".
+overlap_obj &lt;- td_overlap_valib(data1=customer,
+                                data2=customer_analysis,
+                                columns1=c("cust_id"),
+                                columns2="cust_id")
+# Print the results.
+print(overlap_obj$result)
+
+# Example 2: Run Overlap analysis on columns 'cust_id' and 'tran_id' present
+#            in the input objects 'checking_tran', 'credit_tran' and
+#            'savings_tran' of class "tbl_teradata".
+overlap_obj &lt;- td_overlap_valib(data1=checking_tran,
+                                data2=credit_tran,
+                                data3=savings_tran,
+                                columns1=c("cust_id", "tran_id"),
+                                columns2=c("cust_id", "tran_id"),
+                                columns3=c("cust_id", "tran_id"))
+# Print the results.
+print(overlap_obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

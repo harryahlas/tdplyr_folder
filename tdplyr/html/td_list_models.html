@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: td_list_models</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_list_models {tdplyr}"><tr><td>td_list_models {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>td_list_models</h2>
+
+<h3>Description</h3>
+
+<p>Function to list models accessible to the user and optionally only models
+created by the user.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_list_models(
+  name = NULL,
+  algorithm.name = NULL,
+  engine = NULL,
+  accessible = TRUE,
+  public = FALSE
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the search string for model name.<br />
+When this argument is used, all models matching the name
+are listed.<br />
+The search is case-insensitive.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>algorithm.name</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the search string for the analytic
+function name.<br />
+When this argument is used, all models matching
+it are listed.<br />
+The search is case-insensitive.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>engine</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the model generating engine as a filter.<br />
+The search is case-insensitive.<br />
+Permitted Values: &quot;ML Engine&quot;, &quot;MLE&quot;, &quot;Advanced SQL Engine&quot;,
+&quot;SQLE&quot;<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>accessible</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to list all models that the user has
+access to, or only the models that the user created.<br />
+When TRUE, all models which the user has access to are
+listed.<br />
+When FALSE, only models created by the user are listed.<br />
+Default Value: TRUE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>public</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to filter only those models that have
+public access.<br />
+Default Value: FALSE<br />
+Types: logical</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A data.frame representation of the model listing.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load example data.
+loadExampleData("glm_example", "admissions_train")
+
+# Create object of class "tbl_teradata" to use as input.
+admissions_train &lt;- tbl(con, "admissions_train")
+
+# Create the GLM model.
+td_glm_out1 &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                          family = "LOGISTIC",
+                          linkfunction = "LOGIT",
+                          data = admissions_train,
+                          weights = "1",
+                          threshold = 0.01,
+                          maxit = 25,
+                          step = FALSE,
+                          intercept = TRUE
+)
+
+# Save this generated model.
+td_save_model(model = td_glm_out1, name = "glm_model", description = "GLM test")
+
+# Example 1 - List all models saved and accessible to the current user.
+td_list_models()
+
+# Example 2 - List models accessible to the user with
+# name = 'glm_model'.
+td_list_models(name = "glm_model")
+
+# Example 3 - List all models accessible to the user with algorithm
+# name 'GLM'.
+td_list_models(algorithm.name = "GLM")
+
+# Example 4 - List all models accessible to user with algorithm name
+# 'GLM' and name containing string 'glm'.
+td_list_models(name = "glm", algorithm.name = "GLM")
+
+# Example 5 - List all models accessible to user with algorithm name
+# 'GLM' and generated using 'ML Engine'.
+td_list_models(algorithm.name = "GLM", engine = "ML Engine")
+
+# Example 6 - List all models created by the user with algorithm name
+# 'GLM', generated using 'MLE', and access not set to Public.
+td_list_models(algorithm.name = "GLM", engine = "MLE",
+               accessible = FALSE, public = FALSE)
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

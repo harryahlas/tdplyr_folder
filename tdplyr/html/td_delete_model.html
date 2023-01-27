@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: td_delete_model</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_delete_model {tdplyr}"><tr><td>td_delete_model {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>td_delete_model</h2>
+
+<h3>Description</h3>
+
+<p>Function to delete a saved model, and optionally the model objects.<br />
+A model can be deleted only by its creator.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_delete_model(name, delete.objects = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the model to be deleted.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>delete.objects</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies whether to drop objects of the model
+to be deleted.<br />
+When TRUE, the model objects are deleted/dropped.<br />
+Default Value: FALSE<br />
+Types: logical</p>
+</td></tr>
+</table>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load example data.
+loadExampleData("glm_example", "admissions_train")
+
+# Create object of class "tbl_teradata" to use as input.
+admissions_train &lt;- tbl(con, "admissions_train")
+
+# Create the GLM model.
+td_glm_out1 &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                          family = "LOGISTIC",
+                          linkfunction = "LOGIT",
+                          data = admissions_train,
+                          weights = "1",
+                          threshold = 0.01,
+                          maxit = 25,
+                          step = FALSE,
+                          intercept = TRUE
+)
+
+# Save this generated model.
+td_save_model(model = td_glm_out1, name = "glm_model", description = "GLM test")
+
+# Example 1 - Only delete model information from the Model Catalog.
+td_delete_model('glm_model')
+
+# Example 2 - Delete model information from the Model Catalog 
+# and drop model objects as well.
+# This example does not apply to the model we just saved, as we have already
+# deleted it from the catalog in Example 1.
+# We save the model again with another name for this example.
+td_save_model(model = td_glm_out1, name = "glm_model_2", description = "GLM test 2")
+
+td_delete_model('glm_model_2', TRUE)
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

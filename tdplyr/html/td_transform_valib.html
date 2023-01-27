@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Transformation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_transform_valib {tdplyr}"><tr><td>td_transform_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Transformation</h2>
+
+<h3>Description</h3>
+
+<p>The Variable Transformation analysis reads the input data in tbl_teradata
+object and produces an output containing transformed columns. This is useful
+when preparing data for input to an analytic algorithm. For example,
+a K-Means Clustering algorithm typically produces better results when the
+input columns are first converted to their Z-Score values to put all input
+variables on an equal footing, regardless of their magnitude.<br />
+Function supports the following transformations:<br />
+</p>
+
+<ol>
+<li><p> Binning - replaces a continuous numeric column with a categorical
+one to produce ordinal values (for example, numeric categorical values where
+order is meaningful).
+</p>
+</li>
+<li><p> Derive - allows you to enter free-form formulas based on columns
+within a table. It requires the free-form transformation to be specified
+as a formula using operators, arguments, and functions.
+</p>
+</li>
+<li><p> One Hot Encoding - re-expresses a categorical data element as one or
+more numeric data elements and creates a binary numeric field for each
+categorical data value.
+</p>
+</li>
+<li><p> Null Replacement - defines how missing values are treated.
+</p>
+</li>
+<li><p> Label Encoding - allows to re-express existing values of a categorical
+data column (variable) into a new coding scheme or to correct data quality
+problems and focus an analysis on a value.
+</p>
+</li>
+<li><p> Min-Max Scaling - limits the upper and lower boundaries of the data in
+a continuous numeric column using a linear rescaling function based on
+maximum and minimum data values.
+</p>
+</li>
+<li><p> Retain - allows copying of one or more columns into the final analytic
+data set.
+</p>
+</li>
+<li><p> Sigmoid - provides rescaling of continuous numeric data using a type
+of sigmoid or s-shaped function.
+</p>
+</li>
+<li><p> ZScore - provides rescaling of continuous numeric data using Z-Scores.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_transform_valib(data, bins=NULL, derive=NULL, one.hot.encode=NULL,
+                   fillna=NULL, label.encode=NULL, rescale=NULL,
+                   retain=NULL, sigmoid=NULL, zscore=NULL, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to perform variable transformations.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>bins</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class <code>tdBinning</code>.
+Binning replaces a continuous numeric column with a
+categorical one to produce ordinal values (for example,
+numeric categorical values where order is meaningful).<br />
+Types: tdBinning or vector of tdBinning</p>
+</td></tr>
+<tr valign="top"><td><code>derive</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class <code>tdDerive</code>.
+This argument allows user to perform a free form transformation
+using arithmetic formula.<br />
+Types: tdDerive or vector of tdDerive</p>
+</td></tr>
+<tr valign="top"><td><code>one.hot.encode</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class
+<code>tdOneHotEncoder</code>. One hot encoding allows user to
+re-express categorical data as one or more numeric data
+elements, creating a binary numeric field for each
+categorical data value.<br />
+Types: tdOneHotEncoder or vector of tdOneHotEncoder</p>
+</td></tr>
+<tr valign="top"><td><code>fillna</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class <code>tdFillNa</code>.
+This argument allows user to perform a missing value/null
+replacement transformation.<br />
+Types: tdFillNa or vector of tdFillNa</p>
+</td></tr>
+<tr valign="top"><td><code>label.encode</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class
+<code>tdLabelEncoder</code>. This allows to re-express existing
+values of a categorical data column  (variable) into a
+new coding scheme.<br />
+Types: tdLabelEncoder or vector of tdLabelEncoder</p>
+</td></tr>
+<tr valign="top"><td><code>rescale</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class
+<code>tdMinMaxScalar</code>. This limits the upper and lower
+boundaries of the data in a continuous numeric column using a
+linear rescaling function based on maximum and minimum data
+values.<br />
+Types: tdMinMaxScalar or vector of tdMinMaxScalar</p>
+</td></tr>
+<tr valign="top"><td><code>retain</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class <code>tdRetain</code>. This
+argument allows user to retain columns from input to output.<br />
+Types: tdRetain or vector of tdRetain</p>
+</td></tr>
+<tr valign="top"><td><code>sigmoid</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class <code>tdSigmoid</code>.
+This argument allows user to perform a rescaling using sigmoid
+transformation.<br />
+Types: tdSigmoid or vector of tdSigmoid</p>
+</td></tr>
+<tr valign="top"><td><code>zscore</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies one or more object(s) of class <code>tdZScore</code>.
+This argument allows user to perform a rescaling using Z-Score
+transformation.<br />
+Types: tdZScore or vector of tdZScore</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described
+in the '<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns result based on transformation object passed.
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>fallback</h4>
+
+<p>Optional Argument.<br />
+Specifies whether a mirrored copy of underlying table of
+output tbl_teradata is required or not.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>index.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the output column(s) to be
+used as index in output tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>unique.index</h4>
+
+<p>Optional Argument.<br />
+Specifies whether the underlying output table should
+contain a unique primary index or not.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>key.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) that can be
+unique key in input and output tbl_teradata. When
+null replacement is requested, i.e., &quot;fillna&quot;
+argument is used either in <code>tdFillNa</code>
+transformation or in combination with a
+<code>tdBinning</code>, <code>tdDerive</code>,
+<code>tdOneHotEncoder</code>, <code>td_LabelEncoder</code>,
+<code>tdMinMaxScalar</code>, <code>tdSigmoid</code>,
+<code>td_ZScore</code> transformation, the &quot;key.columns&quot;
+argument must be specified.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>allow.duplicates</h4>
+
+<p>Optional Argument.<br />
+Specifies whether output should contain
+duplicate rows or not.<br />
+Types: logical
+</p>
+
+
+
+<h4>nopi</h4>
+
+<p>Optional Argument.<br />
+Specifies whether the underlying output table should contain
+no index columns. When TRUE, output table does not contain
+index columns.<br />
+Note:
+</p>
+
+<ul>
+<li><p> When this argument is set to TRUE, &quot;allow.duplicates&quot;
+must also be set to TRUE.
+</p>
+</li></ul>
+
+<p>Types: logical
+</p>
+
+
+
+<h4>filter</h4>
+
+<p>Optional Argument.<br />
+Specifies the clause to filter rows selected for
+transformation.<br />
+For example,<br />
+filter = &quot;cust_id &gt; 0&quot;<br />
+Types: character
+</p>
+
+
+
+<h3>See Also</h3>
+
+<p><code>tdFillNa</code>, <code>tdBinning</code>, <code>tdDerive</code>,
+<code>tdOneHotEncoder</code>, <code>tdLabelEncoder</code>,
+<code>tdMinMaxScalar</code>, <code>tdSigmoid</code>, <code>tdZScore</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+Notes:
+# 1. To run any transformation, user needs to use td_transform_valib()
+#    function.
+# 2. To do so set option 'val.install.location' to the database name
+#    where Vantage analytic library functions are installed.
+# 3. Datasets used in these examples can be loaded using Vantage Analytic
+#    Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create object(s) of class "tbl_teradata".
+customer &lt;- tbl(con, "customer")
+
+# Example of running individual transformations can be found in the example
+# sections for each Transformation.
+
+# Binning performed on column 'income' with different number of bins.
+bin_1 &lt;- tdBinning(style="bins", value=3, columns=list("income"="inc1"))
+bin_2 &lt;- tdBinning(style="bins", value=4, columns=list("income"="inc2"))
+bin_3 &lt;- tdBinning(style="bins", value=5, columns=list("income"="inc3"))
+
+# Derive transformation done on 'age' column with different arithmetic
+# formula.
+derive_1 &lt;- tdDerive(formula="x/10", columns="age", out.column="age1")
+derive_2 &lt;- tdDerive(formula="x*10", columns="age", out.column="age2")
+derive_3 &lt;- tdDerive(formula="x+10", columns="age", out.column="age3")
+
+# One hot encoding done for values in columns 'gender' and 'marital_status'.
+dc_1 &lt;- tdOneHotEncoder(values=list("M", "F"), column="gender")
+dc_2 &lt;- tdOneHotEncoder(values=list(1, 2, 3, 4), column="marital_status")
+
+# Replace null values in column 'street_nbr', by using 'literal' and 'mean'
+# null style.
+fillna_1 &lt;- tdFillNa(style="literal", value=0, columns="street_nbr")
+fillna_2 &lt;- tdFillNa(columns=list("street_nbr"="street_nbr2"))
+
+# Recode values in column 'marital_status', using different coding schemes.
+rc_1 &lt;- tdLabelEncoder(values=list("1"="S", "2"="M", "3"="S", "4"="S"),
+                       default="SAME", columns=list("marital_status"="mar1"))
+rc_2 &lt;- tdLabelEncoder(values=list("1"="B", "2"="A", "3"="B", "4"="B"),
+                       default=NULL, columns=list("marital_status"="mar2"))
+
+# Values in column 'age' are rescaled using MinMaxScalar using
+#        1. Both lower bound and upper bound,
+#        2. Only lower bound,
+#        3. Only upper bound.
+rs_1 &lt;- tdMinMaxScalar(lbound=0, ubound=100, columns=list("age"="age4"))
+rs_2 &lt;- tdMinMaxScalar(lbound=0, ubound=None, columns=list("age"="age5"))
+rs_3 &lt;- tdMinMaxScalar(lbound=None, ubound=100, columns=list("age"="age6"))
+
+# Rescale values in column "nbr_children" using various sigmoid functions.
+sig_1 &lt;- tdSigmoid(style="logit", columns=list("nbr_children"="nbr1"))
+sig_2 &lt;- tdSigmoid(style="modifiedlogit", columns=list("nbr_children"="nbr2"))
+sig_3 &lt;- tdSigmoid(style="tanh", columns=list("nbr_children"="nbr3"))
+
+# Rescale values in column 'years_with_bank' using Z-Score values.
+zscore &lt;- tdZScore(columns=list("years_with_bank"="ywb"))
+
+# Retain columns 'income', 'age', 'years_with_bank' and 'nbr_children' in the
+# transformed output.
+retain &lt;- tdRetain(columns=list("income", "age", "years_with_bank",
+                                "nbr_children"))
+
+# Execute the td_transform_valib() function.
+obj &lt;- td_transform_valib(data=customer,
+                          bins=c(bin_1, bin_2, bin_3),
+                          derive=c(derive_1, derive_2, derive_3),
+                          one.hot.encode=c(dc_1, dc_2),
+                          fillna=c(fillna_1, fillna_2),
+                          label.encode=c(rc_1, rc_2),
+                          rescale=c(rs_1, rs_2),
+                          sigmoid=c(sig_1, sig_2, sig_3),
+                          retain=retain,
+                          zscore=zscore,
+                          key.columns="cust_id")
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

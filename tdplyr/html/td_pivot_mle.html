@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Pivot</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_pivot_mle {tdplyr}"><tr><td>td_pivot_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Pivot
+</h2>
+
+<h3>Description</h3>
+
+<p>The Pivot function pivots data that is stored in rows into columns.
+It outputs a tbl_teradata whose columns are based on the individual values 
+from an input tbl_teradata column. The schema of the output tbl_teradata depends on 
+the arguments to the function. The columns in the output tbl_teradata appear
+in the order specified by the &quot;data.order.column&quot; argument.<br />
+The function handles missing or NULL values automatically.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_pivot_mle (
+    data = NULL,
+    partition.columns = NULL,
+    target.columns = NULL,
+    pivot.column = NULL,
+    pivot.keys = NULL,
+    numeric.pivotkey = FALSE,
+    num.rows = NULL,
+    data.sequence.column = NULL,
+    data.partition.column = NULL,
+    data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the data to be pivoted.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>partition.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the same columns as the &quot;data.partition.columns&quot; argument (in any 
+order).<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the input columns that contain the values to 
+pivot.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>pivot.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains the pivot keys. If 
+the pivot column contains numeric values, then the function casts 
+them to VARCHAR.<br />
+Note:<br />
+</p>
+
+<ol>
+<li><p> If you omit the &quot;num.rows&quot; argument, then you must specify 
+this argument.
+</p>
+</li>
+<li><p> If you specify the &quot;pivot.column&quot; argument, then you must use the 
+&quot;data.order.column&quot; argument to order the input data. Otherwise, the 
+contents of the columns of the output tbl_teradata may vary from run to run.
+</p>
+</li></ol>
+<p><br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>pivot.keys</code></td>
+<td>
+
+<p>Optional Argument. Required if you specify &quot;pivot.column&quot;.<br />
+Specifies the names of the pivot keys. Do not use this argument 
+without the &quot;pivot.column&quot; argument.<br /> 
+If &quot;pivot.column&quot; contains a value that is not specified as a pivot key, 
+then the function ignores the row containing that value.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>numeric.pivotkey</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a flag indicating whether the pivot key values are numeric values.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>num.rows</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of rows in any partition. If a partition 
+has fewer than &quot;num.rows&quot; rows, then the function adds NULL 
+values; if a partition has more than &quot;num.rows&quot; rows, then the 
+function omits the extra rows.<br /> 
+If you omit this argument, then you must specify the &quot;pivot.column&quot; 
+argument.<br />
+Note: If you specify &quot;num.rows&quot;, then you must use the &quot;data.order.column&quot; 
+argument to order the input data. Otherwise, the contents of the columns 
+of the output tbl_teradata may vary from run to run.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_pivot_mle&quot; which is a named 
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("pivot_example", "pivot_input")
+
+    # Create object(s) of class "tbl_teradata".
+    pivot_input &lt;- tbl(con, "pivot_input")
+
+    # Example 1: This example specifies the "pivot.column" argument and with the 
+    # "pivot.keys" argument, which specifies the values from the "pivot.column"
+    # to use as pivot keys. Because "pivot.keys" does not include 'dewpoint', the
+    # function ignores rows that include 'dewpoint'.
+    td_pivot_out1 &lt;- td_pivot_mle(data = pivot_input,
+                                  data.partition.column = c("sn","city","week"),
+                                  data.order.column = c("week","attribute"),
+                                  partition.columns = c("sn","city", "week"),
+                                  target.columns = c("value1"),
+                                  pivot.column = "attribute",
+                                  pivot.keys = c("temp","pressure")
+                                 )
+
+    # Example 2: Specify the "num.rows" argument instead of specifying the "pivot.column" argument.
+    td_pivot_out2 &lt;- td_pivot_mle(data = pivot_input,
+                                  data.partition.column = c("sn","city","week"),
+                                  data.order.column = c("week","attribute"),
+                                  partition.columns = c("sn","city", "week"),
+                                  target.columns = c("value1"),
+                                  num.rows = 3
+                                 )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

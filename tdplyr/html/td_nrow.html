@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Number of rows in a data.frame or a tibble object</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_nrow {tdplyr}"><tr><td>td_nrow {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Number of rows in a data.frame or a tibble object</h2>
+
+<h3>Description</h3>
+
+<p>This function retrieves number of rows in a tibble or data.frame object.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_nrow(df)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>df</code></td>
+<td>
+<p>Required Argument<br />
+Specifies a data.frame or a tibble object.<br />
+Types: R data.frame OR tibble</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Returns the number of rows in a data.frame or a tibble object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection
+con &lt;- td_get_context()$connection
+
+# Create a dataframe.
+df &lt;- data.frame(column1 = c(1, 2, 3), column2 = c('teradata', 'vantage', 'release'), 
+                 column3 = c(TRUE, FALSE, TRUE))
+# Returns the number of rows for data.frame.
+td_nrow(df)
+
+# Create table from R dataframe "df".
+copy_to(con, df, name = "test_table", analyze = TRUE, overwrite = TRUE)
+
+# Create remote tibble object.
+test_table &lt;- tbl(con, "test_table")
+
+# Returns the number of rows for tibble object.
+td_nrow(test_table)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

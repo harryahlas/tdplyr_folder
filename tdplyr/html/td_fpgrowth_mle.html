@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: FPGrowth</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_fpgrowth_mle {tdplyr}"><tr><td>td_fpgrowth_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+FPGrowth
+</h2>
+
+<h3>Description</h3>
+
+<p>The FPGrowth (Frequent Pattern Growth) function uses an
+FP-growth algorithm to generate association rules from patterns
+in a data set, and then determines their interestingness.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_fpgrowth_mle (
+      data = NULL,
+      tran.item.columns = NULL,
+      tran.id.columns = NULL,
+      patterns.or.rules = "both",
+      groupby.columns = NULL,
+      pattern.distribution.key.column = NULL,
+      rule.distribution.key.column = NULL,
+      compress = "nocompress",
+      group.size = 4,
+      min.support = 0.05,
+      min.confidence = 0.8,
+      max.pattern.length = "2",
+      antecedent.count.range = "1-INFINITE",
+      consequence.count.range = "1-1",
+      delimiter = ",",
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the data set.
+</p>
+</td></tr>
+<tr valign="top"><td><code>tran.item.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns that contain transaction items to 
+analyze.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>tran.id.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns that contain identifiers for the 
+transaction items.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>patterns.or.rules</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function outputs patterns, rules, or both. 
+An example of a pattern is onions, potatoes, hamburger. <br />
+Default Value: &quot;both&quot;<br />
+Permitted Values: both, patterns, rules<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>groupby.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of columns that define the partitions into which 
+the function groups the input data and calculates output for it. At 
+least one column must be usable as a distribution key. If you omit 
+this argument, then the function considers all input data to be in a 
+single partition.<br />
+Note: Do not specify the same column in both this 
+argument and the &quot;tran.id.column argument&quot;, because this causes 
+incorrect counting in the partitions.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>pattern.distribution.key.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column to use as the distribution key for 
+&quot;output.pattern.table&quot; tbl_teradata. The default value is the first
+column name - &quot;pattern_&lt;tran.item.columns&gt;&quot; as generated in the 
+&quot;output.pattern.table&quot; tbl_teradata.<br />
+Note: Only one column name can be specified.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>rule.distribution.key.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column to use as the distribution key for 
+&quot;output.rule.table&quot; tbl_teradata. The default value is the first
+column name - &quot;antecedent_&lt;tran.item.columns&gt;&quot; as generated
+in the &quot;output.rule.table&quot; tbl_teradata. <br />
+Note: Only one column name can be specified.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>compress</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the compression level of the output tbl_teradata objects.
+Realized compression ratios depend on both this value and the data 
+characteristics. These ratios typically range from 3x to 12x. <br />
+Default Value: &quot;nocompress&quot;<br />
+Permitted Values: low, medium, high, nocompress<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>group.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of transaction items to be assigned to each 
+worker. This value must be an integer in the range from 1 to the 
+number of distinct transaction items, inclusive. For a machine with 
+limited RAM, use a relatively small value. <br />
+Default Value: 4<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>min.support</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the minimum support value of returned patterns (including 
+the specified support value). This value must be a floating point number in the 
+range [0, 1]. <br />
+Default Value: 0.05<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>min.confidence</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the minimum confidence value of returned patterns 
+(including the specified confidence value). This value must be a 
+floating point number in the range [0, 1]. <br />
+Default Value: 0.8<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.pattern.length</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum length of returned patterns. The length of a 
+pattern is the sum of the item numbers in the antecedent and 
+consequence columns. This value must be an integer greater than 2.
+&quot;max.pattern.length&quot; also limits the length of
+returned rules to this value.<br />
+Default Value: &quot;2&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>antecedent.count.range</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the range for the number of items in the antecedent.
+This argument takes the format, &quot;lower_bound-upper_bound&quot;.
+The function returns only patterns for which number of items in the 
+antecedent is in the range [lower_bound, upper_bound]. 
+The lower_bound must be an integer greater than 0. 
+The lower_bound and upper_bound can be equal.<br />
+Default Value: &quot;1-INFINITE&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>consequence.count.range</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the range for the number of items in the consequence. 
+The function returns only patterns for which number of items in the consequence 
+is in the range [lower_bound, upper_bound]. The lower_bound must be greater an 
+integer greater than 0. The lower_bound and upper_bound can be equal.<br />
+Default Value: &quot;1-1&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the delimiter that separates items in the output.<br />
+Default Value: &quot;,&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_fpgrowth_mle&quot; which is a 
+named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> output.pattern.table</p>
+</li>
+<li> 
+<p>output.rule.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("fpgrowth_example", "sales_transaction")
+    
+    # Create object(s) of class "tbl_teradata".
+    # Sales transaction data of an office supply chain store.
+    # The column "product" specifies the items that are purchased by a
+    # customer in a given transaction (column "orderid")
+    sales_transaction &lt;- tbl(con, "sales_transaction")
+    
+    # Compute association rules based on the pattern in the "product" column
+    td_fpgrowth_out &lt;- td_fpgrowth_mle(data = sales_transaction,
+                                   tran.item.columns = "product",
+                                   tran.id.columns = "orderid",
+                                   groupby.columns = "region",
+                                   min.support = 0.01,
+                                   min.confidence = 0.0,
+                                   max.pattern.length = "4"
+                                   )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

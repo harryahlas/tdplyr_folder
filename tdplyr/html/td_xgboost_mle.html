@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: XGBoost</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_xgboost_mle {tdplyr}"><tr><td>td_xgboost_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+XGBoost
+</h2>
+
+<h3>Description</h3>
+
+<p>The XGBoost function takes a training data set and uses gradient
+boosting to create a strong classifying model that can be input
+to the function XGBoostPredict (<code>td_xgboost_predict_mle</code>).
+The function supports input tables in both dense and sparse format.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_xgboost_mle (
+      formula = NULL,
+      data = NULL,
+      id.column = NULL,
+      loss.function = "SOFTMAX",
+      prediction.type = "CLASSIFICATION",
+      reg.lambda = 1,
+      shrinkage.factor = 0.1,
+      iter.num = 10,
+      min.node.size = 1,
+      max.depth = 5,
+      variance = 0,
+      seed = NULL,
+      attribute.name.column = NULL,
+      num.boosted.trees = NULL,
+      attribute.table = NULL,
+      attribute.value.column = NULL,
+      column.subsampling = 1.0,
+      response.column = NULL,
+      data.sequence.column = NULL,
+      attribute.table.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+
+<p>Required Argument when input data is in dense format.<br />
+Specifies an object of class &quot;formula&quot;. Specifies the model to be fitted. Only
+basic formula of the (col1 ~ col2 + col3 +...) form are supported and
+all variables must be from the same tbl_teradata object. The
+response should be column of type real, numeric, integer or boolean.
+This argument is not supported for sparse format. For sparse data format
+provide this information using &quot;attribute.table&quot; argument.<br />
+Note: This argument should not be specified along with &quot;response.column&quot;.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata object containing the input data set.
+If the input data set is in dense format, the td_xgboost_mle function requires only &quot;data&quot;.
+</p>
+</td></tr>
+<tr valign="top"><td><code>id.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the partitioning column of input tbl_teradata. This
+column is used as a row identifier to distribute data among different
+vworkers for parallel boosted trees.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>loss.function</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the learning task and corresponding learning objective.<br />
+Default Value: &quot;SOFTMAX&quot;<br />
+Permitted Values: BINOMIAL, SOFTMAX<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>prediction.type</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function predicts the result from the number of classes
+('classification') or from a continuous response variable ('regression').
+The function supports only 'classification'.<br />
+Default Value: &quot;CLASSIFICATION&quot;<br />
+Permitted Values: CLASSIFICATION<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>reg.lambda</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the L2 regularization that the loss function uses
+while boosting trees. The higher the lambda, the stronger the
+regularization effect.<br />
+Default Value: 1<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>shrinkage.factor</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the learning rate (weight) of a learned tree in each boosting step.
+After each boosting step, the algorithm multiplies the learner by shrinkage
+to make the boosting process more conservative. The shrinkage is a
+DOUBLE PRECISION value in the range [0, 1]. <br />
+The value 1 specifies no shrinkage.<br />
+Default Value: 0.1<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>iter.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of iterations to boost the weak classifiers,
+which is also the number of weak classifiers in the ensemble (T). The
+number must an in the range [1, 100000].<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>min.node.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the minimum size of any particular node within each
+decision tree.<br />
+Default Value: 1<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.depth</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum depth of the tree. The &quot;max.depth&quot; must be
+in the range [1, 100000].<br />
+Default Value: 12<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>variance</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a decision tree stopping criterion. If the variance within
+any node dips below this value, the algorithm stops looking for splits
+in the branch.<br />
+Default Value: 0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the random seed the algorithm uses for repeatable results.
+If you omit this argument or specify its default value 1, the function
+uses a faster algorithm but does not ensure repeatability. This argument
+must be greater than or equal to 1. To ensure repeatability,
+specify a value greater than 1.<br />
+Default Value: 1<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.name.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Required if the input data set is in sparse format.
+Specifies the column containing the attributes in the
+input data set.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>num.boosted.trees</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of boosted trees to be trained. By default, the
+number of boosted trees equals the number of vworkers available for
+the functions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.table</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Required argument for sparse data format.<br />
+Specifies the name of the tbl_teradata containing the features in the input
+data. <br />
+If the input data set is in sparse format, the function requires both &quot;data&quot;
+and &quot;attribute.table&quot; arguments.
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.value.column</code></td>
+<td>
+
+<p>Required if the input data set is in sparse format.<br />
+If the data is in the sparse format, this argument indicates the
+column containing the attribute values in the input tbl_teradata.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>column.subsampling</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the fraction of features to subsample during boosting.<br />
+Default Value: 1.0 (no subsampling)<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.column</code></td>
+<td>
+
+<p>Required Argument when &quot;formula&quot; is not specified.<br />
+Specifies the name of the input tbl_teradata column that contains the response variable
+for each data point in the training data set.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;data&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.table.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;attribute.table&quot;. The argument is used to
+ensure deterministic results for functions which produce results that
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_xgboost_mle&quot; which is a named
+list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator
+using following names:</p>
+<ol>
+<li><p> model.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("xgboost_example", "housing_train_binary", "iris_train", "sparse_iris_train",
+                    "sparse_iris_attribute")
+
+    # Example 1: Binary Classification
+    # Create object(s) of class "tbl_teradata".
+    housing_train_binary &lt;- tbl(con, "housing_train_binary")
+    td_xgboost_out1 &lt;- td_xgboost_mle(data=housing_train_binary,
+              id.column='sn',
+              formula = (homestyle ~ driveway + recroom + fullbase + gashw + airco + prefarea +
+                                     price + lotsize + bedrooms + bathrms + stories + garagepl),
+              num.boosted.trees=2,
+              loss.function='binomial',
+              prediction.type='classification',
+              reg.lambda=1,
+              shrinkage.factor=0.1,
+              iter.num=10,
+              min.node.size=1,
+              max.depth=10
+              )
+
+
+    # Example 2: Multiple-Class Classification
+    iris_train &lt;- tbl(con,"iris_train")
+    td_xgboost_out2 &lt;- td_xgboost_mle(data=iris_train,
+                                  id.column='id',
+                                  formula = (species ~ sepal_length + sepal_length +
+                                                       petal_length + petal_width + species),
+                                  num.boosted.trees=2,
+                                  loss.function='softmax',
+                                  reg.lambda=1,
+                                  shrinkage.factor=0.1,
+                                  iter.num=10,
+                                  min.node.size=1,
+                                  max.depth=10)
+
+     # Example 3: Sparse Input Format. "response.column" argument is specified instead of formula.
+     sparse_iris_train &lt;- tbl(con,"sparse_iris_train")
+     sparse_iris_attribute &lt;- tbl(con,"sparse_iris_attribute")
+
+     td_xgboost_out3 &lt;- td_xgboost_mle(data=sparse_iris_train,
+                attribute.table=sparse_iris_attribute,
+                id.column='id',
+                attribute.name.column='attribute',
+                attribute.value.column='value_col',
+                response.column="species",
+                loss.function='SOFTMAX',
+                reg.lambda=1,
+                num.boosted.trees=2,
+                shrinkage.factor=0.1,
+                column.subsampling=1.0,
+                iter.num=10,
+                min.node.size=1,
+                max.depth=10,
+                variance=0,
+                seed=1
+                )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

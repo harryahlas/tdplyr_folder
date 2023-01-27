@@ -1,0 +1,47 @@
+{
+    "function_tdplyr_name": "td_pmml_predict_sqle",
+    "function_r_name": "pmml.predict",
+    "function_alias_name": "PMMLPredict",
+    "input_tables": [
+        {
+            "rName": "newdata",
+            "name": ["InputTable"],
+            "useInR": true,
+            "rOrderNum": 2
+        },
+        {
+            "rName": "modeldata",
+            "name": ["ModelTable"],
+            "useInR": true,
+            "rOrderNum": 1
+        }
+    ],
+    "function_name": "PMMLPredict",
+    "function_tdml_name": " PMMLPredict",
+    "argument_clauses": [
+        {
+            "allowsLists": true,
+            "datatype": "COLUMNS",
+            "rName": "accumulate",
+            "name": ["Accumulate"],
+            "useInR": true,
+            "rOrderNum": 3
+        },
+        {
+            "allowsLists": true,
+            "datatype": "STRING",
+            "rName": "model.output.fields",
+            "name": ["ModelOutputFields"],
+            "useInR": true,
+            "rOrderNum": 4
+        },
+        {
+            "allowsLists": true,
+            "datatype": "STRING",
+            "rName": "overwrite.cached.models",
+            "name": ["OverwriteCachedModel"],
+            "useInR": true,
+            "rOrderNum": 5
+        }
+    ]
+}

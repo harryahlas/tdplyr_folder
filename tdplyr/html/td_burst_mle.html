@@ -1,0 +1,393 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Burst</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_burst_mle {tdplyr}"><tr><td>td_burst_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Burst
+</h2>
+
+<h3>Description</h3>
+
+<p>The Burst function bursts (splits) a time interval into a series of 
+shorter &quot;burst&quot; intervals and allocates values from the time intervals 
+into the new, shorter subintervals. The Burst function is useful for 
+allocating values from overlapping time intervals into user-defined time 
+intervals (for example, when a cable company has customer data from
+overlapping time intervals, which it wants to analyze by dividing into 
+uniform time intervals). The Burst function supports several allocation 
+methods.<br />
+The burst intervals can have either the same length (specified by the 
+&quot;time.interval&quot; argument), the same number of data points (specified 
+by the &quot;num.points&quot; argument), or specific start and end 
+times (specified by &quot;time.data&quot;).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_burst_mle (
+      data = NULL,
+      time.data = NULL,
+      time.column = NULL,
+      value.columns = NULL,
+      time.interval = NULL,
+      time.datatype = NULL,
+      value.datatype = NULL,
+      start.time = NULL,
+      end.time = NULL,
+      num.points = NULL,
+      values.before.first = NULL,
+      values.after.last = NULL,
+      split.criteria = "nosplit",
+      seed = NULL,
+      accumulate = NULL,
+      data.sequence.column = NULL,
+      time.data.sequence.column = NULL,
+      data.partition.column = NULL,
+      time.data.partition.column = NULL,
+      data.order.column = NULL,
+      time.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the time series data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata containing the time data.<br />
+Note: Specify exactly one of the following arguments:<br />
+&quot;time.data&quot;, &quot;time.interval&quot;, or &quot;num.points&quot;.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.data.partition.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;time.data&quot; is specified.<br />
+Specifies Partition By columns for &quot;time.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;time.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the input tbl_teradata columns that contain the start 
+and end times of the time interval to be burst. This argument is specified
+as a vector of the form c(&quot;&lt;start_time_column&gt;&quot;, &quot;&lt;end_time_column&gt;&quot;).<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>value.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of input tbl_teradata columns to copy to the output 
+tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.interval</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the length of each burst time interval.<br />
+Note: Specify exactly one of the following arguments:<br />
+&quot;time.data&quot;, &quot;time.interval&quot; or &quot;num.points&quot;.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.datatype</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the data type of the output columns that correspond to the 
+input tbl_teradata columns specified by the argument &quot;time.column&quot;
+(start_time_column and end_time_column). If you omit this argument, 
+then the function infers the data type of start_time_column and 
+end_time_column from the input tbl_teradata and uses the inferred 
+data type for the corresponding output tbl_teradata columns. If you 
+specify this argument, then the function can transform the input data 
+to the specified output data type only if both the input column data 
+type and the specified output column data type are in this list: 
+INTEGER, BIGINT, SMALLINT, DOUBLE PRECISION, DECIMAL(n,n), DECIMAL, NUMERIC,
+NUMERIC(n,m).<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>value.datatype</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the data types of the output columns that correspond to the 
+input tbl_teradata columns specified by the argument &quot;value.columns&quot;. If you omit 
+this argument, then the function infers the data type of each 
+value column from the input tbl_teradata and uses the inferred data 
+type for the corresponding output tbl_teradata column. If you specify 
+&quot;value.datatype&quot;, then it must be the same size as &quot;value.columns&quot;. That 
+is, if &quot;value.columns&quot; specifies n columns, then &quot;value.datatype&quot; must 
+specify n data types. For i in [1, n], value_column_i has 
+value_type_i. However, value_type_i can be empty. For example: 
+value.columns (c1, c2, c3), value.datatype (integer, ,VARCHAR). If you 
+specify this argument, then the function can transform the input data 
+to the specified output data type only if both the input column data 
+type and the specified output column data type are in this list: 
+INTEGER, BIGINT, SMALLINT, DOUBLE PRECISION, DECIMAL(n,n), DECIMAL, NUMERIC, 
+NUMERIC(n,n)<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>start.time</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the start time for the time interval to be burst. The default 
+value is the start time of the start column in &quot;time.column&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>end.time</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the end time for the time interval to be burst. The default 
+value is the end time of the end column in &quot;time.column&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>num.points</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of data points in each burst time interval.<br />
+Note: Specify exactly one of the following arguments:<br />
+&quot;time.data&quot;, &quot;time.interval&quot;, or &quot;num.points&quot;.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>values.before.first</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the values to use if start_time is before 
+start_time_column. Each of these values must have the same data type 
+as its corresponding value column. Values of data type VARCHAR are 
+case-insensitive. If you specify &quot;values.before.first&quot;, then it must be 
+the same size as that of &quot;value.columns&quot;. That is, if &quot;value.columns&quot; specifies n 
+columns, then &quot;values.before.first&quot; must specify n values. For i in [1, 
+n], value_column_i has the value before_first_value_i. However, 
+before_first_value_i can be empty. For example: value.columns (c1, 
+c2, c3), values.before.first (1, ,&quot;abc&quot;). If before_first_value_i is 
+empty, then value_column_i has the value &quot;NULL&quot;.<br />
+Note: NULL should be put in double quotes.<br />
+If you do not specify &quot;values.before.first&quot;, then value_column_i has 
+the value NULL for i in [1, n].<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>values.after.last</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the values to use if end_time is after end_time_column. 
+Each of these values must have the same data type as its 
+corresponding value column. Values of data type VARCHAR are 
+case-insensitive. If you specify &quot;values.after.last&quot;, then it must be the 
+same size as that of &quot;value.columns&quot;. That is, if &quot;value.columns&quot; specifies n 
+columns, then &quot;values.after.last&quot; must specify n values. For i in [1, n], 
+value_column_i has the value after_last_value_i. However, 
+after_last_value_i can be empty. For example: value.columns (c1, c2, 
+c3), values.after.last (1, ,&quot;abc&quot;). If after_last_value_i is empty, 
+then value_column_i has the value &quot;NULL&quot;.<br />
+Note: NULL should be put in double quotes.<br />
+If you do not specify &quot;values.after.last&quot;, then value_column_i has
+the value NULL for i in [1, n].<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>split.criteria</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the split criteria of the value columns.<br />
+Default Value: &quot;nosplit&quot;<br />
+Permitted Values: nosplit, proportional, random, gaussian, poisson<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the seed for the random number generator.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of input tbl_teradata columns (other than those 
+specified by &quot;time.column&quot; and &quot;value.columns&quot;) to copy to the output 
+tbl_teradata. By default, the function copies to the output tbl_teradata 
+only the columns specified by &quot;time.column&quot; and &quot;value.columns&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;time.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_burst_mle&quot; which is a named 
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("burst_example", "burst_data", "finance_data", "time_table2")
+
+    # Create object(s) of class "tbl_teradata".
+    burst_data &lt;- tbl(con, "burst_data")
+    finance_data &lt;- tbl(con, "finance_data")
+    time_table2 &lt;- tbl(con, "time_table2")
+
+    # Example 1: Use "time.interval" argument to burst the data for
+    # a duration of 1 day (86400 seconds).
+    td_burst_out1 &lt;- td_burst_mle(data = burst_data,
+                                  data.partition.column = c("id"),
+                                  data.order.column = "id",
+                                  time.column = c("start_time_column", "end_time_column"),
+                                  value.columns = c("num_custs"),
+                                  time.interval = 86400,
+                                  start.time = "08/01/2010",
+                                  end.time = "08/10/2010",
+                                  split.criteria = "nosplit",
+                                  accumulate = c("id")
+                                  )
+
+    # Example 2: "split.criteria" = proportional.
+    td_burst_out2 &lt;- td_burst_mle(data = burst_data,
+                                  data.partition.column = c("id"),
+                                  data.order.column = "id",
+                                  time.column = c("start_time_column", "end_time_column"),
+                                  value.columns = c("num_custs"),
+                                  time.interval = 86400,
+                                  start.time = "08/01/2010",
+                                  end.time = "08/10/2010",
+                                  split.criteria = "proportional",
+                                  accumulate = c("id")
+                                  )
+
+    # Example 3: "split.criteria" = gaussian.
+    td_burst_out3 &lt;- td_burst_mle(data = burst_data,
+                                  data.partition.column = c("id"),
+                                  data.order.column = "id",
+                                  time.column = c("start_time_column", "end_time_column"),
+                                  value.columns = c("num_custs"),
+                                  time.interval = 86400,
+                                  start.time = "08/01/2010",
+                                  end.time = "08/10/2010",
+                                  split.criteria = "gaussian",
+                                  accumulate = c("id")
+                                  )
+
+    # Example 4: uses a "time.data" argument, "values.before.first" and "values.after.last".
+    # The "time.data" option allows the use of different time intervals and partitions the 
+    # data accordingly.
+    td_burst_out4 &lt;- td_burst_mle(data = finance_data,
+                                  data.partition.column = c("id"),
+                                  data.order.column = "id",
+                                  time.data = time_table2,
+                                  time.data.partition.column = c("id"),
+                                  time.data.order.column = "burst_start",
+                                  time.column = c("start_time_column", "end_time_column"),
+                                  value.columns = c("expenditure", "income", "investment"),
+                                  start.time = "06/30/1967",
+                                  end.time = "07/10/1967",
+                                  values.before.first = c("NULL","NULL","NULL"),
+                                  values.after.last = c("NULL","NULL","NULL"),
+                                  accumulate = c("id")
+                                  )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

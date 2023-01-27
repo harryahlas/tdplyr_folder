@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: RealTimeChangePointDetection</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_changepoint_detection_rt_mle {tdplyr}"><tr><td>td_changepoint_detection_rt_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+RealTimeChangePointDetection
+</h2>
+
+<h3>Description</h3>
+
+<p>The RtChangePointDetection function detects change points in a
+stochastic process or time series, using real-time change-point
+detection, implemented with these algorithms:<br />
+</p>
+<ol>
+<li><p> Search algorithm: sliding window
+</p>
+</li>
+<li><p> Segmentation algorithm: normal distribution</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_changepoint_detection_rt_mle (
+      data = NULL,
+      data.partition.column = NULL,
+      data.order.column = NULL,
+      value.column = NULL,
+      accumulate = NULL,
+      segmentation.method = "normal_distribution",
+      window.size = 10,
+      threshold = 10,
+      output.option = "CHANGEPOINT",
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies tbl_teradata object defining the input time series data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>value.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+time series data.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input tbl_teradata columns to copy to the
+output tbl_teradata.<br />
+Note: To identify change points in the output tbl_teradata, specify the columns
+that appear in &quot;data.partition.column&quot; and &quot;data.order.column&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>segmentation.method</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the segmentation method, normal distribution (in each 
+segment, the data is in a normal distribution).<br />
+Default Value: &quot;normal_distribution&quot;<br />
+Permitted Values: normal_distribution<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>window.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the size of the sliding window. The ideal window size 
+depends heavily on the data. You might need to experiment with this 
+value. <br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>threshold</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a numeric value that the function
+compares to ln(L1)-ln(L0). The definition of Log(L1) and Log(L0) are
+in <code>td_changepoint_detection_mle</code>. They are the logarithms of
+L1 and L2.<br />
+Default Value: 10<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.option</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the output tbl_teradata columns.<br />
+Default Value: &quot;CHANGEPOINT&quot;<br />
+Permitted Values: changepoint, segment, verbose<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_changepoint_detection_rt_mle&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("changepointdetectionrt_example", "cpt")
+
+    # Create object(s) of class "tbl_teradata".
+    cpt &lt;- tbl(con, "cpt")
+
+    # Example 1: ChangePointThreshold 10, Window Size 3, Default Output.
+    td_changepoint_detection_rt_out1 &lt;- td_changepoint_detection_rt_mle(data = cpt ,
+                                                                 data.partition.column = c("sid"),
+                                                                 data.order.column = c("id"),
+                                                                 value.column = "val",
+                                                                 accumulate = c("sid","id"),
+                                                                 window.size = 3,
+                                                                 threshold = 10
+                                                                 )
+
+    # Example 2: ChangePointThreshold 20, Window Size 3, VERBOSE Output.
+    td_changepoint_detection_rt_out2 &lt;- td_changepoint_detection_rt_mle(data = cpt,
+                                                                 data.partition.column = c("sid"),
+                                                                 data.order.column = c("id"),
+                                                                 value.column = "val",
+                                                                 accumulate = c("sid","id"),
+                                                                 window.size = 3,
+                                                                 threshold = 20,
+                                                                 output.option = "verbose"
+                                                                 )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

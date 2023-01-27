@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: td_retrieve_model</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_retrieve_model {tdplyr}"><tr><td>td_retrieve_model {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>td_retrieve_model</h2>
+
+<h3>Description</h3>
+
+<p>Function to retrieve a saved model accessible to the current user.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_retrieve_model(name)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the saved model to be retrieved.<br />
+Types: character</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Object of class &quot;td_analytics&quot; corresponding to the model retrieved.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load example data.
+loadExampleData("glm_example", "admissions_train")
+
+# Create object of class "tbl_teradata" to use as input.
+admissions_train &lt;- tbl(con, "admissions_train")
+
+# Create the GLM model.
+td_glm_out1 &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                          family = "LOGISTIC",
+                          linkfunction = "LOGIT",
+                          data = admissions_train,
+                          weights = "1",
+                          threshold = 0.01,
+                          maxit = 25,
+                          step = FALSE,
+                          intercept = TRUE
+)
+
+# Save this generated model.
+td_save_model(model = td_glm_out1, name = "glm_model", description = "GLM test")
+
+# Retrieve the saved model.
+retrieved_glm_model &lt;- td_retrieve_model("glm_model")
+
+# Use the retrieved model for scoring.
+loadExampleData("glmpredict_example", "admissions_test")
+admissions_test &lt;- tbl(con, "admissions_test")
+
+td_glm_predict_out1 &lt;- td_glm_predict_sqle(modeldata = retrieved_glm_model,
+                                           newdata = admissions_test,
+                                           terms = c("id","masters","gpa","stats",
+                                                     "programming","admitted"),
+                                           family = "LOGISTIC",
+                                           linkfunction = "LOGIT"
+                                           )
+
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

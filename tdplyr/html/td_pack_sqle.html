@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Pack</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_pack_sqle {tdplyr}"><tr><td>td_pack_sqle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Pack
+</h2>
+
+<h3>Description</h3>
+
+<p>The Pack function packs data from multiple input columns into a
+single column. The packed column has a virtual column for each input 
+column. By default, virtual columns are separated by commas and each 
+virtual column value is labeled with its column name.<br />
+Note: This function is only available when tdplyr is connected to Vantage 1.1
+or later versions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_pack_sqle (
+    data = NULL,
+    input.columns = NULL,
+    output.column = NULL,
+    delimiter = ",",
+    include.column.name = TRUE,
+    data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the input attributes.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input columns to pack into a single output 
+column. These names become the column names of the virtual columns. 
+By default, all input tbl_teradata columns are packed into a single 
+output column. If you specify this argument, but do not specify all
+input tbl_teradata columns, the function copies the unspecified input 
+tbl_teradata columns to the output tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name to give to the packed output column.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the delimiter (a string) that separates the virtual columns 
+in the packed data.<br />
+Default Value: &quot;,&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code> include.column.name</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to label each virtual column value with its column 
+name (making the virtual column &quot;input_column:value&quot;).<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_pack_sqle&quot; which is a named 
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("pack_example", "ville_temperature")
+    
+    # Create object(s) of class "tbl_teradata".
+    # The input table, ville_temperature, contains temperature readings for the cities
+    # Nashville and Knoxville, in the state of Tennessee.
+    ville_temperature &lt;- tbl(con, "ville_temperature")
+    
+    # Example 1 - Default Argument Values.
+    # Default values used for arguments "delimiter" and "input.columns".
+    td_pack_out1 &lt;- td_pack_sqle(data = ville_temperature,
+                      input.columns = c("city", "state", "period", "temp_f"),
+                      output.column = "packed_data",
+                      delimiter = ",",
+                      include.column.name = TRUE
+                      )
+    
+    # Example 2 - Nondefault Argument Values.
+    # This example uses nondefault values for arguments "delimiter" and "include.column.name".
+    td_pack_out2 &lt;- td_pack_sqle(data = ville_temperature,
+                      input.columns = c("city", "state", "period", "temp_f"),
+                      output.column = "packed_data",
+                      delimiter = "|",
+                      include.column.name = FALSE
+                      )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

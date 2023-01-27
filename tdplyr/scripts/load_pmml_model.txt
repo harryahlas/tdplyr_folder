@@ -1,0 +1,2 @@
+iris_db_xgb_model|iris_db_xgb_model.pmml
+iris_rf_class_model|iris_rf_class_model.pmml

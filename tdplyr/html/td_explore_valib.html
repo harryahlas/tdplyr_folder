@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Descriptive Statistics Function: Explore</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_explore_valib {tdplyr}"><tr><td>td_explore_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Descriptive Statistics Function: Explore</h2>
+
+<h3>Description</h3>
+
+<p>Function performs basic statistical analysis on a set of selected tbl_teradata 
+object(s), or on selected columns from tbl_teradata. It stores results from
+four fundamental types of analysis based on simplified versions of the
+Descriptive Statistics analysis:<br />
+</p>
+
+<ol>
+<li><p> Values
+</p>
+</li>
+<li><p> Statistics
+</p>
+</li>
+<li><p> Frequency
+</p>
+</li>
+<li><p> Histogram
+</p>
+</li></ol>
+
+<p>Output tbl_teradata are produced for each type of analysis.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_explore_valib(data, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to perform basic statistical analysis.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described 
+in the '<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_explore_valib&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using names as follows:<br /> 
+</p>
+
+<ol>
+<li><p> frequency.output
+</p>
+</li>
+<li><p> histogram.output
+</p>
+</li>
+<li><p> statistics.output
+</p>
+</li>
+<li><p> values.output
+</p>
+</li></ol>
+
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) to analyze.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>bins</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the number of equal width bins to create for 
+Histogram analysis.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+
+
+
+<h4>bin.style</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the bin style for Histogram analysis.<br />
+Permitted Values: 'bins', 'quantiles'<br />
+Default Value: 'bins'<br />
+Types: character
+</p>
+
+
+
+<h4>max.comb.values</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the maximum number of combined values 
+for frequency or histogram analysis.<br />
+Default Value: 10000<br />
+Types: integer
+</p>
+
+
+
+<h4>max.unique.char.values</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the maximum number of unique 
+character values for unrestricted frequency 
+analysis.<br />
+Default Value: 100<br />
+Types: integer
+</p>
+
+
+
+<h4>max.unique.num.values</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the maximum number of unique date 
+or numeric values for frequency analysis.<br />
+Default Value: 20<br />
+Types: integer
+</p>
+
+
+
+<h4>min.comb.rows</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the minimum number of rows before frequency
+or histogram combining attempted.<br />
+Default Value: 25000<br />
+Types: integer
+</p>
+
+
+
+<h4>restrict.freq</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the restricted frequency processing 
+including prominent values.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+
+
+
+<h4>restrict.threshold</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the minimum percentage of rows a value 
+must occur in, for inclusion in results.<br />
+Default Value: 1<br />
+Types: integer
+</p>
+
+
+
+<h4>statistical.method</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the method for calculating the 
+statistics.<br />
+Permitted Values: 'population', 'sample'<br />
+Default Value: 'population'<br />
+Types: character
+</p>
+
+
+
+<h4>stats.options</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the basic statistics to be calculated for 
+the Statistics analysis.<br />
+Permitted Values:<br />
+</p>
+
+<ul>
+<li><p> all
+</p>
+</li>
+<li><p> count (cnt)
+</p>
+</li>
+<li><p> minimum (min)
+</p>
+</li>
+<li><p> maximum (max)
+</p>
+</li>
+<li><p> mean
+</p>
+</li>
+<li><p> standarddeviation (std)
+</p>
+</li>
+<li><p> skewness (skew)
+</p>
+</li>
+<li><p> kurtosis (kurt)
+</p>
+</li>
+<li><p> standarderror (ste)
+</p>
+</li>
+<li><p> coefficientofvariance (cv)
+</p>
+</li>
+<li><p> variance (var)
+</p>
+</li>
+<li><p> sum
+</p>
+</li>
+<li><p> uncorrectedsumofsquares (uss)
+</p>
+</li>
+<li><p> correctedsumofsquares (css)
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>distinct</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the unique values count for each selected 
+column when this argument is set to TRUE.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>filter</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the clause to filter rows selected for data 
+exploration.<br />
+For example,<br />
+filter = &quot;cust_id &gt; 0&quot;
+Types: character
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 
+#      'val.install.location' to the database name where Vantage analytic 
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+cust &lt;- tbl(con, "customer_analysis")
+print(cust)
+
+# Example 1: Shows data exploration with default values.
+obj &lt;- td_explore_valib(data=cust)
+
+# Print the frequency results.
+print(obj$frequency.output)
+
+# Print the histogram results.
+print(obj$histogram.output) 
+
+# Print the statistics results. 
+print(obj$statistics.output) 
+
+# Print the values results. 
+print(obj$values.output)
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

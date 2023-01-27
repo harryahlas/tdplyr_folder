@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: *_(Deprecated)_* Setup test environment</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_setup_test_env {tdplyr}"><tr><td>td_setup_test_env {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2><b><em>(Deprecated)</em></b> Setup test environment</h2>
+
+<h3>Description</h3>
+
+<p>The function enables the user to load the sandbox image that is downloaded
+from Teradata site. This sets up the environment for the user to run the
+script within docker container using data from csv file, which enables the
+user to fix script issues outside Teradata Vantage.<br />
+Note:
+</p>
+
+<ol>
+<li><p> This function is deprecated from tdplyr 17.00.00.01. Teradata
+recommends using <code>td_setup_sandbox_env()</code> function.
+</p>
+</li>
+<li><p> Refer to Teradata Package for R User Guide to get the location of the
+downloadable docker image.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_setup_test_env(docker.image.location = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>docker.image.location</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the location of the downloaded image
+on user's system.<br />
+Types: character</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Nothing. Loads the docker image if successful.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Script</code>, <code>td_test_script</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Replace "&lt;path_to_docker_image&gt;" with the local path to the downloaded
+# docker image file.
+docker_image_location &lt;- "&lt;path_to_docker_image&gt;"
+
+# Setup the environment by providing the docker image location.
+td_setup_test_env(docker.image.location = docker_image_location)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

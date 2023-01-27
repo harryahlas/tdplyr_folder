@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Sample</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_sampling_mle {tdplyr}"><tr><td>td_sampling_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Sample
+</h2>
+
+<h3>Description</h3>
+
+<p>The Sample function draws rows randomly from the input tbl_teradata.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_sampling_mle (
+      data = NULL,
+      data.partition.column = "ANY",
+      data.order.column = NULL,
+      summary.data = NULL,
+      summary.data.order.column = NULL,
+      stratum.column = NULL,
+      strata = NULL,
+      sample.fraction = NULL,
+      approx.sample.size = NULL,
+      seed = 0,
+      data.sequence.column = NULL,
+      summary.data.sequence.column = NULL
+   )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the data to be sampled.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Optional Argument<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Default Value: ANY<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>summary.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the summary tbl_teradata containing the stratum count information.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>summary.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;summary.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>stratum.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains the sample conditions. 
+If the function has only one input tbl_teradata, then sampling
+condition column is in the &quot;data&quot;. If the function has two input 
+tbl_teradata, &quot;data&quot; and &quot;summary.data&quot;, then the sampling
+condition column is in the &quot;summary.data&quot;.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>strata</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the sample conditions that appear in the condition column 
+specified by &quot;stratum.column&quot;. If &quot;strata&quot; specifies a condition that 
+does not appear in condition column, then the function issues an 
+error message.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>sample.fraction</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies one or more fractions to use in sampling the data. (Syntax 
+options that do not use &quot;sample.fraction&quot; require &quot;approx.sample.size&quot;.)
+If you specify only one fraction, then the function uses the specified
+fraction for all strata defined by the sample conditions. If you specify
+more than one fractions, then the function uses each fraction for sampling a
+particular stratum defined by the condition arguments.<br />
+Note: For conditional sampling with variable sample sizes, specify one fraction
+for each condition that you specify with the strata argument.<br />
+Types: numeric OR vector of numerics
+</p>
+</td></tr>
+<tr valign="top"><td><code>approx.sample.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies one or more approximate sample sizes to use in sampling the 
+data. (Syntax options that do not use &quot;approx.sample.size&quot; require 
+&quot;sample.fraction&quot;.) Each sample size is approximate because the 
+function maps the size to the sample fractions and then generates the 
+sample data. If you specify only one size, then it represents the 
+total sample size for the entire population. If you also specify the 
+strata argument, then the function proportionally generates sample 
+units for each stratum. If you specify more than one size, then each 
+size corresponds to a stratum, and the function uses each size to 
+generate sample units for the corresponding stratum.<br />
+Note: For conditional sampling with argument &quot;approx.sample.size&quot;, specify
+one size for each condition that you specify with the &quot;strata&quot; argument.<br />
+Types: integer OR vector of integers
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the random seed used to initialize the algorithm.<br />
+Default Value: 0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>summary.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;summary.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_sampling_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("sampling_example", "students", "score_category")
+
+    # Create object(s) of class "tbl_teradata".
+    students &lt;- tbl(con, "students")
+    score_category &lt;- tbl(con, "score_category")
+
+    # Example 1: This example selects a sample of approximately 20%
+    # of the rows in the students tbl_teradata.
+    td_sampling_out1 &lt;- td_sampling_mle(data = students,
+                                        sample.fraction = 0.2,
+                                        seed = 2
+                                        )
+
+    # Example 2: This example applies sampling rates 20%, 30%, and 40%
+    # to categories fair, very good, and excellent, respectively, and rounds
+    # the number sampled to the nearest integer.
+    td_sampling_out2 &lt;- td_sampling_mle(data = score_category,
+                                        data.partition.column = "stratum",
+                                        stratum.column = "stratum",
+                                        strata = c("fair", "very good", "excellent"),
+                                        sample.fraction = c(0.2, 0.3, 0.4),
+                                        seed = 2
+                                        )
+
+    # Example 3: This examples demonstrates conditional sampling with Approximate
+    # Sample Size.
+    # score_summary groups the score_category tbl_teradata based on the stratum
+    # column and also has their corresponding count.
+    score_summary &lt;- score_category %&gt;% select(stratum) %&gt;% count(stratum) %&gt;%
+                      mutate(stratum_count = as.integer(n)) %&gt;% select(-n)
+
+    td_sampling_out3 &lt;- td_sampling_mle(data=score_category,
+                                        summary.data=score_summary,
+                                        stratum.column='stratum',
+                                        strata=c('excellent','fair','very good'),
+                                        approx.sample.size=c(5,10,5),
+                                        seed=2
+                                        )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Group by Time for PTI and non-PTI tables</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for group_by_time {tdplyr}"><tr><td>group_by_time {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Group by Time for PTI and non-PTI tables</h2>
+
+<h3>Description</h3>
+
+<p>This function takes an existing tbl_teradata and converts into a grouped tbl_teradata
+object that allows a set of aggregate functions to be computed on data grouped in terms of time.
+Although the grouping is optimized for objects of class &quot;tbl_teradata&quot; created using PTI tables,
+it is also supported on objects of class &quot;tbl_teradata&quot; created using non-PTI tables when the
+argument &quot;timecode.column&quot; is specified.<br />
+Note: If consecutive groupings are performed, latest grouping operation is considered, i.e. if
+<code>groupby</code> is followed by <code>groupby_time</code>, <code>groupby_time</code> grouping is considered
+for aggregation. Similarly, if <code>groupby_time</code> is followed by <code>groupby</code>, <code>groupby</code>
+grouping is considered for aggregation. If consecutive <code>groupby_time</code> operations are
+performed, latest <code>groupby_time</code> is considered for aggregation.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+group_by_time(
+  df,
+  timebucket.duration,
+  value.expression = c(),
+  timecode.column = NULL,
+  sequence.column = NULL,
+  fill = NULL,
+  ...
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>df</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the tbl_teradata on which grouping based on time is to be done.</p>
+</td></tr>
+<tr valign="top"><td><code>timebucket.duration</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the duration of each timebucket for aggregation and is
+used to assign each potential timebucket a unique number. The
+timebucket number is shown as a column in the aggregated
+tbl_teradata.<br />
+A time duration can be specified using any of the units of time
+as shown below:
+</p>
+
+<table summary="Rd table">
+<tr>
+ <td style="text-align: left;">
+------------------------</td><td style="text-align: left;">-------------------------------</td><td style="text-align: left;">
+---------------------------------------------------------------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Time Unit </td><td style="text-align: left;"> Formal Form Example </td><td style="text-align: left;"> Shorthand Equivalents </td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+------------------------</td><td style="text-align: left;">-------------------------------</td><td style="text-align: left;">
+---------------------------------------------------------------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Calendar Years </td><td style="text-align: left;"> CAL_YEARS(N)</td><td style="text-align: left;"> Ncy, Ncyear, Ncyears</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Calendar Months </td><td style="text-align: left;"> CAL_MONTHS(N) </td><td style="text-align: left;"> Ncm, Ncmonth, Ncmonths</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Calendar Days </td><td style="text-align: left;"> CAL_DAYS(N) </td><td style="text-align: left;"> Ncd, Ncday, Ncdays</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Weeks </td><td style="text-align: left;"> WEEKS(N) </td><td style="text-align: left;"> Nw, Nweek, Nweeks</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Days </td><td style="text-align: left;"> DAYS(N) </td><td style="text-align: left;"> Nd, Nday, Ndays</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Hours </td><td style="text-align: left;"> HOURS(N) </td><td style="text-align: left;"> Nh, Nhr, Nhrs, Nhour, Nhours</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Minutes </td><td style="text-align: left;"> MINUTES(N) </td><td style="text-align: left;"> Nm, Nmins, Nminute, Nminutes</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Seconds </td><td style="text-align: left;"> SECONDS(N) </td><td style="text-align: left;"> Ns, Nsec, Nsecs, Nsecond,
+Nseconds</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Milliseconds </td><td style="text-align: left;"> MILLISECONDS(N) </td><td style="text-align: left;"> Nms, Nmsec, Nmsecs,
+Nmillisecond, Nmilliseconds</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+Microseconds </td><td style="text-align: left;"> MICROSECONDS(N) </td><td style="text-align: left;"> Nus, Nusec, Nusecs,
+Nmicrosecond, Nmicroseconds</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+------------------------</td><td style="text-align: left;">-------------------------------</td><td style="text-align: left;">
+---------------------------------------------------------------------
+</td>
+</tr>
+
+</table>
+
+<p>Where, N is a 16-bit positive integer with a maximum value of
+32767.<br />
+When timebucket.duration is Calendar Days, columns are grouped
+in 24-hour periods starting at 00:00:00.000000 and ending at
+23:59:59.999999 on the day identified by time zero.<br />
+The time units do not store values such as the year or the month.
+For example, CAL_YEARS(2017) does not set the year to 2017. It sets
+the timebucket.duration to intervals of 2017 years. Similarly,
+CAL_MONTHS(7) does not set the month to July. It sets the
+timebucket.duration to intervals of 7 months.<br />
+A DAYS time unit is a 24-hour span relative to any moment in time.
+For example, if time zero (while creating PTI tables in Teradata
+SQL Engine) is 2016-10-01 12:00:00, the day buckets are
+2016-10-01 12:00:00.000000 - 2016-10-02 11:59:59.999999.
+This spans multiple calendar days,
+but encompasses one 24-hour period representative of a day.<br />
+Note: This argument can take unbounded timebucket duration (&quot;*&quot;) that
+can only be used with <code>ts.delta_t</code> time series aggregate
+function.<br />
+Types: str<br />
+Examples:
+</p>
+
+<ol>
+<li><p> MINUTES(23) which is equal to 23 minutes
+</p>
+</li>
+<li><p> CAL_MONTHS(5) which is equal to 5 calendar months
+</p>
+</li></ol>
+</td></tr>
+<tr valign="top"><td><code>value.expression</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies a column or any expression involving columns. These
+expressions are used for grouping purposes not related to time.<br />
+Note:
+</p>
+
+<ol>
+<li><p> The value.expression must not be a column reference to a view
+column that is derived from a function and cannot contain any ordered
+analytical or aggregate functions.
+</p>
+</li>
+<li><p> The value.expression cannot be a literal.
+</p>
+</li></ol>
+
+<p>Default Value : c()<br />
+Types: character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>timecode.column</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies a column that serves as the timecode for a tbl_teradata
+created of a non-PTI table. <br />
+For tbl_teradata created using PTI table, this argument takes
+TD_TIMECODE implicitly, but it can also be specified explicitly by the
+user with this argument.<br />
+For tbl_teradata created using non-PTI table, one must pass column
+name to this argument, otherwise an error is raised.<br />
+Default Value : NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>sequence.column</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies column expression that is the sequence number.<br />
+For tbl_teradata created using PTI table, it can be TD_SEQNO or any
+other column that acts as a sequence number.<br />
+For tbl_teradata created using non-PTI table, sequence.column is a
+column that plays the role of TD_SEQNO, because non-PTI tables do not
+have TD_SEQNO.<br />
+Note: This argument can only be given when &quot;timecode.column&quot; is not
+NULL.<br />
+Default Value : NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>fill</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the value to be used for missing timebucket values.<br />
+Below is the description of accepted values:
+</p>
+
+<ol>
+<li><p> NULLS: The missing timebuckets are returned to the user with a NULL value
+for all aggregate results.
+</p>
+</li>
+<li><p> numeric_constant: Any Teradata SQL Engine supported Numeric literal. The
+missing timebuckets are returned to the user with the specified constant value
+for all aggregate results. If the data type specified in this argument is
+incompatible with the input data type for an aggregate function, an error is reported.
+</p>
+</li>
+<li><p> PREVIOUS/PREV: The missing timebuckets are returned to the user with the aggregate
+results populated by the value of the closest previous timebucket with a non-missing value.
+If the immediate predecessor of a missing timebucket is also missing, both buckets, and
+any other immediate predecessors with missing values, are loaded with the first preceding
+non-missing value. If a missing timebucket has no predecessor with a result (for example,
+if the timebucket is the first in the series or all the preceding timebuckets in the entire
+series are missing), the missing timebuckets are returned to the user with a NULL value for
+all aggregate results. The abbreviation PREV may be used instead of PREVIOUS.
+</p>
+</li>
+<li><p> NEXT: The missing timebuckets are returned to the user with the aggregate results
+populated by the value of the closest succeeding timebucket with a non-missing value. If
+the immediate successor of a missing timebucket is also missing, both buckets, and any
+other immediate successors with missing values, are loaded with the first succeeding
+non-missing value. If a missing timebucket has no successor with a result (for example,
+if the timebucket is the last in the series or all the succeeding timebuckets in the
+entire series are missing), the missing timebuckets are returned to the user with a NULL
+value for all aggregate results.
+</p>
+</li></ol>
+
+<p>Default Value : NULL<br />
+Permitted Values : NULLS, PREVIOUS, PREV, NEXT and any numeric constant<br />
+Types: character or a numeric value</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Optional arguments for future purpose, if needed.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A 'tbl_teradata' object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load the required tables.
+loadExampleData("time_series_example", "ocean_buoys_seq", "ocean_buoys_nonseq",
+                "ocean_buoys_nonpti", "package_tracking_pti")
+
+# Create objects of class "tbl_teradata".
+df_seq &lt;- tbl(con, "ocean_buoys_seq") # tbl of sequenced PTI table.
+df_nonseq &lt;- tbl(con, "ocean_buoys_nonseq") # tbl of non-sequenced PTI table.
+df_nonpti &lt;- tbl(con, "ocean_buoys_nonpti") # tbl of non-PTI table.
+
+# Example 1: Grouping the sequenced PTI tables based on time with timebucket duration of
+#            30 minutes and the column 'buoyid' and ignoring the aggregation when there is
+#            no values in the group.
+
+# Grouping by timebucket duration of 30 minutes and 'buoyid'.
+# Note the use of shorthand notation for timebucket duration.
+seq_group1 &lt;- df_seq %&gt;% group_by_time(timebucket.duration = "30m",
+                                       value.expression = "buoyid")
+
+# Applying min() aggregation on grouped tbl object.
+seq_group1 %&gt;% summarise(min_temp = min(temperature))
+
+# Example 2: Grouping the non-PTI tables based on time with timebucket duration of 1 minute
+#            and fills the missing timebuckets with previous values.
+
+# Grouping by timebucket duration of 1 minute.
+# Note the use of formal notation for timebucket duration.
+# Note the use of timecode.column argument (mandatory for non-PTI table).
+seq_group2 &lt;- df_nonpti %&gt;% group_by_time(timebucket.duration = "MINUTES(1)",
+                                          timecode.column = "TIMECODE",
+                                          fill = "PREV")
+
+# Applying min() aggregation on grouped tbl object.
+temp_grouped &lt;- seq_group2 %&gt;% summarise(min_temp = min(temperature))
+
+# Displaying the rows in the increasing order to TIMECODE_RANGE or 'GROUP BY TIME(MINUTES(1))'
+# column.
+temp_grouped %&gt;% arrange(`GROUP BY TIME(MINUTES(1))`)
+
+# Example 3: Grouping the non-sequenced PTI tables based on time with timebucket duration of
+#            2 Calendar years. Note the use of timecode.column and sequence.column arguments.
+
+# The next three grouping give a quick demo of the use of fill argument keeping all other
+# arguments same.
+# With fill = "PREVIOUS"
+grp1 &lt;- df_nonseq %&gt;% group_by_time(timebucket.duration = "CAL_YEARS(1)",
+                                    timecode.column = "TD_TIMECODE",
+                                    sequence.column = "buoyid",
+                                    fill = "PREVIOUS")
+min_t &lt;- grp1 %&gt;% summarise(min_temp = min(temperature))
+min_t %&gt;% arrange(`GROUP BY TIME(CAL_YEARS(1))`)
+
+# With fill = "NEXT"
+grp1 &lt;- df_nonseq %&gt;% group_by_time(timebucket.duration = "CAL_YEARS(1)",
+                                    timecode.column = "TD_TIMECODE",
+                                    sequence.column = "buoyid",
+                                    fill = "NEXT")
+min_t &lt;- grp1 %&gt;% summarise(min_temp = min(temperature))
+min_t %&gt;% arrange(`GROUP BY TIME(CAL_YEARS(1))`)
+
+# With fill = 10000 (some numeric constant)
+grp1 &lt;- df_nonseq %&gt;% group_by_time(timebucket.duration = "CAL_YEARS(1)",
+                                    timecode.column = "TD_TIMECODE",
+                                    sequence.column = "buoyid",
+                                    fill = 10000)
+min_t &lt;- grp1 %&gt;% summarise(min_temp = min(temperature))
+min_t %&gt;% arrange(`GROUP BY TIME(CAL_YEARS(1))`)
+
+# Example 4: Finding Time Elapsed between Shipping and Receiving an Item. Input data used for
+#            this example contains information about parcels sent by a delivery service. This
+#            example also demonstrates the use of unbounded timebucket duration ('*') for
+#            'ts.delta_t' time series aggregate function.
+df_pack_pti &lt;- tbl(con, "package_tracking_pti")
+df_grp &lt;- df_pack_pti %&gt;% group_by_time(timebucket.duration = "*",
+                                        value.expression = "parcel_number")
+df_out &lt;- df_grp %&gt;% summarise(delta_t = ts.delta_t("Status LIKE 'picked%up%customer'",
+                                                    "Status LIKE 'delivered%customer'"))
+df_out %&gt;% arrange(TIMECODE_RANGE, parcel_number)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

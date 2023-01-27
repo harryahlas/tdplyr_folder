@@ -1,0 +1,523 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Factor Analysis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_pca_valib {tdplyr}"><tr><td>td_pca_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Factor Analysis</h2>
+
+<h3>Description</h3>
+
+<p>Factor Analysis is one of the most fundamental types of statistical analysis, and
+Principal Components Analysis (PCA), is arguably the most common variety of Factor
+Analysis. In PCA Analysis, a set of variables (denoted by columns) is reduced to a
+smaller number of factors that account for most of the variance in the variables.
+This can be useful in reducing the number of variables by converting them to factors,
+or in gaining insight into the nature of the variables when they are used for further
+data analysis.<br />
+<br />
+Some of the key features of PCA Analysis are outlined below.
+</p>
+
+<ol>
+<li><p> One or more group by columns can optionally be specified so that an input matrix
+is built for each combination of group by column values, and subsequently a
+separate PCA Analysis model is built for each matrix.
+</p>
+</li>
+<li><p> A Near Dependency Report is available to identify two or more columns that may be
+collinear. This report can be requested by setting the argument &quot;near.dep.report&quot;
+to TRUE and if desired, the arguments &quot;cond.ind.threshold&quot; and
+&quot;variance.prop.threshold&quot;.
+</p>
+</li>
+<li><p> Both orthogonal and oblique factor rotations are available. Refer to the
+&quot;rotation.type&quot; parameter.
+</p>
+</li>
+<li><p> There are three Prime Factor reports available. Refer to the &quot;load.report&quot;,
+&quot;vars.report&quot;, and &quot;vars.load.report&quot; arguments.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_pca_valib(data, columns, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data containing the columns to perform PCA analysis.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the column(s) representing the variables used in
+building a PCA analysis model. Occasionally, it can also accept permitted
+strings to specify all columns or all numeric columns.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;.
+</p>
+</li>
+<li><p> Pre-defined strings:
+</p>
+
+<ol>
+<li><p> 'all' - all columns
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_pca_valib&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>exclude.columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) to exclude from the 
+PCA analysis.<br />
+If 'all' or 'allnumeric' is used in the &quot;columns&quot; argument, 
+this argument can be used to exclude specific columns from the 
+analysis.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>cond.ind.threshold</h4>
+
+ 
+<p>Optional Argument.<br />
+Required when the argument &quot;near.dep.report&quot; is set to TRUE.<br />
+Specifies the condition index threshold parameter to generate 
+Near Dependency Report.<br />
+Default Value: 30<br />
+Types: numeric
+</p>
+
+
+
+<h4>min.eigen</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the minimum eigen value to include factors for.<br />
+Default Value: 1.0<br />
+Types: numeric
+</p>
+
+
+
+<h4>load.report</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether to generate Prime Factor Loadings Report in which
+rows are variables and columns are factors, matching each variable with 
+the factor that has the biggest absolute loading value with.<br />
+When set to TRUE, Prime Factor Loadings Report is generated and added 
+in the XML result string.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>vars.load.report</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether to generate Prime Factor Variables with Loadings 
+Report, equivalent to Prime Factor Variables Report with the 
+addition of loading values that determined the relationship 
+between factors and variables. The absolute sizes of the loading 
+values point out the relationship strength and the sign its 
+direction, i.e., either a positive or negative correlation.<br />
+When set to TRUE, Prime Factor Variables with Loadings Report is 
+generated and added in the XML result string.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>vars.report</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether to generate Prime Factor Variables Report in which 
+rows are variables and columns are factors, matching variables with 
+their prime factors, and if a threshold is used, possibly other than 
+prime factors. (Either a threshold percent is specified with the 
+&quot;percent.threshold&quot; argument or a threshold loading is specified with 
+the &quot;load.threshold&quot; argument.)<br />
+When set to TRUE, Prime Factor Variables Report is generated and added 
+in the XML result string.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>gamma</h4>
+
+ 
+<p>Optional Argument.<br />
+Required when the argument &quot;rotation.type&quot; is set to 'orthomax' or 
+'orthomin'.<br />
+Specifies the gamma value to be set when 'orthomax' or 'orthomin' is used in
+&quot;rotation.type&quot; argument.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This argument is ignored for values of &quot;rotation.type&quot; other than
+'orthomax' and 'orthomin'.
+</p>
+</li></ul>
+
+<p>Types: numeric
+</p>
+
+
+
+<h4>group.columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name(s) of the input column(s) dividing the input 
+&quot;data&quot; into partitions, one for each combination of values in the 
+group by columns. For each partition or combination of values, a 
+separate factor model is built. The default case is no group by 
+columns. 
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>matrix.input</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies whether the input tbl_teradata is an extended 
+sum-of-squares-and-cross-products (ESSCP) matrix built by the 
+<code>td_matrix_valib()</code>. Use of this feature saves internally 
+building a matrix each time this function is performed, providing 
+a significant performance improvement.<br />
+When set to TRUE, the columns specified with the &quot;columns&quot; argument 
+may be a subset of the columns in the matrix and may be specified 
+in any order. The columns must, however, all be present in the 
+matrix. Further, if group by columns are specified in the 
+<code>td_matrix_valib()</code> call, these same group by columns must 
+be specified in this function.<br />
+Note:
+</p>
+
+<ul>
+<li><p> If the input tbl_teradata &quot;data&quot; represents a saved matrix, 
+set this argument to TRUE to get predictable results.
+</p>
+</li></ul>
+
+<p>Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>matrix.type</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies type of matrix for processing affecting measure and score 
+scaling.<br />
+Permitted Values: 'correlation', 'covariance'<br />
+Default Value: 'correlation'<br />
+Types: character
+</p>
+
+
+
+<h4>near.dep.report</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies whether to produce an XML report showing columns that 
+are collinear as part of the output or not. The report is included 
+in the XML output only if collinearity is detected. Two threshold 
+arguments are available for this report, &quot;cond.ind.threshold&quot; and 
+&quot;variance.prop.threshold&quot;.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>rotation.type</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the rotation type among various schemes for rotating 
+factors for possibly better results. Both orthogonal and oblique 
+rotations are provided. Gamma value in the rotation equation assumes
+a different value for each rotation type, with f representing the 
+number of factors and v the number of variables. Refer below table:<br />
+</p>
+
+<table summary="Rd table">
+<tr>
+ <td style="text-align: left;">
+                          --------------------- </td><td style="text-align: left;"> ----------------- </td><td style="text-align: left;"> ------------------
+                          ------------- </td><td style="text-align: left;"> -----------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          <b>rotation.type</b> </td><td style="text-align: left;"> <b>gamma value</b> </td><td style="text-align: left;"> 
+                          <b>Orthogonal/Oblique</b> </td><td style="text-align: left;"> <b>Notes</b></td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          --------------------- </td><td style="text-align: left;"> ----------------- </td><td style="text-align: left;"> ------------------
+                          ------------- </td><td style="text-align: left;"> -----------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          equamax </td><td style="text-align: left;"> f/2 </td><td style="text-align: left;"> orthogonal </td><td style="text-align: left;"> -</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          prthomax </td><td style="text-align: left;"> Set by user </td><td style="text-align: left;"> orthogonal </td><td style="text-align: left;"> -</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          parsimax </td><td style="text-align: left;"> v(f-1)/v+f+2 </td><td style="text-align: left;"> orthogonal </td><td style="text-align: left;"> -</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          quartimax </td><td style="text-align: left;"> 0.0  </td><td style="text-align: left;"> orthogonal </td><td style="text-align: left;"> -</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          varimax  </td><td style="text-align: left;"> 1.0  </td><td style="text-align: left;"> orthogonal </td><td style="text-align: left;"> -</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          biquartimin </td><td style="text-align: left;"> 0.5  </td><td style="text-align: left;"> oblique </td><td style="text-align: left;"> least oblique rotation</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          covarimin </td><td style="text-align: left;"> 2.0  </td><td style="text-align: left;"> oblique </td><td style="text-align: left;"> -</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          orthomin </td><td style="text-align: left;"> Set by user </td><td style="text-align: left;"> oblique </td><td style="text-align: left;"> -</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          quartimin </td><td style="text-align: left;"> 0.0  </td><td style="text-align: left;"> oblique </td><td style="text-align: left;"> most oblique rotation</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+                          </td>
+</tr>
+
+</table>
+
+<p>Types: character
+</p>
+
+
+
+<h4>load.threshold</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies a threshold factor loading value. If this argument is 
+specified, a factor that is not a prime factor may be associated
+with a variable. This argument is used when the argument 
+&quot;vars.report&quot; is set to TRUE; ignored otherwise.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> This argument and the argument &quot;percent.threshold&quot; cannot 
+both be specified. 
+</p>
+</li>
+<li><p> This argument is used when the argument &quot;vars.report&quot; is 
+set to TRUE; ignored otherwise.
+</p>
+</li></ol>
+
+<p>Types: numeric
+</p>
+
+
+
+<h4>percent.threshold</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies a threshold percent. If this argument is specified, a 
+factor that is not a prime factor may be associated with a 
+variable.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> This argument and the argument &quot;load.threshold&quot; cannot both 
+be specified.
+</p>
+</li>
+<li><p> This argument is used when the argument &quot;vars.report&quot; is 
+set to TRUE; ignored otherwise.
+</p>
+</li></ol>
+
+<p>Types: numeric
+</p>
+
+
+
+<h4>variance.prop.threshold</h4>
+
+ 
+<p>Optional Argument.<br />
+Required when the argument &quot;near.dep.report&quot; is set to 
+TRUE.<br /> 
+Specifies the variance proportion threshold parameter to 
+generate Near Dependency Report.<br />
+Default Value: 0.5<br />
+Types: numeric
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 'val.install.location' to
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Generate Near Dependency Report.
+obj &lt;- td_pca_valib(data=df,
+                    columns=c("age", "years_with_bank", "nbr_children"),
+                    cond.ind.threshold=3,
+                    near.dep.report=TRUE,
+                    variance.prop.threshold=.3)
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Run PCA on two group by columns. The result contains one row
+#            for each group by column combination.
+obj &lt;- td_pca_valib(data=df,
+                    columns=c("age", "years_with_bank", "nbr_children"),
+                    group.columns=c("gender", "marital_status"))
+
+# Print the results.
+print(obj$result)
+
+# Example 3: Run PCA by taking input from a pre-built matrix. Both the Matrix Build
+#            and PCA Analysis are shown. Note that only a subset of matrix columns
+#            is used.
+mat_obj &lt;- td_matrix_valib(data=df,
+                           columns=c("income", "age", "years_with_bank", "nbr_children"),
+                           type="esscp")
+obj &lt;- td_pca_valib(data=mat_obj$result,
+                    columns=c("age", "years_with_bank", "nbr_children"),
+                    matrix.input=TRUE)
+
+# Print the results.
+print(obj$result)
+
+# Example 4: Run PCA by taking input from a pre-built matrix with group by columns.
+#            Both the Matrix Build and  PCA Analysis are shown. Note that only a
+#            subset of matrix columns is used.
+mat_obj &lt;- td_matrix_valib(data=df,
+                           columns=c("income", "age", "years_with_bank", "nbr_children"),
+                           group.columns="gender",
+                           type="esscp")
+obj &lt;- td_pca_valib(data=mat_obj$result,
+                    columns=c("age", "years_with_bank", "nbr_children"),
+                    matrix.input=TRUE,
+                    group.columns="gender")
+
+# Print the results.
+print(obj$result)
+
+# Example 5: Run PCA with 'varimax' rotation.
+obj &lt;- td_pca_valib(data=df,
+                    columns=c("age", "years_with_bank", "nbr_children"),
+                    rotation.type="varimax")
+
+# Print the results.
+print(obj$result)
+
+# Example 6: Run PCA with Prime Factor reports requested. The "percent.threshold"
+#            argument applies to "vars.report" argument.
+obj &lt;- td_pca_valib(data=df,
+                    columns=c("age", "years_with_bank", "nbr_children"),
+                    load.report=TRUE,
+                    vars.load.report=TRUE,
+                    vars.report=TRUE,
+                    percent.threshold=0.9)
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

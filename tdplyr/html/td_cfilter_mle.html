@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: CFilter</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_cfilter_mle {tdplyr}"><tr><td>td_cfilter_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+CFilter
+</h2>
+
+<h3>Description</h3>
+
+<p>The CFilter function is a general-purpose collaborative filter.
+A typical input tbl_teradata for the CFilter function is a set of
+sales transactions, with a column of purchased items and a column of
+something by which to group the purchased items; for example, a
+transaction id or timestamp.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_cfilter_mle (
+      data = NULL,
+      input.columns = NULL,
+      join.columns = NULL,
+      add.columns = NULL,
+      partition.key = "col1_item1",
+      max.itemset = 100,
+      data.sequence.column = NULL,
+      null.handling = TRUE,
+      use.basketgenerator = TRUE
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the data to 
+filter.
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the input tbl_teradata columns that contain 
+the data to filter.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>join.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the input tbl_teradata columns to join.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>add.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input columns to copy to the output tbl_teradata. 
+The function partitions the input data and the output tbl_teradata on 
+these columns. By default, the function treats the input data as 
+belonging to one partition.<br />
+Note: Specifying a column as both an &quot;add_column&quot; and a &quot;join_column&quot; 
+causes incorrect counts in partitions.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>partition.key</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the output column to use as the partition key.<br />
+Default Value: &quot;col1_item1&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.itemset</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum size of the item set. <br />
+Default Value: 100<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>null.handling</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to handle null values in the input. If the input 
+data contains null values, then this argument should be TRUE.<br />
+Note: &quot;null.handling&quot; is only available when tdplyr is connected to 
+Vantage 1.3.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>use.basketgenerator</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specify this argument to basket_generator to generate baskets.<br />
+Note: &quot;use.basketgenerator&quot; is only available when tdplyr is connected to 
+Vantage 1.3.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_cfilter_mle&quot; which is a named 
+list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> output.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    # sales_transactions dataset contains sales transaction data from an office supply chain store. 
+    loadExampleData("cfilter_example", "sales_transaction")
+    
+    # Create object(s) of class "tbl_teradata".
+    sales_transaction &lt;- tbl(con, "sales_transaction")
+    
+    # Example 1 -  Collaborative Filtering by Product.
+    td_cfilter_out1 &lt;- td_cfilter_mle(data = sales_transaction,
+                                 input.columns = c("product"),
+                                 join.columns = c("orderid"),
+                                 add.columns = c("region")
+                                 )
+    
+    # Example 2 - Collaborative Filtering by Customer Segment.
+    td_cfilter_out2 &lt;- td_cfilter_mle(data = sales_transaction,
+                                 input.columns = c("customer_segment"),
+                                 join.columns = c("product")
+                                 )
+    
+
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

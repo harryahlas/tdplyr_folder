@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: POSTagger</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_pos_tagger_mle {tdplyr}"><tr><td>td_pos_tagger_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+POSTagger
+</h2>
+
+<h3>Description</h3>
+
+<p>The POSTagger function creates part-of-speech (POS) tags for the 
+words in the input text. POS tagging is the first step in the 
+syntactic analysis of a language, and an important preprocessing step 
+in many natural language processing applications.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_pos_tagger_mle (
+      data = NULL,
+      text.column = NULL,
+      language = "en",
+      accumulate = NULL,
+      data.sequence.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata that contains the input texts to tag.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the text to be 
+tagged.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>language</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the language of the input text.<br />
+Permitted Values: en (English), zh_CN (Simplified Chinese)<br />
+Default Value: &quot;en&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input tbl_teradata columns to copy to the 
+output tbl_teradata.<br /> 
+Note: If you intend to use the function output tbl_teradata as input 
+to the function TextChunker (<code>td_textchunker_mle</code>), then this 
+argument must specify the input tbl_teradata columns that comprise 
+the partition key.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_pos_tagger_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("pos_tagger_example", "paragraphs_input")
+    
+    # Create object(s) of class "tbl_teradata".
+    paragraphs_input &lt;- tbl(con, "paragraphs_input")
+    
+    # Example 1 - Applying POSTagger using default language 'en'.
+    pos_tagger_out &lt;- td_pos_tagger_mle(data=paragraphs_input,
+                                        text.column='paratext',
+                                        language='en',
+                                        accumulate='paraid'
+                                       )
+    
+    # Example 2 - This example uses output of td_sentence_extractor_mle() function as input.
+    td_sentence_extractor_out &lt;- td_sentence_extractor_mle(data = paragraphs_input,
+                                                           text.column = "paratext",
+                                                           accumulate = c("paraid", "paratopic")
+                                                          )
+    
+    
+    pos_tagger_out &lt;- td_pos_tagger_mle(data=td_sentence_extractor_out$result,
+                                        text.column='sentence',
+                                        accumulate=c('sentence','sentence_sn')
+                                       )
+
+  
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

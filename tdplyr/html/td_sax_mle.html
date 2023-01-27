@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: SAX</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_sax_mle {tdplyr}"><tr><td>td_sax_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+SAX
+</h2>
+
+<h3>Description</h3>
+
+<p>The Symbolic Aggregate approXimation function transforms original 
+time series data into symbolic strings, which are more suitable 
+for additional types of manipulation, because of their smaller 
+size and the relative ease with which patterns can be identified 
+and compared. Input and output formats allow it to supply data 
+to the Shapelet Functions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_sax_mle (
+      data = NULL,
+      data.partition.column = NULL,
+      data.order.column = NULL,
+      meanstats.data = NULL,
+      stdevstats.data = NULL,
+      value.columns = NULL,
+      time.column = NULL,
+      window.type = "global",
+      output = "string",
+      mean = NULL,
+      st.dev = NULL,
+      window.size = NULL,
+      output.frequency = 1,
+      points.persymbol = 1,
+      symbols.perwindow = NULL,
+      alphabet.size = 4,
+      bitmap.level = 2,
+      print.stats = FALSE,
+      accumulate = NULL,
+      data.sequence.column = NULL,
+      meanstats.data.sequence.column = NULL,
+      stdevstats.data.sequence.column = NULL,
+      meanstats.data.partition.column = NULL,
+      stdevstats.data.partition.column = NULL,
+      meanstats.data.order.column = NULL,
+      stdevstats.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>meanstats.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that contains the global means of
+each column in &quot;value.columns&quot; argument of the input tbl_teradata.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>meanstats.data.partition.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;meanstats.data&quot; is specified.<br />
+Specifies Partition By columns for &quot;meanstats.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>meanstats.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;meanstats.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>stdevstats.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that contains the global standard
+deviations of each column in &quot;value.columns&quot; argument of the input tbl_teradata.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>stdevstats.data.partition.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;stdevstats.data&quot; is specified.<br />
+Specifies Partition By columns for &quot;stdevstats.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>stdevstats.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;stdevstats.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>value.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the input tbl_teradata columns that contain 
+the time series data to be transformed.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+time axis of the data.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>window.type</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Determines how much data the function processes at one time:
+</p>
+
+<ol>
+<li><p> &quot;global&quot;: The function computes the SAX code using a single 
+mean and standard deviation for the entire data set.
+</p>
+</li>
+<li><p> &quot;sliding&quot;: The function recomputes the mean and standard
+deviation for a sliding window of the data set.
+</p>
+</li></ol>
+<p><br />
+Default Value: &quot;global&quot;<br />
+Permitted Values: sliding, global<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>output</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Determines how the function outputs the results:
+</p>
+
+<ol>
+<li><p> &quot;string&quot;: The function outputs a list of SAX codes for each 
+window.
+</p>
+</li>
+<li><p> &quot;bytes&quot;: The function outputs the list of SAX codes as compact
+byte arrays (which are not &quot;human-readable&quot;).
+</p>
+</li>
+<li><p> &quot;bitmap&quot;: The function outputs a JSON representation of a SAX
+bitmap.
+</p>
+</li>
+<li><p> &quot;characters&quot;: The function outputs one character for each line.
+</p>
+</li></ol>
+<p><br />
+Default Value: &quot;string&quot;<br />
+Permitted Values: string, bitmap, bytes, characters<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>mean</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the global mean values that the function uses to calculate 
+the SAX code for every partition. A mean value has the data type 
+numeric. If &quot;mean&quot; specifies only one value and &quot;value.columns&quot; specifies 
+multiple columns, then the specified value applies to every item in
+&quot;value.columns&quot;. If &quot;mean&quot; specifies multiple values, then it must specify 
+one value for each item in &quot;value.columns&quot;. The nth mean value corresponds to the 
+nth value column.<br /> 
+Note: To specify a different global mean value for each partition, use the 
+multiple-input syntax and put the values in the &quot;meanstats.data&quot; tbl_teradata.<br />
+Default Value: NULL<br />
+Types: numeric OR vector of numerics
+</p>
+</td></tr>
+<tr valign="top"><td><code>st.dev</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the global standard deviation values that the function uses 
+to calculate the SAX code for every partition. A standard deviation
+value has the data type numeric and its value must be greater than 0.
+If it specifies only one value and &quot;value.columns&quot; specifies multiple
+columns, then the specified &quot;st.dev&quot; value applies to every item in &quot;value.columns&quot;.
+If it specifies multiple values, then it must specify one value for
+each item in &quot;value.columns&quot;. The nth standard deviation value corresponds
+to the nth item in &quot;value.columns&quot; argument.<br />
+Note: To specify a different global standard deviation value for each 
+partition, use the multiple-input syntax and put the values in the 
+&quot;stdevstats.data&quot; tbl_teradata.<br />
+Default Value: NULL<br />
+Types: numeric OR vector of numerics
+</p>
+</td></tr>
+<tr valign="top"><td><code>window.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the size of the sliding window. The value must be an 
+integer greater than 0.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.frequency</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of data points that the window slides between 
+successive outputs. The value must be an integer greater than 0.<br />
+Note: &quot;window.type&quot; value must be &quot;sliding&quot; and &quot;output&quot; value cannot be
+&quot;characters&quot;. If &quot;window.type&quot; is &quot;sliding&quot; and &quot;output&quot; value is
+&quot;characters&quot;, then &quot;output.frequency&quot; is automatically set to the value
+of &quot;window.size&quot;, to ensure that a single character is assigned to each
+time point. If the number of data points in the time series is not an 
+integer multiple of the window size, then the function ignores the 
+leftover parts.<br />
+Default Value: 1<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>points.persymbol</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of data points to be converted into one SAX 
+symbol. Each value must be an integer greater than 0.<br />
+Note: &quot;window.type&quot; value must be &quot;global&quot;.<br />
+Default Value: 1<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>symbols.perwindow</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of SAX symbols to be generated for each window. 
+Each value must be an integer greater than 0. The default value is 
+the value of &quot;window.size&quot;. <br />
+Note: &quot;window.type&quot; value must be &quot;sliding&quot;.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>alphabet.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of symbols in the SAX alphabet. The value must 
+be an integer in the range [2, 20].<br />
+Default Value: 4<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>bitmap.level</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of consecutive symbols to be converted to one 
+symbol on a bitmap. For bitmap level 1, the bitmap contains the 
+symbols &quot;a&quot;, &quot;b&quot;, &quot;c&quot;, and so on; for bitmap level 2, the bitmap 
+contains the symbols &quot;aa&quot;, &quot;ab&quot;, &quot;ac&quot;, and so on. The input value 
+must be an integer in the range [1, 4]. <br />
+Note: &quot;output&quot; value must be &quot;bitmap&quot;.<br />
+Default Value: 2<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>print.stats</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the function prints the mean and standard 
+deviation. <br />
+Note: &quot;output&quot; value must be &quot;string&quot;.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input tbl_teradata columns that are to appear in the
+output tbl_teradata. For each sequence in the input tbl_teradata, the function chooses
+the value corresponding to the first time point in the sequence to 
+output as the &quot;accumulate&quot; value.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>meanstats.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;meanstats.data&quot;. The argument is used to 
+ensure deterministic results for functions which produce results that 
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>stdevstats.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;stdevstats.data&quot;. The argument is used to 
+ensure deterministic results for functions which produce results that 
+vary from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_sax_mle&quot; which is a named 
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("sax_example", "finance_data3")
+
+    # Create object(s) of class "tbl_teradata".
+    finance_data3 &lt;- tbl(con, "finance_data3")
+
+    # Example 1: This example uses "window.type" as global and default output value.
+    td_sax_out &lt;- td_sax_mle(data = finance_data3,
+                             data.partition.column = c("id"),
+                             data.order.column = c("period"),
+                             value.columns = c("expenditure","income","investment"),
+                             time.column = "period",
+                             window.type = "global",
+                             print.stats = TRUE,
+                             accumulate = c("id")
+                            )
+
+    # Example 2: This example uses "window.type" as sliding and default output value.
+    # "window.size" should also be specified when "window.type" is set as sliding.
+    td_sax_out2 &lt;- td_sax_mle(data = finance_data3,
+                              data.partition.column = c("id"),
+                              data.order.column = c("period"),
+                              value.columns = c("expenditure"),
+                              time.column = "period",
+                              window.type = "sliding",
+                              window.size = 20,
+                              print.stats = TRUE,
+                              accumulate = c("id")
+                             )
+
+    # Example 3: This example uses a the multiple-input version, where the
+    # mean and standard deviation statistics are applied globally with the
+    # meanstats tbl_teradata and the stdevstats tbl_teradata.
+    meanstats &lt;- tbl(con, "finance_data3") %&gt;% group_by(id) %&gt;%
+                    summarize(expenditure = mean(expenditure, na.rm = TRUE),
+                    income =  mean(income, na.rm = TRUE),
+                    investment =  mean(investment, na.rm = TRUE))
+    stdevstats &lt;- tbl(con, "finance_data3") %&gt;% group_by(id) %&gt;%
+                    summarize(expenditure = sd(expenditure, na.rm = TRUE),
+                    income =  sd(income, na.rm = TRUE),
+                    investment =  sd(investment, na.rm = TRUE))
+
+    td_sax_out3 &lt;- td_sax_mle(data = finance_data3,
+                              data.partition.column = c("id"),
+                              data.order.column = c("id"),
+                              meanstats.data = meanstats,
+                              meanstats.data.partition.column = c("id"),
+                              stdevstats.data = stdevstats,
+                              stdevstats.data.partition.column = c("id"),
+                              value.columns = c("expenditure","income","investment"),
+                              time.column = "period",
+                              window.type = "global",
+                              accumulate = c("id")
+                             )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

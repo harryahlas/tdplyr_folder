@@ -1,0 +1,425 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Linear Regression</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_lin_reg_valib {tdplyr}"><tr><td>td_lin_reg_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Linear Regression</h2>
+
+<h3>Description</h3>
+
+<p>Linear Regression is one of the fundamental types of predictive modeling algorithms.
+In linear regression, a dependent numeric variable is expressed in terms of the sum
+of one or more independent numeric variables, which are each multiplied by a numeric
+coefficient, usually with a constant term added to the sum of independent variables.
+It is the coefficients of the independent variables together with a constant term
+that comprise a linear regression model. Applying these coefficients to the variables
+(columns) of each observation (row) in a data set is known as scoring, as described
+in Linear Regression Scoring.<br />
+Some of the key features of Linear Regression are outlined below.
+</p>
+
+<ol>
+<li><p> The Teradata table operator CALCMATRIX is used to build on object of class &quot;tbl_teradata&quot;
+that represents an extended cross-products matrix that is the input to the algorithm.
+</p>
+</li>
+<li><p> One or more group by columns may optionally be specified so that an input matrix is
+built for a separate linear model is built for each matrix.
+</p>
+</li></ol>
+
+<p>To achieve this, the names of the group by columns are passed to CALCMATRIX as
+parameters, so it includes them as columns in the matrix output it creates.
+</p>
+
+<ol>
+<li><p> The stepwise feature for Linear Regression is a technique for selecting the
+independent variables in a linear model. It consists of different methods of
+trying a variable and adding or removing it from a model by checking either
+a partial F-Statistic or the P-Value of a T-Statistic, at the user's choice.
+</p>
+</li>
+<li><p> The algorithm is partially scalable because the size of each input matrix
+depends only on the number of independent variables (columns) and not on the
+size of the input tbl_teradata. The calculations performed on the client workstation
+however are not scalable when group by columns are used, because each model is
+built serially based on each matrix in the matrix tbl_teradata.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_lin_reg_valib(data, columns, response.column, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to build a linear regression model from.
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the column(s) representing the independent
+variables used in building a linear regression model. Occasionally,
+it can also accept permitted strings to specify all columns, or all
+numeric columns.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;.
+</p>
+</li>
+<li><p> Pre-defined strings:
+</p>
+
+<ol>
+<li><p> 'all' - all columns
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>response.column</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the column that represents the dependent
+variable being predicted.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_lin_reg_valib&quot;
+which is a named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator
+using names:
+</p>
+
+<ol>
+<li><p> model
+</p>
+</li>
+<li><p> statistical.measures
+</p>
+</li>
+<li><p> xml.reports
+</p>
+</li></ol>
+
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>backward</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use backward technique or not. When set to TRUE,
+starting with all independent variables in the model, one backward step
+is followed by one forward step until no variables can be removed.
+A backward step consists of computing the Partial F-Statistic for each
+variable and removing that with the smallest value if it is less than
+the criterion to remove. The P-value of the T-Statistic may be used
+instead of the Partial F-Statistic. All of the P-values for variables in
+the model can be calculated at once, removing the variable with the
+largest P-Value if greater than the criterion to remove.<br />
+Types: logical
+</p>
+
+
+
+<h4>backward.only</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use only backward technique or not. This
+technique is similar to the backward technique, except that a
+forward step is not performed. It starts with all independent
+variables in the model. Backward steps are executed until no
+more are possible.<br />
+Types: logical
+</p>
+
+
+
+<h4>exclude.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) to exclude from the
+analysis, if a column specifier such as 'all', 'allnumeric'
+is used in the &quot;columns&quot; argument. By default, when the
+&quot;exclude.columns&quot; argument is used, dependent variable and
+group by columns, if any, are automatically excluded as
+input columns and do not need to be included as
+&quot;exclude.columns&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>cond.ind.threshold</h4>
+
+<p>Optional Argument.<br />
+Specifies the condition index threshold value to use
+while generating near dependency report. This is used
+when &quot;near.dep.report&quot; is set to TRUE.<br />
+Default Value: 30<br />
+Types: integer
+</p>
+
+
+
+<h4>constant</h4>
+
+<p>Optional Argument.<br />
+Specifies whether the linear model includes a constant term
+or not. When set to TRUE, model includes a constant term.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+
+
+
+<h4>entrance.criterion</h4>
+
+<p>Optional Argument.<br />
+Specifies the criterion to enter a variable into the model.
+The Partial F-Statistic must be greater than this value, or
+the T-Statistic P-value must be less than this value, depending
+on the value passed to &quot;use.fstat&quot; or &quot;use.pvalue&quot; arguments.<br />
+Default Value: 3.84 if &quot;use.fstat&quot; is TRUE and
+0.05 if &quot;use.pvalue&quot; is TRUE.<br />
+Types: numeric
+</p>
+
+
+
+<h4>forward</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use forward technique or not. When set to TRUE,
+starting with no independent variables in the model, a forward step is
+performed, adding the best choice in explaining the dependent variable's
+variance, followed by a backward step, removing the worst choice. A forward
+step is made by determining the largest partial F-Statistic and adding
+the corresponding variable to the model, provided the statistic is greater
+than the criterion to enter (see the &quot;entrance.criterion&quot;).<br />
+An alternative is to use the P-value of the T-Statistic (the ratio of a
+variable's B coefficient to its Standard Error). When the P-value is used,
+a forward step determines the variable with the smallest P-value and
+adds that variable if the P-value is less than the criterion to enter.
+(If more than one variable has a P-value of zero, the F-Statistic is used
+instead.)<br />
+Types: logical
+</p>
+
+
+
+<h4>forward.only</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use only forward technique or not. This
+technique is similar to the forward technique, except that a
+backward step is not performed.<br />
+Types: logical
+</p>
+
+
+
+<h4>group.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) dividing the input into
+partitions, one for each combination of values in the group by
+columns. For each partition or combination of values a separate
+linear model is built.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>matrix.input</h4>
+
+<p>Optional Argument.<br />
+Specifies whether the input tbl_teradata passed to argument &quot;data&quot;
+represents an ESSCP matrix build by Matrix Building function or not,
+refer <code>td_matrix_valib</code> function for more details.<br />
+When this is set to TRUE, the input passed to &quot;data&quot; argument
+represents an ESSCP matrix built by the Matrix Building function.
+Use of this feature saves internally building a matrix each time
+this function is performed, providing a significant performance
+improvement. The columns specified with the &quot;columns&quot; argument may
+be a subset of the columns in this matrix and may be specified in
+any order. The columns must, however, all be present in the matrix.
+Further, if group by columns are specified in the matrix, these
+same group by columns must be specified in this function.<br />
+Note:
+</p>
+
+<ul>
+<li><p> If the input represents a saved matrix, make sure to set
+this argument to TRUE because results can otherwise be unpredictable.
+</p>
+</li></ul>
+
+<p>Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>near.dep.report</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to produce an XML report showing columns
+that may be collinear as part of the output or not. The report
+is included in the XML output only if collinearity is detected.<br />
+Two threshold arguments are available for this report,
+&quot;cond.ind.threshold&quot; and &quot;variance.prop.threshold&quot;.<br />
+Types: logical
+</p>
+
+
+
+<h4>remove.criterion</h4>
+
+<p>Optional Argument.<br />
+Specifies the criterion to remove a variable from the model.
+The T-Statistic P-value must be greater than this value for a
+variable to be removed.<br />
+The Partial F-Statistic must be less than this value, or the
+T-Statistic P-value must be greater than this value, depending
+on the value passed to &quot;use.fstat&quot; or &quot;use.pvalue&quot; arguments.<br />
+Default Value: 3.84 if &quot;use.fstat&quot; is TRUE and
+0.05 if &quot;use.pvalue&quot; is TRUE.<br />
+Types: numeric
+</p>
+
+
+
+<h4>stats.output</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to produce an additional data quality report
+which includes the mean and standard deviation of each model
+variable, derived from an ESSCP matrix. The report is included
+in the XML output.<br />
+Types: logical
+</p>
+
+
+
+<h4>stepwise</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to perform a stepwise procedure or not.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>use.fstat</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use the partial F-Statistic in assessing whether
+a variable should be added or removed.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+
+
+
+<h4>use.pvalue</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use the T-Statistic P-value in assessing whether
+a variable should be added or removed.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>variance.prop.threshold</h4>
+
+<p>Optional Argument.<br />
+Specifies the variance proportion threshold value to
+use while generating near dependency report. This is
+used when &quot;near.dep.report&quot; is set to TRUE.<br />
+Default Value: 0.5<br />
+Types: numeric
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 'val.install.location' to
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Shows how input columns 'age', 'years_with_bank', and 'nbr_children' are
+#            used to predict 'income'.
+obj &lt;- td_lin_reg_valib(data=df,
+                        columns=c("age", "years_with_bank", "nbr_children"),
+                        response.column="income")
+
+# Print the results.
+print(obj$model)
+print(obj$statistical.measures)
+print(obj$xml.reports)
+
+# Example 2: Shows how group by columns 'gender' and 'marital_status' result in 2x4=8 models
+#            being built.
+obj &lt;- td_lin_reg_valib(data=df,
+                        columns=c("age", "years_with_bank", "nbr_children"),
+                        response.column="income",
+                        group.columns=c("gender", "marital_status"))
+
+# Print the results.
+print(obj$model)
+print(obj$statistical.measures)
+print(obj$xml.reports)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

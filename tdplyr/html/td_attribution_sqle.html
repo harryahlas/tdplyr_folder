@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Attribution</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_attribution_sqle {tdplyr}"><tr><td>td_attribution_sqle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Attribution
+</h2>
+
+<h3>Description</h3>
+
+<p>The Attribution function is used in web page analysis, where it allows
+companies to assign weights to pages before certain events, such as buying
+a product.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_attribution_sqle (
+      data = NULL,
+      data.optional = NULL,
+      conversion.data = NULL,
+      excluding.data = NULL,
+      optional.data = NULL,
+      model1.type = NULL,
+      model2.type = NULL,
+      event.column = NULL,
+      timestamp.column = NULL,
+      window.size = NULL,
+      data.partition.column = NULL,
+      data.optional.partition.column = NULL,
+      data.order.column = NULL,
+      data.optional.order.column = NULL,
+      conversion.data.order.column = NULL,
+      excluding.data.order.column = NULL,
+      optional.data.order.column = NULL,
+      model1.type.order.column = NULL,
+      model2.type.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata that contains the click stream data, 
+which the function uses to compute attributions.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.optional</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that contains the click stream data, which 
+the function uses to compute attributions.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.optional.partition.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;data.optional&quot; is specified.<br />
+Specifies Partition By columns for &quot;data.optional&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.optional.order.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;data.optional&quot; is specified.<br />
+Specifies Order By columns for &quot;data.optional&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>conversion.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata that contains one varchar column
+(conversion.event) containing conversion event values.
+</p>
+</td></tr>
+<tr valign="top"><td><code>conversion.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;conversion.data&quot;.
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>excluding.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that contains one varchar
+column (excluding.events) containing excluding cause event values.
+</p>
+</td></tr>
+<tr valign="top"><td><code>excluding.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;excluding.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>optional.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that contains one varchar 
+column (optional.events) containing optional cause event values.
+</p>
+</td></tr>
+<tr valign="top"><td><code>optional.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;optional.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model1.type</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata that defines the type and distributions of 
+the first model.<br />
+For example: <br />
+model1.data (&quot;EVENT_REGULAR&quot;, &quot;email:0.19:LAST_CLICK:NA&quot;, 
+&quot;impression:0.81:WEIGHTED:0.4,0.3,0.2,0.1&quot;)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model1.type.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;model1.type&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model2.type</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata that defines the type and distributions of the 
+second model.<br /> 
+For example: <br />
+model2.data (&quot;EVENT_OPTIONAL&quot;, &quot;OrganicSearch:0.5:UNIFORM:NA&quot;, 
+&quot;Direct:0.3:UNIFORM:NA&quot;, &quot;Referral:0.2:UNIFORM:NA&quot;)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model2.type.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;model2.type&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>event.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the clickstream 
+events.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>timestamp.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the timestamps 
+of the clickstream events.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>window.size</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies how to determine the maximum window size for the 
+attribution calculation:<br />
+</p>
+
+<ul>
+<li><p> rows:K: Considers the maximum number of events to be attributed, 
+excluding events of types specified in &quot;excluding.data&quot;,
+which means assigning attributions to atmost K effective 
+events before the current impact event.
+</p>
+</li>
+<li><p> seconds:K: Consider the maximum time difference between the
+current impact event and the earliest effective event to 
+be attributed. 
+</p>
+</li>
+<li><p> rows:K&amp;seconds:K2: Consider both constraints and comply with 
+the stricter one.
+</p>
+</li></ul>
+
+<p>Types: character
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_attribution_sqle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load the data to run the example
+    loadExampleData("attribution_example", "attribution_sample_table1",
+                    "attribution_sample_table2" , "conversion_event_table",
+                    "optional_event_table", "model1_table", "model2_table")
+    
+    # Create object(s) of class "tbl_teradata".
+    attribution_sample_table1 &lt;- tbl(con, "attribution_sample_table1")
+    attribution_sample_table2 &lt;- tbl(con, "attribution_sample_table2")
+    conversion_event_table &lt;- tbl(con, "conversion_event_table")
+    optional_event_table &lt;- tbl(con, "optional_event_table")
+    model1_table &lt;- tbl(con, "model1_table")
+    model2_table &lt;- tbl(con, "model2_table")
+    
+    # This example uses models to assign attribution weights to events (conversion,           
+    # optional and excluding).
+    td_attribution_out &lt;- td_attribution_sqle(data=attribution_sample_table1,
+                             data.partition.column="user_id",
+                             data.order.column="time_stamp",
+                             data.optional=attribution_sample_table2,
+                             data.optional.partition.column='user_id',
+                             data.optional.order.column='time_stamp',
+                             event.column="event",
+                             conversion.data=conversion_event_table,
+                             optional.data=optional_event_table,
+                             timestamp.column = "time_stamp",
+                             window.size = "rows:10&amp;seconds:20",
+                             model1.type=model1_table,
+                             model2.type=model2_table
+                             )
+    
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

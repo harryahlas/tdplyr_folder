@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: PathGenerator</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_path_generator_mle {tdplyr}"><tr><td>td_path_generator_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+PathGenerator
+</h2>
+
+<h3>Description</h3>
+
+<p>The PathGenerator function takes a set of paths and outputs the 
+sequence and all possible subsequences, which can be input to the 
+function PathSummarizer (<code>td_path_summarizer_mle</code>).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_path_generator_mle (
+      data = NULL,
+      seq.column = NULL,
+      delimiter = ",",
+      data.sequence.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata containing the input data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>seq.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+paths.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the single-character delimiter that separates symbols in 
+the path string.<br />
+Note: Do not use any of the following characters as delimiter (they cause the function
+to fail): Asterisk (*), Plus (+), Left parenthesis ((), Right 
+parenthesis ()), Single quotation mark ('), Escaped single quotation
+mark (\'), Backslash (\).<br />
+Default Value: &quot;,&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_path_generator_mle&quot; which is 
+a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("pathgenerator_example", "clickstream1")
+    
+    # Create remote tibble objects.
+    # The table contains clickstream data, where the "path" column
+    # contains symbols for the pages that the customer clicked
+    clickstream1 &lt;- tbl(con, "clickstream1")
+    
+    # Generate path sequences and count for the given clickstream data
+    td_path_generator_out &lt;- td_path_generator_mle(data = clickstream1,
+                                               seq.column = "path"
+                                               )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

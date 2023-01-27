@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: CCM</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_ccm_mle {tdplyr}"><tr><td>td_ccm_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+CCM
+</h2>
+
+<h3>Description</h3>
+
+<p>The CCM function takes two or more time series as input and evaluates
+potential cause-effect relationships between them. Each time series
+column can be a single, long time series or a set of shorter
+subsequences that represent the same process. The function returns an
+effect size for each cause-effect pair. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_ccm_mle (
+      data = NULL,
+      sequence.id.column = NULL,
+      time.column = NULL,
+      cause.columns = NULL,
+      effect.columns = NULL,
+      library.size = 100,
+      embedding.dimension = 2,
+      time.step = 1,
+      bootstrap.iterations = 100,
+      predict.step = 1,
+      self.predict = FALSE,
+      seed = NULL,
+      point.select.rule = "DistanceOnly",
+      mode = "Single",
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the input data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>sequence.id.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the column containing the sequence ids. A sequence is a sample of the 
+time series.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the column containing the timestamps.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>cause.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the columns to be evaluated as potential causes.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>effect.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the columns to be evaluated as potential effects.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>library.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+The CCM algorithm works by using &quot;libraries&quot; of randomly selected 
+points along the potential effect time series to predict values of 
+the cause time series. A causal relationship is said to exist if the 
+correlation between the predicted values of the cause time series and 
+the actual values increases as the size of the library increases. 
+Each input value must be greater than 0.<br />
+Default Value: 100<br />
+Types: integer OR vector of integers
+</p>
+</td></tr>
+<tr valign="top"><td><code>embedding.dimension</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies an estimate of the number of past values 
+to use when predicting a given value of the time series. The input 
+value must be greater than 0.<br />
+Default Value: 2<br />
+Types: integer OR vector of integers
+</p>
+</td></tr>
+<tr valign="top"><td><code>time.step</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of time steps between past values to use when
+predicting a given value of the time series. The input value must
+be greater than 0.<br />
+Default Value: 1<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>bootstrap.iterations</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of bootstrap iterations used to predict. The bootstrap 
+process is used to estimate the uncertainty associated with the 
+predicted values. The input value must be greater than 0.<br />
+Default Value: 100<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>predict.step</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the value for the number of time steps into the future to 
+make predictions from past observations. This argument should be used if the best
+embedding dimension is needed.<br />
+Default Value: 1<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>self.predict</code></td>
+<td>
+
+<p>Optional Argument.<br />
+If this argument is set to TRUE, then the function will attempt to 
+predict each attribute using the attribute itself. If an attribute 
+can predict its own time series well, the signal-to-noise ratio is 
+too low for the CCM algorithm to work effectively.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the random seed used to initialize the algorithm.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>point.select.rule</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the rules to select nearest points if the best embedding dimension 
+is needed.<br />
+Default Value: &quot;DistanceOnly&quot;<br />
+Permitted Values: DistanceAndTime, DistanceOnly<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>mode</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the execution mode. CCM can be executed in single mode and 
+distribute mode.<br />
+Default Value: &quot;Single&quot;<br />
+Permitted Values: Single, Distribute<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_ccm_mle&quot; which is a named 
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("ccmprepare_example", "ccmprepare_input")
+    loadExampleData("ccm_example", "ccm_input", "ccm_input2")
+
+    # Load the time series datasets.
+    ccm_input &lt;- tbl(con, "ccm_input")
+    ccm_input2 &lt;- tbl(con, "ccm_input2")
+    ccmprepare_input &lt;- tbl(con, "ccmprepare_input")
+
+    # Example 1: Find causal-effect relationship between income, expenditure and 
+    # investiment fields.
+    td_ccm_out &lt;- td_ccm_mle(data = ccm_input,
+                             sequence.id.column = "id",
+                             time.column = "period",
+                             cause.columns = c("income"),
+                             effect.columns = c("expenditure","investment"),
+                             seed = 0
+                             )
+                             
+    # Example 2: Alternatively, the below example produces the same output as above
+    # by making use of td_ccm_prepare_mle() and then using its output as input
+    # for td_ccm_mle().
+    td_ccm_prepare_out &lt;- td_ccm_prepare_mle(data = ccmprepare_input,
+                                             data.partition.column = "id"
+                                            )
+    td_ccm_out1 &lt;- td_ccm_mle(data = td_ccm_prepare_out$result,
+                              sequence.id.column = "id",
+                              time.column = "period",
+                              cause.columns = c("income"),
+                              effect.columns = c("expenditure","investment"),
+                              seed = 0
+                              )
+
+
+    # Example 3: Find the cause-effect relation on a sample market time series data.
+    td_ccm_out2 &lt;- td_ccm_mle(data = ccm_input2,
+                              sequence.id.column = "id",
+                              time.column = "period",
+                              cause.columns = c("marketindex","indexval"),
+                              effect.columns = c("indexdate","indexchange"),
+                              library.size = 10,
+                              seed = 0
+                              )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

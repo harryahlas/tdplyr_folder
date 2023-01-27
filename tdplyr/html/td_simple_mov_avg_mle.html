@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: SimpleMovAvg</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_simple_mov_avg_mle {tdplyr}"><tr><td>td_simple_mov_avg_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+SimpleMovAvg
+</h2>
+
+<h3>Description</h3>
+
+<p>The SimpleMovAvg function computes the simple moving average of points in a series.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_simple_mov_avg_mle (
+      data = NULL,
+      target.columns = NULL,
+      include.first = FALSE,
+      window.size = 10,
+      data.sequence.column = NULL,
+      data.partition.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata that contains the columns.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;<br />.
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.columns</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input columns for which the moving average is to 
+be computed. If you omit this argument, then the function copies 
+every input column to the output tbl_teradata but does not compute 
+moving average.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>include.first</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to include the starting rows in the output tbl_teradata. 
+If you specify TRUE, the output columns for the starting rows 
+contain NA, because their simple moving average is undefined.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>window.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of previous values to include in the computation 
+of the simple moving average.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_simple_mov_avg_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("simplemovavg_example", "ibm_stock")
+
+    # Create object(s) of class "tbl_teradata".
+    ibm_stock &lt;- tbl(con, "ibm_stock")
+
+    # Compute the simple moving average for "stockprice".
+    # This also includes the first 9 rows with moving average NA.
+    td_simple_mov_avg_out &lt;- td_simple_mov_avg_mle(data = ibm_stock,
+                                                   data.partition.column = "name",
+                                                   data.order.column = "period",
+                                                   target.columns = "stockprice",
+                                                   include.first = TRUE,
+                                                   window.size = 10
+                                                   )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

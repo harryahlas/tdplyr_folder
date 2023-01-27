@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Execute script using Script Table Operator.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_execute_script.ScriptTableOperator {tdplyr}"><tr><td>td_execute_script.ScriptTableOperator {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Execute script using Script Table Operator.</h2>
+
+<h3>Description</h3>
+
+<p>The function enables the user to execute script using Script Table Operator
+on Teradata Vantage.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'ScriptTableOperator'
+td_execute_script(object, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the ScriptTableOperator object.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Any other optional arguments, if required.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Named list containing &quot;tbl_teradata&quot; which can be referenced directly
+with the &quot;$&quot; operator using name: result.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>Script</code>, <code>td_test_script</code>, <code>td_setup_sandbox_env</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Note: Refer to Teradata Package for R User Guide for setting search path
+#       and required permissions.
+
+# Replace "&lt;tdplyr_install_location&gt;" with the absolute path of the install
+# location of the tdplyr library. One can get this location using
+# '.libPaths()'.
+# Make sure to include 'tdplyr' in the path. For example,
+# &lt;r_pkg_install_location&gt;/tdplyr.
+tdplyr_install_location &lt;- "&lt;tdplyr_install_location&gt;"
+
+# Replace "&lt;schema_name&gt;" with the name of the schema to search the file for.
+schema_name &lt;- "&lt;schema_name&gt;"
+
+set_session &lt;- gettextf('SET SESSION SEARCHUIFDBPATH = "%s";', schema_name)
+script_command &lt;- gettextf("Rscript ./%s/mapper.R", schema_name)
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Set Search path, which is necessary for runninng td_execute_script()
+# function.
+dbExecute(con, dplyr::sql(set_session))
+
+# Load example data.
+loadExampleData("script_example", "barrier")
+
+# Create object(s) of class "tbl_teradata".
+barrier &lt;- tbl(con, "barrier")
+
+# Create a ScriptTableOperator object that allows us to execute user script
+# in Vantage.
+script_obj &lt;- Script(data = barrier %&gt;% select(Name),
+                     script.command = script_command,
+                     returns = list("word"= "VARCHAR(15)",
+                                    "count_input"= "VARCHAR(2)")
+                     )
+
+# Install the file 'mapper.R' found in the 'scripts' directory of tdplyr
+# installation location.
+td_install_file(file.path.loc = file.path(tdplyr_install_location,
+                                          "scripts", "mapper.R"),
+                file.identifier = 'mapper')
+
+# Execute user script on vantage.
+td_execute_script(script_obj)
+
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

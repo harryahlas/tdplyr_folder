@@ -1,0 +1,520 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Parametric Tests</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_parametric_test_valib {tdplyr}"><tr><td>td_parametric_test_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Parametric Tests</h2>
+
+<h3>Description</h3>
+
+<p>Parametric tests make assumptions about the data, such as the observations 
+being normally distributed. This can be verified with a test of normality 
+prior to executing a parametric test. Both T-Tests and F-Tests are provided.
+T-Tests can be either paired or unpaired, while the unpaired T-Tests can be 
+with or without an indicator variable.
+<br />
+F-Tests can be 1-way, 2-way or 3-way. 2-way tests can have equal or unequal 
+cell counts (count of rows having a combination of distinct column values), 
+while the 3-way test must have equal cell counts. A 1-way test has 1 
+independent input column, a 2-way test has 2 independent columns and a 3-way 
+test has 3 independent columns in addition to a dependent &quot;column of 
+interest&quot;.<br />
+Detailed information about each test can be found in 
+<b>'Statistical Tests offered'</b> section.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_parametric_test_valib(data, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to run statistical tests.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_parametric_test_valib&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) representing 
+independent variables to be analyzed in a F-Test N-Way 
+with Equal Cell Counts analysis. There can be 1, 2 or 3 
+columns listed in this parameter.
+If 2 or 3 columns, cell counts (the count of rows having
+a combination of distinct column values) should be the same.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>dependent.column</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name of the column representing 
+the dependent variable in an F-Test.<br />
+Types: character
+</p>
+
+
+
+<h4>equal.variance</h4>
+
+ 
+<p>Optional Argument.<br />
+Required when the argument &quot;near.dep.report&quot; is 
+set to TRUE.<br />
+Specifies the condition index threshold parameter 
+to generate Near Dependency Report.<br />
+Default Value: 30<br />
+Types: numeric
+</p>
+
+
+
+<h4>fallback</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether the FALLBACK is requested as in the 
+output result or not.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>first.column</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name of the column representing the 
+first variable to analyze for a T-test. For an F-Test, 
+specifies the name of the column representing the 
+first independent variable in the analysis.<br />
+Types: character
+</p>
+
+
+
+<h4>first.column.values</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies a list of the &quot;first.column&quot; values
+to be included in the analysis.<br />
+Types: Integer, Numeric, character OR vector 
+of Integers, Numerics, Strings (character)
+</p>
+
+
+
+<h4>group.columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) for grouping
+so that a separate result is produced for each value
+or combination of values in the specified column or columns.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This option is not available for an F 2-way analysis.
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>allow.duplicates</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether duplicates are allowed 
+in the output or not.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>paired</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether the first and second column values are 
+matched with each other. When set to TRUE, the mean 
+difference is also analyzed.<br />
+Default Value: FALSE<br />
+Note:
+</p>
+
+<ul>
+<li><p> This is an option for T-Test.
+</p>
+</li></ul>
+
+<p>Types: logical
+</p>
+
+
+
+<h4>second.column</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name of the column representing the 
+second variable to analyze. If the &quot;with.indicator&quot;
+argument is set to TRUE, the second column is used 
+to define two analysis categories, one where the 
+second column is negative or zero, and another where
+the second column is positive.<br />
+For an F-Test, specifies the name of the column 
+representing the second independent variable in the
+analysis.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Date Type is not allowed to be used for the 
+paired T-Test. 
+</p>
+</li></ul>
+
+<p>Types: character
+</p>
+
+
+
+<h4>second.column.values</h4>
+
+ 
+<p>Optional Argument. Required for a 2-way 
+F-Test with Unequal Cell Counts.<br />
+Specifies a list of the &quot;second.column&quot; 
+values to be included 
+in the analysis.<br />
+Types: Integer, Numeric, character OR vector 
+of Integers, Numerics, Strings (character)
+</p>
+
+
+
+<h4>stats.database</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the database where the statistical test 
+metadata tables are installed. If not specified, 
+the source database is searched for these
+metadata tables.<br />
+Types: character
+</p>
+
+
+
+<h4>style</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the test style.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> 't' - T-Test paired, unpaired or unpaired with 
+indicator variable (second column).
+</p>
+</li>
+<li><p> 'fnway' - F-Test N-Way with Equal Cell Counts (1, 2, 
+or 3 columns with same number of cell counts). A cell count 
+is the count of rows having a combination of distinct 
+column values.
+</p>
+</li>
+<li><p> 'f2way' - F-Test 2-Way with Unequal Cell Counts (2 
+columns with possibly different numbers of cell counts). A 
+cell count is the count of rows having a combination of 
+distinct column values.
+</p>
+</li></ol>
+
+<p>Default Value: 't'<br />
+Types: character
+</p>
+
+
+
+<h4>probability.threshold</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the threshold probability, i.e., 
+'alpha' probability, below which the null 
+hypothesis is rejected.<br />
+Default Value: 0.05<br />
+Types: numeric
+</p>
+
+
+
+<h4>with.indicator</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies whether the second column is used to 
+indicate there are two analysis categories: one for 
+the case where the second column is negative or 
+zero, and another when the second column is 
+positive. When this is set to TRUE, then second 
+column is used to indicate the analysis 
+categories.<br />
+Notes:
+</p>
+
+<ul>
+<li><p> Argument can be used with an un-paired 
+T-Test, i.e., when &quot;style&quot; is set to 't' and 
+paired is set to FALSE.
+</p>
+</li></ul>
+
+<p>Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h3>Statistical Tests offered</h3>
+
+
+
+<h4>Two Sample T-Test for Equal Means</h4>
+
+<p>For the paired t test, a one-to-one correspondence must exist between values 
+in both samples. The test is whether paired values have mean differences 
+which are not significantly different from zero. It assumes differences are 
+identically distributed normal random variables, and that they are 
+independent.<br />
+<br />
+The unpaired t test is similar, but there is no correspondence between values 
+of the samples. It assumes that, within each sample, values are identically 
+distributed normal random variables, and that the two samples are independent 
+of each other. The two sample sizes may be equal or unequal. Variances of 
+both samples may be assumed to be equal (homoscedastic) or unequal 
+(heteroscedastic). In both cases, the null hypothesis is that the population 
+means are equal. Test output is a p-value which compared to the threshold 
+determines whether the null hypothesis should be rejected.<br />
+<br />
+The unpaired t test uses the following methods of data selection:
+</p>
+
+<ul>
+<li><p> T Unpaired selects the columns with the two unpaired datasets, some of 
+which may be NULL.
+</p>
+</li>
+<li><p> T Unpaired with Indicator selects the column of interest and a second 
+indicator column which determines to which group the first variable belongs.
+</p>
+</li></ul>
+
+<p>If the indicator variable is negative or zero, it will be assigned to the 
+first group; if it is positive, it will be assigned to the second group.<br />
+<br />
+The two sample t tests for unpaired data are defined as shown below:
+</p>
+
+<ul>
+<li><p> H0: mu1 = mu2
+</p>
+</li>
+<li><p> H1: mu1 != mu2
+</p>
+</li>
+<li><p> Test Statistic: T = (Y1 - Y2) / sqrt(s1/N1 + s2/N2)<br />
+where N1 and N2 are the sample sizes, Y1 and Y2 are the sample means, and 
+s1 and s2 are sample variances.
+</p>
+</li></ul>
+
+
+
+
+<h4>F-Test - N-Way</h4>
+
+
+<ul>
+<li> <p><b>F-Test/Analysis of Variance</b> - One Way, Equal or Unequal Sample 
+Size.
+</p>
+</li>
+<li> <p><b>F-Test/Analysis of Variance</b> - Two Way, Equal Sample Size. 
+</p>
+</li>
+<li> <p><b>F-Test/Analysis of Variance</b> - Three Way, Equal Sample Size.
+</p>
+</li></ul>
+
+<p>Use the ANOVA or F-test to determine if significant differences exist among 
+treatment means or interactions. This preliminary test indicates if further 
+analysis of the relationship among treatment means is warranted. If the null 
+hypothesis of no difference among treatments is accepted, the test result 
+implies factor levels and response are unrelated, so the analysis is 
+terminated. When the null hypothesis is rejected, the analysis is usually 
+continued to examine the nature of the factor-level effects. Examples are:
+</p>
+
+<ul>
+<li><p> Tukey's Method - Tests all possible pairwise differences of means.
+</p>
+</li>
+<li><p> Scheffe's Method -Tests all possible contrasts at the same time.
+</p>
+</li>
+<li><p> Bonferroni's Method - Tests, or puts simultaneous confidence intervals 
+around a preselected group of contrasts.
+</p>
+</li></ul>
+
+<p>Use the N-way F-Test to execute within groups defined by the distinct values 
+of the group-by variables (GBVs), the same as most of the other nonparametric 
+tests. Two or more treatments must exist in the data within the groups 
+defined by the distinct GBV values.<br />
+<br />
+Given a column of interest (dependent variable), one or more input columns 
+(independent variables) and optionally one or more group-by columns (all from 
+the same input), an F-Test is produced. The N-Way ANOVA tests whether a 
+set of sample means are all equal (the null hypothesis). Output is a p-value 
+which when compared to the user's threshold, determines whether the null 
+hypothesis should be rejected.<br />
+</p>
+
+
+
+<h4>F-Test/Analysis of Variance - 2-Way Unequal Sample Size</h4>
+
+<p>Use the 2-way Unequal Sample Size F-Test to execute on the entire dataset. 
+No group-by parameter is provided for this test, but if such a test is 
+desired, multiple tests must be run on pre-prepared datasets with group-by 
+variables in each as different constants. Two or more treatments must exist 
+in the data within the dataset.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This test creates a temporary work table in the Result Database and 
+drops it at the end of processing, even if the Output option to Store the 
+tabular output of this analysis in the database is not selected.<br />
+</p>
+</li></ul>
+
+<p>Given the input of tabulated values, an F-Test is produced. The N-Way 
+ANOVA tests whether a set of sample means are all equal (the null 
+hypothesis). Output is a p-value which when compared to the user's threshold, 
+determines whether the null hypothesis should be rejected.<br />
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 
+#      'val.install.location' to the database name where Vantage analytic 
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+#   3. The Statistical Test metadata tables must be loaded into the database 
+#      where Analytics Library is installed.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create required objects of class "tbl_teradata".
+customer &lt;- tbl(con, "customer")
+print(df)
+
+cust &lt;- tbl(con, "customer_analysis")
+print(cust)
+
+# Example 1: Perform T-Test with default values.
+obj &lt;- td_parametric_test_valib(data=cust,
+                                first.column="avg_cc_bal",
+                                second.column="avg_sv_bal",
+                                paired=TRUE,
+                                equal.variance=TRUE,
+                                group.columns=c("age", "gender"))
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Perform One way F-Test.
+obj &lt;- td_parametric_test_valib(data=customer,
+                                style="fnway",
+                                dependent.column="income",
+                                columns="gender",
+                                probability.threshold=0.01,
+                                group.columns=c("years_with_bank", 
+                                                "nbr_children"))
+
+# Print the results.
+print(obj$result)
+
+# Example 3: Perform a 2-way F-Test with Unequal Cell Counts.
+obj &lt;- td_parametric_test_valib(data=customer,
+                                style="f2way",
+                                dependent.column="income",
+                                first.column="years_with_bank",
+                                first.column.values=c(0, 1, 2, 3, 4, 5, 6, 7),
+                                second.column="marital_status",
+                                second.column.values=c(1, 2, 3, 4),
+                                probability.threshold=0.01)
+
+# Print the results.
+print(obj$result)
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Descriptive Statistics Function: Values</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_values_valib {tdplyr}"><tr><td>td_values_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Descriptive Statistics Function: Values</h2>
+
+<h3>Description</h3>
+
+<p>Use Values analysis as the first type of analysis performed on unknown data.
+Values analysis determines the nature and quality of the data. For example, whether
+the data is categorical or continuously numeric, how many null values it contains,
+and so on.<br />
+<br />
+A Values analysis provides a count of rows, rows with non-null values, rows with
+null values, rows with value 0, rows with a positive value, rows with a negative
+value, and the number of rows containing blanks in the given column. By default,
+unique values are counted, but this calculation can be inhibited for performance
+reasons if desired.<br />
+<br />
+For a column of non-numeric type, the zero, positive, and negative counts are
+always zero (for example, 000 is not counted as 0). A Values analysis can be
+performed on columns of any data type, though the measures displayed vary according
+to column type.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_values_valib(data, columns, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to perform Values analysis.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br /> 
+Specifies the name(s) of the column(s) to analyze. Occasionally, it can also 
+accept permitted strings to specify all columns, or all numeric columns, or 
+all character columns.<br /> 
+Permitted Values: 
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;. 
+</p>
+</li>
+<li><p> Pre-defined strings: 
+</p>
+
+<ol>
+<li><p> 'all' - all columns 
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns 
+</p>
+</li>
+<li><p> 'allcharacter' - all numeric and date columns 
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_values_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>exclude.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) to exclude from the 
+analysis, if a column specifier such as 'all', 'allnumeric', 
+'allcharacter' is used in the &quot;columns&quot; argument.<br />
+Types: character OR vector of Strings (character)  
+</p>
+
+
+
+<h4>group.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of column(s) to perform separate analysis 
+for each group.<br />
+Types: character OR vector of Strings (character)  
+</p>
+
+
+
+<h4>distinct</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies whether to select unique values count for each selected column. <br />
+Default Value: FALSE <br />
+Types: logical  
+</p>
+
+
+
+<h4>filter</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the clause to filter rows selected for analysis within Values. <br />
+For example,<br />
+filter = &quot;cust_id &gt; 0&quot; <br />
+Types: character
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set options 'val.install.location' to
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Perform Values analysis using default values on 'income' and
+#            'marital_status' columns.
+obj &lt;- td_values_valib(data=df, columns=c("income", "marital_status"))
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Perform Values analysis on 'income' column with values grouped by
+#            'gender' and only for rows with income greater than 0.
+obj &lt;- td_values_valib(data=df, columns="income", group.columns="gender", filter="income &gt; 0")
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

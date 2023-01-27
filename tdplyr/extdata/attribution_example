@@ -1,0 +1,16 @@
+--loadByTypes--
+attribution_sample_table1::int,varchar(20),timestamp
+--loadByTypes--
+attribution_sample_table2::int,varchar(20),timestamp
+--loadByTypes--
+attribution_sample_table::int,varchar(20),timestamp
+--load--
+conversion_event_table
+--load--
+optional_event_table
+--load--
+model1_table
+--load--
+model2_table
+--load--
+excluding_event_table

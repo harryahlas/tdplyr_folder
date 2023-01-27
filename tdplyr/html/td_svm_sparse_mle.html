@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: SVMSparse</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_svm_sparse_mle {tdplyr}"><tr><td>td_svm_sparse_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+SVMSparse
+</h2>
+
+<h3>Description</h3>
+
+<p>The SVMSparse function takes training data (in sparse format) and outputs 
+a predictive model in binary format, which is input to the functions 
+SVMSparsePredict <code>td_svm_sparse_predict_mle</code> and 
+SVMSparseSummary <code>td_svm_sparse_summary_mle</code>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_svm_sparse_mle (
+      data = NULL,
+      sample.id.column = NULL,
+      attribute.column = NULL,
+      value.column = NULL,
+      label.column = NULL,
+      cost = 1.0,
+      bias = 0.0,
+      hash = FALSE,
+      hash.buckets = NULL,
+      class.weights = NULL,
+      max.step = 100,
+      epsilon = 0.01,
+      seed = 0,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the training 
+samples.
+</p>
+</td></tr>
+<tr valign="top"><td><code>sample.id.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the 
+identifiers of the training samples.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>attribute.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the 
+attributes of the samples.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>value.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the input column that contains the 
+attribute values. By default, each attribute has the value 1.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>label.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the 
+classes of the samples.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>cost</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Speifies the regularization parameter in the SVM soft-margin loss 
+function. The cost must be greater than 0.0.<br />
+Default Value: 1.0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>bias</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a non-negative value. If the value is greater than zero, 
+each sample x in the training set will be converted to (x, b); 
+that is, it will add another dimension containing the bias value b.
+This argument addresses situations where not all samples center at 0.<br />
+Default Value: 0.0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>hash</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to use hash projection on attributes. Hash 
+projection can accelerate processing speed but can slightly decrease 
+accuracy.<br /> 
+Note: You must use hash projection if the dataset has more features 
+than fit into memory.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>hash.buckets</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Valid only if hash is TRUE. Specifies the number of buckets for 
+hash projection. In most cases, the function can determine the 
+appropriate number of buckets from the scale of the input data set. 
+However, if the dataset has a very large number of features, you 
+might have to specify number of buckets to accelerate the function.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>class.weights</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the weights for different classes. The format is: 
+&quot;classlabel m:weight m&quot;.<br />
+For a single class, the weight can be specified as the value 
+of type character:<br />
+&quot;classlabel m:weight m&quot;<br />
+For multiple classes, the weights can be specified as a vector
+of characters:<br />
+c(&quot;classlabel m:weight m&quot;, &quot;classlabel n:weight n&quot;)<br />
+If weight for a class is given, the cost parameter for this 
+class is weight * cost. A weight larger than 1 often increases 
+the accuracy of the corresponding class; however, it may decrease 
+global accuracy. Classes not assigned a weight in this argument 
+are assigned a weight of 1.0.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.step</code></td>
+<td>
+
+<p>Optional Argument.<br />
+A positive integer value that specifies the maximum number of 
+iterations of the training process. One step means that each sample 
+is seen once by the trainer. The input value must be in the range (0, 
+10000].<br />
+Default Value: 100<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>epsilon</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the termination criterion.<br />
+When the difference between the values of the loss function in two 
+sequential iterations is less than this number, the function stops.<br />
+epsilon must be greater than 0.0.<br />
+Default Value: 0.01<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a long integer value used to order the training set randomly 
+and consistently. This value can be used to ensure that the same model 
+will be generated if the function is run multiple times in a given 
+database with the same arguments. The input value must be in the 
+range [0, 9223372036854775807].<br />
+Default Value: 0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_svm_sparse_mle&quot; which is a 
+named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> model.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("svmsparse_example", "svm_iris_input_train")
+
+    # Create object(s) of class "tbl_teradata".
+    svm_iris_input_train &lt;- tbl(con, "svm_iris_input_train")
+
+    # Example -
+    td_svm_sparse_out &lt;- td_svm_sparse_mle(data = svm_iris_input_train,
+                                           sample.id.column = "id",
+                                           attribute.column = "attribute",
+                                           value.column = "value1",
+                                           label.column = "species",
+                                           max.step = 150,
+                                           seed = 0
+                                          )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

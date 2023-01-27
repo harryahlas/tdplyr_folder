@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: DecisionForest</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_decision_forest_mle {tdplyr}"><tr><td>td_decision_forest_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+DecisionForest
+</h2>
+
+<h3>Description</h3>
+
+<p>The DecisionForest function uses a training data set to generate a
+predictive model. You can input the model to the function
+DecisionForestPredict (<code>td_decision_forest_predict_mle</code>
+or <code>td_decision_forest_predict_sqle</code>)
+function, which uses it to make predictions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_decision_forest_mle (
+      formula = NULL,
+      data = NULL,
+      maxnum.categorical = 20,
+      tree.type = NULL,
+      ntree = NULL,
+      tree.size = NULL,
+      nodesize = 1,
+      variance = 0,
+      max.depth = 12,
+      mtry = NULL,
+      mtry.seed = NULL,
+      seed = NULL,
+      outofbag = FALSE,
+      display.num.processed.rows = FALSE,
+      categorical.encoding = "graycode",
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>formula</code></td>
+<td>
+
+<p>Required Argument.<br />
+An object of class &quot;formula&quot;. Specifies the model to be fitted. Only
+basic formula of the (col1 ~ col2 + col3 +...) form are supported and
+all variables must be from the same tbl_teradata object. The
+response should be column of type real, numeric, integer or boolean.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the input data set.
+</p>
+</td></tr>
+<tr valign="top"><td><code>maxnum.categorical</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of distinct values for a single
+categorical variable. Value greater than 20 is not recommended.<br />
+Default Value: 20<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>tree.type</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether the analysis is a regression (continuous response
+variable) or a multiclass classification (predicting result from the
+number of classes). The default value is &quot;regression&quot; if the response
+variable is numeric and &quot;classification&quot; if the response variable is
+nonnumeric.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>ntree</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of trees to grow in the forest model. When
+specified, number of trees must be greater than or equal to the
+number of vworkers. When not specified, the function builds the
+minimum number of trees that provides the input dataset with full
+coverage.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>tree.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of rows that each tree uses as its input data
+set. If not specified, the function builds a tree using either the
+number of rows on a vworker or the number of rows that fit into the
+vworker's memory, whichever is less.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>nodesize</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a decision tree stopping criterion, i.e., the minimum
+size of any node within each decision tree. <br />
+Default Value: 1<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>variance</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a decision tree stopping criterion. If the variance within
+any node dips below this value, the algorithm stops looking for splits
+in the branch.<br />
+Default Value: 0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.depth</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a decision tree stopping criterion. If the tree reaches a
+depth past this value, the algorithm stops looking for splits.<br />
+Decision trees can grow to (2(max_depth+1) - 1) nodes. This stopping
+criterion has the greatest effect on the performance of the function.<br />
+Default Value: 12<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>mtry</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of variables to randomly sample from each
+input value.<br /> For example, if mtry is 3, then the function randomly
+samples 3 variables from each input at each split. The mtry must be an
+integer.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>mtry.seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a numeric value to use in determining the random seed for
+mtry.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a numeric value to use in determining the seed for the
+random number generator. If you specify this value, you can specify
+the same value in future calls to this function and the function will
+build the same tree.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>outofbag</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to output the out-of-bag estimate of error rate.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>display.num.processed.rows</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to display the number of processed rows of input
+tbl_teradata.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>categorical.encoding</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies which encoding method is used for categorical variables.<br />
+Note: &quot;categorical.encoding&quot; argument support is only available when tdplyr is
+connected to Vantage 1.1 or later versions.<br />
+Default Value: &quot;graycode&quot;<br />
+Permitted Values: graycode, hashing<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row
+of the input argument &quot;data&quot;. The argument is used to ensure
+deterministic results for functions which produce results that vary
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_decision_forest_mle&quot; which is
+a named list containing object of class &quot;tbl_teradata&quot;.
+Named list members can be referenced directly with the &quot;$&quot; operator
+using following names:</p>
+<ol>
+<li><p> predictive.model</p>
+</li>
+<li><p> monitor.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load example data.
+    loadExampleData("decisionforest_example", "housing_train", "boston")
+
+    # Create object(s) of class "tbl_teradata".
+    housing_train &lt;- tbl(con, "housing_train")
+    boston &lt;- tbl(con, "boston")
+
+    # Example 1 -
+    td_decision_forest_out1 &lt;- td_decision_forest_mle(
+                               formula = (homestyle ~ bedrooms + lotsize + gashw + driveway +
+                                                      stories + recroom + price + garagepl +
+                                                      bathrms + fullbase + airco + prefarea),
+                               data = housing_train,
+                               tree.type = "classification",
+                               ntree = 50,
+                               nodesize = 1,
+                               variance = 0.0,
+                               max.depth = 12,
+                               mtry = 3,
+                               mtry.seed = 100,
+                               seed = 100
+                               )
+
+    # Example 2 -
+    td_decision_forest_out2 &lt;- td_decision_forest_mle(
+                               formula = (homestyle ~ bedrooms + lotsize + gashw + driveway +
+                                                      stories + recroom + price + garagepl +
+                                                      bathrms + fullbase + airco + prefarea),
+                               data = housing_train,
+                               tree.type = "classification",
+                               ntree = 50,
+                               nodesize = 2,
+                               max.depth = 12,
+                               mtry = 3,
+                               outofbag = TRUE
+                               )
+
+    # Example 3 -
+    td_decision_forest_out3 &lt;- td_decision_forest_mle(
+                               formula = (medv ~ indus + ptratio + lstat + black + tax + dis +
+                                                 zn + rad + nox + chas + rm + crim + age),
+                               data = boston,
+                               tree.type = "regression",
+                               ntree = 50,
+                               nodesize = 2,
+                               max.depth = 6,
+                               outofbag = TRUE
+                               )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

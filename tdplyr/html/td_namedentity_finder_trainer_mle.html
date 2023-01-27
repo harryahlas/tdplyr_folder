@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TrainNamedEntityFinder</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_namedentity_finder_trainer_mle {tdplyr}"><tr><td>td_namedentity_finder_trainer_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+TrainNamedEntityFinder
+</h2>
+
+<h3>Description</h3>
+
+<p>The TrainNamedEntityFinder function takes training data and outputs a Max Entropy data model. 
+The function is based on OpenNLP, and follows its annotation. For more information on OpenNLP, 
+see <a href="https://opennlp.apache.org/docs/">OpenNLP Documentation</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_namedentity_finder_trainer_mle (
+      data = NULL,
+      text.column = NULL,
+      entity.type = NULL,
+      model.file = NULL,
+      iter.num = 100,
+      cutoff = 5,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata containing the text column to train.
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+text to analyze.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>entity.type</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the entity type to be trained (for example, LOCATION). The 
+input training documents must contain the same tag.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>model.file</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the data model file to be generated.<br />
+Note: If a file with the same name exists, then it will be overwritten.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>iter.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the iterator number for training (an openNLP training 
+parameter). <br />
+Default Value: 100<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>cutoff</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the cutoff number for training (an openNLP training 
+parameter). <br />
+Default Value: 5<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_namedentity_finder_trainer_mle&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: output.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("namedentityfindertrainer_example", "nermem_sports_train")
+    
+    # Create object(s) of class "tbl_teradata".
+    nermem_sports_train &lt;- tbl(con, "nermem_sports_train")
+    
+    # Example: Train a namedentity finder model on entity type: "LOCATION".
+    # The trained model is stored in a binary file: "location.sports".
+    td_neft_out &lt;- td_namedentity_finder_trainer_mle(data = nermem_sports_train,
+                                                     text.column = "content",
+                                                     entity.type = "LOCATION",
+                                                     model.file = "location.sports"
+                                                    )
+
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

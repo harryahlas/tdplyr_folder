@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: KNN</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_knn_mle {tdplyr}"><tr><td>td_knn_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+KNN
+</h2>
+
+<h3>Description</h3>
+
+<p>The KNN function uses training data objects to map test data objects 
+to categories. The function is optimized for both small and large 
+training sets. The function supports user-defined distance metrics 
+and distance-weighted voting.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_knn_mle (
+      train = NULL,
+      test = NULL,
+      k = NULL,
+      response.column = NULL,
+      id.column = NULL,
+      distance.features = NULL,
+      voting.weight = 0,
+      customized.distance = NULL,
+      force.mapreduce = FALSE,
+      parblock.size = NULL,
+      partition.key = NULL,
+      accumulate = NULL,
+      output.prob = FALSE,
+      train.sequence.column = NULL,
+      test.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>train</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the training 
+data. Each row represents a classified data object.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>test</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the tbl_teradata that contains the test data to 
+be classified by the <code>td_knn_mle</code> function. Each row represents a test 
+data object.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>k</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the number of nearest neighbors to use for classifying the 
+test data.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>response.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the training tbl_teradata column that contains 
+the class label or classification of the classified data objects.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>id.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the testing tbl_teradata column that uniquely 
+identifies a data object.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>distance.features</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the training tbl_teradata columns that the 
+function uses to compute the distance between a test object and the 
+training objects. The test tbl_teradata must also have these 
+columns.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>voting.weight</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the voting weight of the distance between a test object and 
+the training objects. The voting_weight must be a non-negative
+integer. The function calculates distance-weighted voting, w, with this
+equation: w = 1/POWER(distance, voting_weight) Where distance is the
+distance between the test object and the training object.<br />
+Default Value: 0<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>customized.distance</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the distance function. The first value of the parameter is the name of the 
+JAR file that contains the distance metric class. The second value 
+is the distance metric class defined in the JAR file. For details on how to install
+a JAR file, see Teradata Vantage user guide.
+The default distance function is Euclidean distance.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>force.mapreduce</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to partition the training data. This causes the 
+<code>td_knn_mle</code> function to load all training data into memory and use only 
+the row function. If you specify TRUE, the <code>td_knn_mle</code> function 
+partitions the training data and uses the map and reduce function.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>parblock.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the partition block size to use with force.mapreduce 
+(TRUE). The recommended value depends on training data size and 
+number of vworkers. For example, if your training data size is 10 
+billion and you have 10 vworkers, the recommended parblock.size is
+1/n billion, where n is an integer that corresponds to your vworker
+nodes memory. Omitting this argument or specifying an inappropriate
+value for argument &quot;parblock.size&quot; can degrade performance.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>partition.key</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the training tbl_teradata column that partitions 
+data in parallel model. The default value is the first column of 
+&quot;distance.features&quot; argument.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of test tbl_teradata columns to copy to the 
+output tbl_teradata.<br />
+Note: This argument is supported when tdplyr is connected to Vantage 1.1 
+or later versions.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.prob</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to display output probability for the predicted 
+category.<br />
+Note: This argument is supported when tdplyr is connected to Vantage 1.1 
+or later versions.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>train.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;train&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>test.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;test&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_knn_mle&quot; which is a named 
+list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> output.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("knn_example", "computers_train1_clustered", "computers_test1")
+
+    # Both "computers_train1_clustered" tb_teradata and "computers_test1" tbl_teradata
+    # contains five attributes of personal computers-price, speed, hard disk
+    # size, RAM, and screen size.
+    computers_train1_clustered &lt;- tbl(con, "computers_train1_clustered")
+    computers_test1 &lt;- tbl(con, "computers_test1")
+
+    # Example 1: Map the test computer data to their respective categories.
+    td_knn_out &lt;- td_knn_mle(train = computers_train1_clustered,
+                             test = computers_test1,
+                             k = 50,
+                             response.column = "computer_category",
+                             id.column = "id",
+                             distance.features = c("price","speed","hd","ram","screen"),
+                             voting.weight = 1
+                             )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

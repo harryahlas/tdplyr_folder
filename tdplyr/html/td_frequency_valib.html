@@ -1,0 +1,353 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Descriptive Statistics Function: Frequency</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_frequency_valib {tdplyr}"><tr><td>td_frequency_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Descriptive Statistics Function: Frequency</h2>
+
+<h3>Description</h3>
+
+<p>Frequency analysis counts the occurrences of individual data values in columns that
+contain categorical data. Frequency analysis is useful in understanding the meaning
+of a particular data element and can point out the need to recode some of the data
+values found, either permanently or in the course of building an analytic data set.
+This function is also useful in analyzing combinations of values occurring in two
+or more columns.<br />
+<br />
+A Frequency analysis calculates the number of occurrences of each value of the column
+or columns individually or in combination. Additionally, for each value, the percentage
+of rows in the selected tbl_teradata is provided in descending order starting with the
+most frequently occurring value.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_frequency_valib(data, columns, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to perform frequency analysis.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br /> 
+Specifies the name(s) of the column(s) to analyze. Occasionally, 
+it can also accept permitted strings to specify all columns, or 
+all numeric columns, or all character columns.<br />
+Permitted Values: 
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;. 
+</p>
+</li>
+<li><p> Pre-defined strings: 
+</p>
+
+<ol>
+<li><p> 'all' - all columns 
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns 
+</p>
+</li>
+<li><p> 'allcharacter' - all numeric and date columns 
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the 
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_frequency_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>exclude.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) to exclude from 
+the analysis, if a column specifier such as 'all', 
+'allnumeric', 'allcharacter' is used in the &quot;columns&quot; 
+argument.<br />
+Types: character OR vector of Strings (character)  
+</p>
+
+
+
+<h4>cumulative.option</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies whether to include rank, cumulative count, 
+and cumulative percent information for each frequency 
+value.<br />
+When set to TRUE, this information is included 
+otherwise not.<br />
+Note:
+</p>
+
+<ul>
+<li><p> This argument should not be set to TRUE when 
+style is 'pairwise'. 
+</p>
+</li></ul>
+
+<p>Default Value: FALSE<br />
+Types: logical  
+</p>
+
+
+
+<h4>agg.filter</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the clause to restrict returned aggregations.<br />
+For example,<br />
+agg.filter=&quot;xpct &gt; 1&quot;<br />
+Note: 
+</p>
+
+<ul>
+<li><p> This argument should not be used when &quot;min.percentage&quot; 
+argument is used. 
+</p>
+</li></ul>
+
+<p>Types: character
+</p>
+
+
+
+<h4>min.percentage</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies a value to determine whether to include 
+only frequency values that occur a minimum percentage 
+of the time. Setting this to 0 or 0.0 is equivalent to 
+not including the argument at all.<br />
+Types: numeric  
+</p>
+
+
+
+<h4>pairwise.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specified the columns to be paired up with the 
+frequency columns.<br />
+Note: 
+</p>
+
+<ul>
+<li><p> Use only when &quot;style&quot; is set to 'pariwise'. 
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings (character)  
+</p>
+
+
+
+<h4>stats.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of column(s) for which the 
+minimum, maximum, mean value, and standard deviation 
+are included in the result with the values computed 
+over the rows corresponding to the individual values 
+of the frequency columns.<br />
+Note: 
+</p>
+
+<ul>
+<li><p> This argument can be used only when &quot;style&quot; is 'basic'. 
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings (character)  
+</p>
+
+
+
+<h4>style</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the frequency style for the analysis.<br />
+Permitted Values: 
+</p>
+
+<ol>
+<li><p> 'basic' - Counts frequencies of individual column values. 
+</p>
+</li>
+<li><p> 'pairwise' - Counts frequencies of pair-wise combinations 
+of values of selected columns rather than individually. This 
+should not be used when &quot;cumulative.option&quot; is set to TRUE.
+</p>
+</li>
+<li><p> 'crosstab' - Counts frequencies of combinations of values 
+of selected columns rather than individually. 
+</p>
+</li></ol>
+
+<p>Default Value: 'basic'<br />
+Types: character  
+</p>
+
+
+
+<h4>top.n</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the number of frequency values to include. Using 
+this argument shows frequency only for the number of top 
+occurring values entered.<br />
+Note: 
+</p>
+
+<ul>
+<li><p> This argument is enabled only if &quot;cumulative.option&quot; is 
+set to TRUE.
+</p>
+</li></ul>
+
+<p>Types: integer 
+</p>
+
+
+
+<h4>filter</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the clause to filter rows selected for analysis 
+within Frequency.<br />
+For example,<br />
+filter = &quot;cust_id &gt; 0&quot;<br />
+Types: character
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set options 'val.install.location' to
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Perform frequency analysis using default values.
+obj &lt;- td_frequency_valib(data=df,
+                          columns="years_with_bank")
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Calculate frequency values that occur a minimum 10% of the time for
+#            the column 'years_with_bank'.
+obj &lt;- td_frequency_valib(data=df,
+                          columns="years_with_bank",
+                          min.percentage=10)
+
+# Print the results.
+print(obj$result)
+
+# Example 3: Calculate the frequency values for the column 'years_with_bank'. Include
+#            cumulative measures and get only the top five frequency values.
+obj &lt;- td_frequency_valib(data=df,
+                          columns="years_with_bank",
+                          cumulative.option=TRUE,
+                          top.n=5)
+
+# Print the results.
+print(obj$result)
+
+# Example 4: Calculate the frequencies using 'crosstab' style on two columns 'income'
+#            and 'age'.
+obj &lt;- td_frequency_valib(data=df,
+                          columns=c("income", "age"),
+                          style="crosstab")
+
+# Print the results.
+print(obj$result)
+
+# Example 5: Calculate frequencies using 'pairwise' style by combining one pairwise
+#            column with two frequency columns.
+obj &lt;- td_frequency_valib(data=df,
+                          columns=c("gender", "marital_status"),
+                          style="pairwise",
+                          pairwise.columns="years_with_bank")
+
+# Print the results.
+print(obj$result)
+
+# Example 6: Calculate frequencies with inclusion of "stats.columns".
+obj &lt;- td_frequency_valib(data=df,
+                          columns="gender",
+                          stats.columns="years_with_bank")
+
+# Print the results.
+print(obj$result)
+
+# Example 7: Calculate frequencies by applying filtering using "agg.filter" and
+#            "filter" to introduce a custom where clause and having clause.
+obj &lt;- td_frequency_valib(data=df,
+                          columns="years_with_bank",
+                          filter="cust_id &gt; 0",
+                          agg.filter="xpct &gt; 1")
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

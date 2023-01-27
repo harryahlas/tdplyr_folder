@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: ChangePointDetection</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_changepoint_detection_mle {tdplyr}"><tr><td>td_changepoint_detection_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+ChangePointDetection
+</h2>
+
+<h3>Description</h3>
+
+<p>The ChangePointDetection function detects change points in a
+stochastic process or time series, using retrospective change-point
+detection, implemented with these algorithms:
+</p>
+<ol>
+<li><p> Search algorithm: binary search
+</p>
+</li>
+<li><p> Segmentation algorithm: normal distribution and linear regression</p>
+</li></ol>
+
+<p>The function takes sorted time series data as input and
+generates change points or data segments as output.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_changepoint_detection_mle (
+      data = NULL,
+      data.partition.column = NULL,
+      data.order.column = NULL,
+      value.column = NULL,
+      accumulate = NULL,
+      segmentation.method = "normal_distribution",
+      search.method = "binary",
+      max.change.num = 10,
+      penalty = "BIC",
+      output.option = "changepoint",
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata defining the input time series data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>value.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+time series data.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the input tbl_teradata columns to copy to the 
+output tbl_teradata.<br />
+Note: To identify change points in the output tbl_teradata, specify the columns 
+that appear in &quot;data.partition.column&quot; and &quot;data.order.column&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>segmentation.method</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies one of these segmentation methods:
+</p>
+
+<ol>
+<li><p> normal_distribution: In each segment, the data is in a normal distribution.
+</p>
+</li>
+<li><p> linear_regression: In each segment, the data is in linear regression.
+</p>
+</li></ol>
+<p><br />
+Default Value: &quot;normal_distribution&quot;<br />
+Permitted Values: normal_distribution, linear_regression<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>search.method</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the search method, binary segmentation. This is the default 
+and only possible value.<br />
+Default Value: &quot;binary&quot;<br />
+Permitted Values: binary<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>max.change.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of change points to detect.<br />
+Default Value: 10<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>penalty</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Possible values are: <br />
+</p>
+
+<ol>
+<li><p> BIC - For change point existence, the condition is:
+<em>ln(L1)-ln(L0) &gt; (p1-p0)*ln(n)/2.</em><br /> 
+For normal distribution and linear regression,
+the condition is: <em>(p1-p0)*ln(n)/2 = ln(n)</em>.
+</p>
+</li>
+<li><p> AIC - the condition for the existence of a change point is:
+<em>ln(L1)-ln(L0) &gt; p1-p0</em>.<br />
+For normal distribution and linear regression, the condition
+is: <em>p1-p0 = 2</em>. <br />
+</p>
+</li>
+<li><p> For threshold(numeric value), the specified value is compared to:
+<em>ln(L1)-ln(L0)</em>. L1 and L2 are the maximum likelihood estimation of
+hypotheses H1 and H0. p is the number of additional parameters
+introduced by adding a change point. p is used 
+in the information criterion BIC or AIC. p1 and p0 represent this
+parameter in hypotheses H1 and H0 separately.
+</p>
+</li></ol>
+<p><br />
+Default Value: &quot;BIC&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.option</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the output tbl_teradata columns.<br />
+Default Value: &quot;changepoint&quot;<br />
+Permitted Values: changepoint, segment, verbose<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_changepoint_detection_mle&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("changepointdetection_example", "finance_data2" , "cpt")
+
+    # Create object(s) of class "tbl_teradata".
+    # The input signal is like a clock signal whose values can represent a
+    # cyclic recurrence of an event (for example, electric power consumption at
+    # certain periods or sequence, pulserate, and so on).
+    cpt &lt;- tbl(con,"cpt")
+
+    # Input contains two time series of finance data.
+    finance_data2 &lt;- tbl(con,"finance_data2")
+
+    # Example 1: Two Series, Default Options.
+    td_changepoint_detection_out1 &lt;- td_changepoint_detection_mle(data=finance_data2,
+                                                           data.partition.column='sid',
+                                                           data.order.column='id',
+                                                           value.column='expenditure',
+                                                           accumulate=c('sid','id','expenditure'))
+
+    # Example 2 -  One Series, Default Options.
+    td_changepoint_detection_out2 &lt;- td_changepoint_detection_mle(data=cpt,
+                                                                  data.partition.column="sid",
+                                                                  data.order.column="id",
+                                                                  value.column = "val",
+                                                                  accumulate = c("sid", "id")
+                                                                  )
+
+    # Example 3 - One Series, VERBOSE Output.
+    td_changepoint_detection_out3 &lt;- td_changepoint_detection_mle(data=cpt,
+                                                                  value.column = "val",
+                                                                  data.partition.column="sid",
+                                                                  data.order.column="id",
+                                                                  accumulate = c("sid","id"),
+                                                                  output.option = "verbose"
+                                                                  )
+
+    # Example 4 - One Series, Penalty 10.
+    td_changepoint_detection_out4 &lt;- td_changepoint_detection_mle(data=cpt,
+                                                                  data.partition.column="sid",
+                                                                  data.order.column="id",
+                                                                  value.column = "val",
+                                                                  accumulate = c("sid","id"),
+                                                                  penalty = "10"
+                                                                  )
+
+    # Example 5 -  One Series, SEGMENT Output, Penalty 10.
+    td_changepoint_detection_out5 &lt;- td_changepoint_detection_mle(data=cpt,
+                                                                  data.partition.column="sid",
+                                                                  data.order.column="id",
+                                                                  value.column = "val",
+                                                                  accumulate = c("sid","id"),
+                                                                  penalty = "10",
+                                                                  output.option = "segment"
+                                                                  )
+
+    # Example 6 - One Series, Penalty 20, Linear Regression.
+    td_changepoint_detection_out6 &lt;- td_changepoint_detection_mle(data=cpt,
+                                                        data.partition.column="sid",
+                                                        data.order.column="id",
+                                                        value.column = "val",
+                                                        accumulate = c("sid","id"),
+                                                        segmentation.method = "linear_regression",
+                                                        penalty = "20"
+                                                        )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

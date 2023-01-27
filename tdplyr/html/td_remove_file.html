@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Remove file from Vantage</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_remove_file {tdplyr}"><tr><td>td_remove_file {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Remove file from Vantage</h2>
+
+<h3>Description</h3>
+
+<p>This function removes external language script or model file from Vantage.
+On success, it prints a message that the file is removed.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_remove_file(file.identifier = NULL, force.remove = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>file.identifier</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name associated with the user-installed file.<br />
+It cannot have a schema name associated with it, as the file is always
+installed in the current schema.<br />
+The name should be unique within the schema. It can be any valid Teradata
+identifier.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>force.remove</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether the file is to be removed even if it is being executed.<br />
+If set to TRUE, the file is removed even if it is being executed.<br />
+If set to FALSE, an error is raised if it is being executed.<br />
+Default Value: FALSE<br />
+Types: logical</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>None. Prints message if the operation is successful.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_install_file</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Note:
+#  1. Connection must be established before running these examples.
+#  2. File can be on client or remote database server.
+#  3. Files mentioned in the examples are part of the package and can be found at
+#     package install location as shown in the below examples.
+
+# Replace "&lt;tdplyr_install_location&gt;" with the absolute path of the install location of the
+# tdplyr library. One can get this location using '.libPaths()'.
+# Make sure to include 'tdplyr' in the path. For example, &lt;r_pkg_install_location&gt;/tdplyr.
+
+tdplyr_install_location &lt;- "&lt;tdplyr_install_location&gt;"
+
+# Example 1: Remove text file.
+
+# Run the following before removing file.
+td_install_file(file.identifier = 'mapper1',
+                file.path.loc = file.path(tdplyr_install_location, "scripts", "mapper.R"))
+
+# Remove the file 'mapper1'.
+td_remove_file(file.identifier='mapper1', force.remove = TRUE)
+
+# Example 2: Remove binary file.
+
+# Run the following before removing file.
+td_install_file(file.identifier='binaryfile1',
+                file.path.loc = file.path(tdplyr_install_location, "scripts",
+                                          "binary_file_replace.dms"),
+                file.on.client = TRUE,
+                is.binary = TRUE)
+
+# Remove the file 'binaryfile1'.
+td_remove_file(file.identifier = 'binaryfile1', force.remove = TRUE)
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

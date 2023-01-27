@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Tests Based on Contingency Tables</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_chi_square_test_valib {tdplyr}"><tr><td>td_chi_square_test_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Tests Based on Contingency Tables</h2>
+
+<h3>Description</h3>
+
+<p>Statistical tests of this type are based on a matrix of frequencies or 
+counts. A frequency pattern that is non-random is sought in the matrix. 
+Supported tests of this type include the following:
+</p>
+
+<ol>
+<li><p> Chi Square Test - Besides a Chi Square value, other measures are 
+computed in a Chi Square Test, including a Phi Coefficient, Cramer's V, 
+Likelihood Ratio Chi Square, Continuity-Adjusted Chi Square, and Contingency 
+Coefficient.
+</p>
+</li>
+<li><p> Median Test - A Median Test is a variation of Chi Square Test wherein 
+samples are tested to see if their populations have the same median value.
+</p>
+</li></ol>
+
+<p>Detailed information about each test can be found in 
+<b>'Statistical Tests offered'</b> section.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_chi_square_test_valib(data, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to run statistical tests.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described 
+in the '<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_chi_square_test_valib&quot;
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>dependent.column</h4>
+
+<p>Optional Argument.<br />
+Specifies the name of the numeric column 
+representing dependent variable.<br />
+Note: 
+</p>
+ 
+<ul>
+<li><p> Used only by the Median Test. 
+</p>
+</li></ul>
+ 
+<p>Types: character
+</p>
+
+
+
+<h4>columns</h4>
+
+ 
+<p>Optional Argument.<br />
+Specifies the name(s) of the categorical column(s) 
+representing independent variables.<br />
+Note: 
+</p>
+ 
+<ul>
+<li><p> Used only by the Median Test.
+</p>
+</li></ul>
+
+<p>Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>fallback</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies whether the FALLBACK is requested as in the 
+output result or not.<br />
+Default Value: FALSE (Not requested)<br />
+Types: logical
+</p>
+
+
+
+<h4>first.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) representing  
+the first of variable pairs for analysis.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Used only by the Chi Square Test.
+</p>
+</li>
+<li><p> The number of combinations of &quot;first.columns&quot;  
+and &quot;second.columns&quot; may not exceed 100.
+</p>
+</li>
+<li><p> If the product of the number distinct values 
+in these column pairs exceeds 2000, the analysis of 
+that combination is skipped.
+</p>
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>group.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) for grouping 
+so that a separate result is produced for each 
+value or combination of values in the specified 
+column or columns.<br />
+Note:
+</p>
+
+<ul>
+<li><p> Used only by the Median Test.
+</p>
+</li></ul>
+ 
+<p>Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>allow.duplicates</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies whether duplicates are allowed in the 
+output or not.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>second.columns</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the name(s) of the column(s) 
+representing the second of variable pairs for 
+analysis.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Used only by the Chi Square Test.
+</p>
+</li>
+<li><p> The number of combinations of 
+&quot;first.columns&quot; and &quot;second.columns&quot; may not 
+exceed 100.
+</p>
+</li>
+<li><p> If the product of the number distinct values 
+in these column pairs exceeds 2000, the analysis 
+of that combination is skipped.
+</p>
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>stats.database</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the database where the statistical test 
+metadata tables are installed. If not specified, 
+the source database is searched for these metadata 
+tables.<br />
+Types: character
+</p>
+
+
+
+<h4>style</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the test style.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> 'chisq' - Chi Square test.
+</p>
+</li>
+<li><p> 'median' - Median test.
+</p>
+</li></ol>
+
+<p>Default Value: 'chisq'<br />
+Types: character
+</p>
+
+
+
+<h4>probability.threshold</h4>
+
+ 
+<p>Optional Argument.<br /> 
+Specifies the threshold probability, i.e., 
+'alpha' probability, below which the null 
+hypothesis is rejected.<br />
+Default Value: 0.05<br />
+Types: numeric
+</p>
+
+
+
+<h3>Statistical Tests offered</h3>
+
+
+
+<h4>Chi Square Tests</h4>
+
+<p>The most common application for chi-square is in comparing observed counts of 
+particular cases to the expected counts. For example, a random sample of 
+people would contain m males and f females but usually we would not find 
+exactly m=0.5N and f=0.5N. We could use the chi-squared test to determine 
+if the difference were significant enough to rule out the 50/50 hypothesis.<br />
+<br />
+The Chi Square Test determines whether the probabilities observed from data  
+in a RxC contingency tables are the same or different. The null hypothesis is 
+that probabilities observed are the same. Output is a p-value which when 
+compared to the user's threshold, determines whether the null hypothesis 
+should be rejected.<br />
+<b>Other Calculated Measures of Association:</b><br />
+</p>
+
+<ol>
+<li><p> Phi coefficient - The Phi coefficient is a measure of the degree of 
+association between two binary variables, and represents the correlation 
+between two dichotomous variables. It is based on adjusting chi-square 
+significance to factor out sample size, and is the same as the Pearson 
+correlation for two dichotomous variables.
+</p>
+</li>
+<li><p> Cramer's V - Cramer's V is used to examine the association between 
+two categorical variables when there is more than a 2 X 2 contingency 
+(e.g., 2 X 3). In these more complex designs, phi is not appropriate, but 
+Cramer's statistic is. Cramer's V represents the association or correlation 
+between two variables. Cramer's V is the most popular of the chi-square-based 
+measures of nominal association, designed so that the attainable upper limit 
+is always 1.
+</p>
+</li>
+<li><p> Likelihood Ratio Chi Square - Likelihood ratio chi-square is an 
+alternative to test the hypothesis of no association of columns and rows in 
+nominal-level tabular data. It is based on maximum likelihood estimation, and 
+involves the ratio between the observed and the expected frequencies, whereas 
+the ordinary chi-square test involves the difference between the two. This is 
+a more recent version of chi-square and is directly related to log-linear 
+analysis and logistic regression.
+</p>
+</li>
+<li><p> Continuity-Adjusted Chi-Square - The continuity-adjusted chi-square 
+statistic for 2 X 2 tables is similar to the Pearson chi-square, except that 
+it is adjusted for the continuity of the chi-square distribution. The 
+continuity-adjusted chi-square is most useful for small sample sizes. The use 
+of the continuity adjustment is controversial; this chi-square test is more 
+conservative, and more like Fisher's exact test, when your sample size is 
+small. As the sample size increases, the statistic becomes more and more like 
+the Pearson chi-square.
+</p>
+</li>
+<li><p> Contingency Coefficient - The contingency coefficient is an adjustment 
+to phi coefficient, intended for tables larger than 2-by-2. It is always less 
+than 1 and approaches 1.0 only for large tables. The larger the contingency 
+coefficient, the stronger the association. Recommended only for 5-by-5 tables 
+or larger, for smaller data it underestimates level of association.
+</p>
+</li></ol>
+
+
+
+
+<h4>Median Test</h4>
+
+<p>The Median test is a special case of the chi-square test with fixed marginal 
+totals. It tests whether several samples came from populations with the same 
+median. The null hypothesis is that all samples have the same median.<br />
+The median test is applied for data in similar cases as for the ANOVA for 
+independent samples, except when the following occurs:<br />
+</p>
+
+<ol>
+<li><p> the data are either importantly non-normally distributed
+</p>
+</li>
+<li><p> the measurement scale of the dependent variable is ordinal (not 
+interval or ratio)
+</p>
+</li>
+<li><p> or the data sample is too small.
+</p>
+</li></ol>
+
+<p>Note:
+</p>
+
+<ul>
+<li><p> The Median test is a less powerful non-parametric test than alternative  
+rank tests due to the fact the dependent variable is dichotomized at the  
+median. Because this technique tends to discard most of the information 
+inherent in the data, it is less often used. Frequencies are evaluated by a 
+simple 2 X 2 contingency table, so it becomes simply a 2 X 2 chi square test 
+of independence with 1 DF.
+</p>
+</li></ul>
+
+<p>Given k independent samples of numeric values, a Median test is produced for  
+each set of unique values of the group-by variables (GBVs), if any, testing 
+whether all the populations have the same median. Output for each set of 
+unique values of the GBVs is a p-value, which when compared to the user's 
+threshold, determines whether the null hypothesis should be rejected for the 
+unique set of values of the GBVs. For more than 2 samples, this is sometimes 
+called the Brown-Mood test.<br />
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 
+#      'val.install.location' to the database name where Vantage analytic 
+#      library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic 
+#      Library installer.
+#   3. The Statistical Test metadata tables must be loaded into the database 
+#      where Analytics Library is installed.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer_analysis")
+print(df)
+
+# Example 1: Shows a Chi Square test execution.
+obj &lt;- td_chi_square_test_valib(data=df,
+                                first.columns=c("female", "single"),
+                                second.columns=c("svacct", "ccacct", 
+                                                 "ckacct"), 
+                                style="chisq")
+
+# Print the results.
+print(obj$result)
+
+# Example 2: Shows a Median test execution with group-by option.
+obj &lt;- td_chi_square_test_valib(data=df,
+                                dependent.column="income",
+                                columns="marital_status",
+                                group.columns="years_with_bank",
+                                style="median",
+                                probability.threshold=0.01)
+
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

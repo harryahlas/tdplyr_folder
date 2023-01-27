@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Test user script</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_test_script.ScriptTableOperator {tdplyr}"><tr><td>td_test_script.ScriptTableOperator {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Test user script</h2>
+
+<h3>Description</h3>
+
+<p>The function enables the user to run script in docker container environment
+outside Vantage.<br />
+<br />
+Note:<br />
+</p>
+
+<ol>
+<li><p> It is the responsibility of the user to make sure the docker
+environment is present in the client machine.
+</p>
+</li>
+<li><p> Input data for user script is read from file or Vantage.
+</p>
+</li>
+<li><p> The function uses the container in the option 'sandbox.container'. If
+this option is NULL, either set this option or run the function
+<code>td_setup_sandbox_env</code>.
+</p>
+</li>
+<li><p> quotechar functionality is not implemented in the function yet.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'ScriptTableOperator'
+td_test_script(
+  object = NULL,
+  files.local.path = NULL,
+  script.name = NULL,
+  input.data.file = NULL,
+  supporting.files = NULL,
+  script.args = NULL,
+  exec.mode = "sandbox",
+  ...
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>object</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the ScriptTableOperator object containing the details 
+that are needed for testing user script.</p>
+</td></tr>
+<tr valign="top"><td><code>files.local.path</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the absolute local path where user script 
+(specified in the argument &quot;script.name&quot;), all 
+supporting files like model files (specified in the 
+argument &quot;supporting.files&quot;), and input data file
+(specified in the argument &quot;input.data.file&quot;) reside.
+<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>script.name</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the user script.<br />
+It should have a path relative to the location specified 
+in &quot;files.local.path&quot; argument.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>input.data.file</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the name of the input data file.<br />
+It should have a path relative to the location
+specified in &quot;files.local.path&quot; argument.<br />
+If this argument is not provided, data is read from
+AMP in the database. The data is taken from the &quot;data&quot;
+argument of ScriptTableOperator object.<br />
+Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>supporting.files</code></td>
+<td>
+<p>Optional Arguument.<br />
+Specifies one or more supporting files like model
+files to be copied to the container. These files
+should have a path relative to the location specified
+in &quot;files.local.path&quot; argument.<br />
+Default Value: NULL<br />
+Types: character OR vector of characters</p>
+</td></tr>
+<tr valign="top"><td><code>script.args</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies command line arguments required by the user
+script.<br />
+Default Value: NULL<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>exec.mode</code></td>
+<td>
+<p>Optional Argument.<br /> 
+Specifies the mode in which user wants to test the script. 
+If set to 'sandbox', the user script will run within the 
+sandbox environment, else it will run locally on user's 
+system. 
+Permitted Values: 'sandbox', 'local' 
+Default Value: 'sandbox' 
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies the arguments used for reading data from all AMPs and
+arguments to specify different types of logon mechanisms.<br />
+The following are the valid argument names:
+</p>
+
+<ol>
+<li><p> data.row.limit: Specifies the number of rows to be taken
+from all AMPs when reading from a table or view on Vantage.<br />
+Default Value: 1000<br />
+Types: integer
+</p>
+</li>
+<li><p> password: Specifies the password to connect to Vantage where
+the data resides.<br />
+Types: character
+</p>
+</li>
+<li><p> data.file.delimiter: Specifies the delimiter used in the 
+input data file. This argument can be specified when data is read 
+from file.<br /> 
+Default Value: ',' 
+Types: character
+</p>
+</li>
+<li><p> data.file.header: Specifies whether the input data file 
+contains header. This argument can be specified when data is read 
+from file.<br /> 
+Default Value: TRUE<br />
+Types: logical
+</p>
+</li>
+<li><p> logmech: Specifies the type of logon mechanism to establish
+a connection to Teradata Vantage.<br />
+Permitted Values: 'TD2', 'TDNEGO', 'LDAP', 'KRB5' &amp; 'JWT'<br />
+Default Value: TD2<br />
+Types: character
+</p>
+
+<ul>
+<li><p> TD2: The Teradata 2 (TD2) mechanism provides authentication
+using a Vantage username and password.<br />
+</p>
+</li>
+<li><p> TDNEGO: A security mechanism that automatically determines
+the actual mechanism required, based on policy, without user's
+involvement.
+The actual mechanism is determined by the TDGSS server configuration
+and by the security policy's mechanism restrictions.<br />
+</p>
+</li>
+<li><p> LDAP: A directory-based user logon to Vantage with a directory
+username and password and is authenticated by the directory.<br />
+</p>
+</li>
+<li><p> KRB5 (Kerberos): A directory-based user logon to Vantage with
+a domain username and password and is authenticated by Kerberos.<br />
+Note: User must have a valid ticket-granting ticket in order to use
+this logon mechanism.<br />
+</p>
+</li>
+<li><p> JWT: The JSON Web Token (JWT) authentication mechanism enables
+single sign-on (SSO) to the Vantage after the user successfully
+authenticates to Teradata UDA User Service.<br />
+Note: User must use logdata parameter when using 'JWT' as the logon
+mechanism.<br />
+</p>
+</li></ul>
+
+<p>Note: tdplyr expects the client environments are already setup with
+appropriate security mechanisms and are in working conditions.<br />
+For more information please refer Teradata Vantage™ - Advanced SQL
+Engine Security Administration at https://www.info.teradata.com/<br />
+</p>
+</li>
+<li><p> logdata: Specifies parameters to the LOGMECH command beyond
+those needed by the logon mechanism, such as user ID, password and
+tokens (in case of JWT) to successfully authenticate the user.<br />
+Types: character
+</p>
+</li></ol>
+
+<p>Any other arguments, if provided, are ignored.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A R data.frame containing the output of user script.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_setup_sandbox_env</code>, <code>Script</code>,
+<code>td_cleanup_sandbox_env</code>, <code>td_copy_files_from_container</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Replace "&lt;tdplyr_install_location&gt;" with the absolute path of the install
+# location of the tdplyr library. One can get this location using
+# '.libPaths()'.
+# Make sure to include 'tdplyr' in the path. For example,
+# &lt;r_pkg_install_location&gt;/tdplyr.
+tdplyr_install_location &lt;- "&lt;tdplyr_install_location&gt;"
+
+# Replace "&lt;schema_name&gt;" with the name of the schema to search the file for.
+schema_name &lt;- "&lt;schema_name&gt;"
+
+# Replace "&lt;path_to_docker_image&gt;" with the local path to the downloaded
+# docker image file.
+docker_image_location &lt;- "&lt;path_to_docker_image&gt;"
+
+# Replace "&lt;password&gt;" with the password of the user to fetch data from
+# Vantage.
+password &lt;- "&lt;password&gt;"
+
+script_command &lt;- gettextf("Rscript ./%s/mapper.R", schema_name)
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load example data.
+loadExampleData("script_example", "barrier")
+
+# Create object(s) of class "tbl_teradata".
+barrier &lt;- tbl(con, "barrier")
+
+# Create a ScriptTableOperator object that allows us to execute user script
+# in Vantage.
+script_obj &lt;- Script(data = barrier %&gt;% select(Name),
+                     script.command = script_command,
+                     returns = list("word"= "VARCHAR(15)",
+                                    "count_input"= "VARCHAR(2)")
+                     )
+
+## Run the user script locally within docker container using data from csv
+## file.
+
+# Setup the environment by providing path to the docker image file.
+td_setup_sandbox_env(docker.image.location = docker_image_location,
+                     docker.image.name = "rstosandbox:1.0")
+
+
+# Example 1: Test user script mentioned in the argument "script.name" using
+# the data provided in the argument "input.data.file".
+td_test_script(object = script_obj,
+               files.local.path = file.path(tdplyr_install_location,
+                                            "scripts"),
+               script.name = "mapper.R",
+               input.data.file = "barrier.csv"
+               )
+
+# Example 2: Test user script mentioned in the argument "script.name" using
+# the data from AMPs in the database.
+td_test_script(object = script_obj,
+               files.local.path = file.path(tdplyr_install_location,
+                                            "scripts"),
+               script.name = "mapper.R",
+               password = password
+               )
+# Example 3: Test user script mentioned in the argument "script.name" using 
+# the data provided in the argument "input.data.file" in local environment.
+td_test_script(object = script_obj,
+               exec.mode = "local",
+               files.local.path = file.path(tdplyr_install_location, 
+                                            "scripts"),
+               script.name = "mapper.R",
+               input.data.file = "barrier.csv"
+               )
+
+# Example 4: Test user script mentioned in the argument "script.name" using 
+# the data from AMPs in the database in local environment.
+td_test_script(object = script_obj,
+               exec.mode = "local",
+               files.local.path = file.path(tdplyr_install_location, 
+                                            "scripts"),
+               script.name = "mapper.R",
+               password = password
+               )                
+
+
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TF</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_tf_mle {tdplyr}"><tr><td>td_tf_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+TF
+</h2>
+
+<h3>Description</h3>
+
+<p>TF (Term Frequency) is used in conjuction with function TF-IDF (Term Frequency 
+- Inverse Document Frequency). TF-IDF is a technique for weighting words in a 
+document. The resulting weights can be used together in a vector space model 
+as input for various document clustering or classification algorithms. To 
+compute TF-IDF values, the TF_IDF function relies on the TF function, which 
+computes the TF value of the input.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_tf_mle (
+      data = NULL,
+      formula = "normal",
+      data.sequence.column = NULL,
+      data.partition.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata that contains the document ID and the term.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>formula</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the formula for calculating the term frequency (tf) of term 
+t in document d.<br />
+Four formulas are supported:
+</p>
+
+<ul>
+<li><p> normal: Normalized frequency (default): tf (t, d) 
+= f ((t, d) / sum  w  where w belongs to d.
+This value is rf divided by the number 
+of terms in the document. 
+</p>
+</li>
+<li><p> bool: Boolean frequency: tf ((t, d) = 1 
+if t occurs in d; otherwise, tf ((t, d) = 0.  
+</p>
+</li>
+<li><p> log: 
+Logarithmically-scaled frequency: tf ((t, d) = log (f ((t, d) + 1) 
+where f ((t, d) is the number of times t occurs in d (that is, the 
+raw frequency, rf).  
+</p>
+</li>
+<li><p> augment: Augmented frequency (to prevent bias 
+towards longer documents): tf ((t, d) = 0.5 + (0.5 x f ((t, d) / max 
+ f (w, d) ) where w belongs to d. This value is rf divided by the maximum raw 
+frequency of any term in the document.<br />
+Default Value: &quot;normal&quot;<br />
+Permitted Values: bool, log, augment, normal
+</p>
+</li></ul>
+
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_tf_mle&quot; which is a named list 
+containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("tf_example", "tfidf_input1")
+    
+    # Create object(s) of class "tbl_teradata".
+    tfidf_input1 &lt;- tbl(con, "tfidf_input1")
+
+    # Example 1 - Calculate TF values using input tbl_teradata containing tokens and their count in
+    # all documents.
+    tf_out &lt;- td_tf_mle(tfidf_input1, data.partition.column="docid")
+    
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

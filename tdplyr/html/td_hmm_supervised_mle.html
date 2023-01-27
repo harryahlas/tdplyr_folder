@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: HMMSupervisedLearner</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_hmm_supervised_mle {tdplyr}"><tr><td>td_hmm_supervised_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+HMMSupervisedLearner
+</h2>
+
+<h3>Description</h3>
+
+<p>The HMMSupervisedLearner function is available on SQL-Graph platform.
+The function can produce multiple HMM models simultaneously, where 
+each model is learned from a set of sequences and where each sequence 
+represents a vertex.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_hmm_supervised_mle (
+      vertices = NULL,
+      model.key = NULL,
+      sequence.key = NULL,
+      observed.key = NULL,
+      state.key = NULL,
+      skip.key = NULL,
+      batch.size = NULL,
+      vertices.sequence.column = NULL,
+      vertices.partition.column = NULL,
+      vertices.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>vertices</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies a tbl_teradata that contains the input vertex information.
+</p>
+</td></tr>
+<tr valign="top"><td><code>vertices.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the Partition By columns for &quot;vertices&quot;.<br />
+Values to this argument can be provided as vector, if multiple 
+columns are used for partition.<br />
+Note:<br />
+</p>
+<p>1. This argument must contain the name of the column
+specified in &quot;sequence.key&quot; argument.<br />
+</p>
+<p>2. This argument should contain the name of the column
+specified in &quot;model.key&quot;, if &quot;model.key&quot; argument is
+used, and it must be the first column followed by the
+name of the column specified in &quot;sequence.key&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>vertices.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the Order By columns for &quot;vertices&quot;.<br />
+Values to this argument can be provided as vector, if multiple 
+columns are used for ordering.<br />
+Note: This argument must contain the name of the column, containing
+time ordered sequence, as one of its columns.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>model.key</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column that contains the model attribute.
+The values in the column can be integers or strings.<br />
+Note: The &quot;vertices.partition.column&quot; argument should contain the name
+of the column specified in this argument.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>sequence.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the sequence
+attribute. It must match one of the columns specified in the
+&quot;vertices.partition.column&quot; argument. A sequence (value in this column)
+must contain more than two observation symbols. Each sequence represent
+a vertex.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>observed.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the column that contains the observed symbols. The 
+function scans the input tbl_teradata to find all possible observed 
+symbols.<br />
+Note: Observed symbols are case-sensitive.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>state.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the state attributes. You can specify multiple states. The states are 
+case-sensitive.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>skip.key</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the column whose values determine whether the function 
+skips the row. The function skips the row if the value is &quot;true&quot;, 
+&quot;yes&quot;, &quot;y&quot;, or &quot;1&quot;. The function does not skip the row if the value 
+is &quot;false&quot;, &quot;f&quot;, &quot;no&quot;, &quot;n&quot;, &quot;0&quot;, or NULL.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>batch.size</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of models to process. The size must be positive. If the 
+batch size is not specified, the function avoids out-of-memory errors 
+by determining the appropriate size. If the batch size is specified 
+and there is insufficient free memory, the function reduces the batch 
+size. The function determines the batch size dynamically based on the memory 
+conditions. For example, the batch size is set to 1000, at time T1, it might
+be adjusted to 980, and at time T2, it might be adjusted to 800.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>vertices.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;vertices&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_hmm_supervised_mle&quot; which is a 
+named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> output.initialstate.table</p>
+</li>
+<li> 
+<p>output.statetransition.table</p>
+</li>
+<li><p> output.emission.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("hmmsupervised_example", "customer_loyalty")
+
+    # Create object(s) of class "tbl_teradata".
+    customer_loyalty &lt;- tbl(con, "customer_loyalty")
+
+    # Example 1 - Train a td_hmm_supervised_mle() function on the customer loyalty dataset
+    td_hmm_supervised_out &lt;- td_hmm_supervised_mle(vertices = customer_loyalty,
+                                               vertices.partition.column = c("user_id", "seq_id"),
+                                               vertices.order.column = c("user_id", "seq_id",
+                                               "purchase_date"),
+                                               model.key = "user_id",
+                                               sequence.key = "seq_id",
+                                               observed.key = "observation",
+                                               state.key = "loyalty_level"
+                                               )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

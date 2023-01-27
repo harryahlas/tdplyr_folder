@@ -1,0 +1,363 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Pattern Matching with nPath.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_npath_mle {tdplyr}"><tr><td>td_npath_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Pattern Matching with nPath.
+</h2>
+
+<h3>Description</h3>
+
+<p>The nPath function scans a set of rows, looking for patterns that you
+specify. For each set of input rows that matches the pattern, nPath
+produces a single output row. The function provides a flexible
+pattern-matching capability that lets you specify complex patterns in
+the input data and define the values that are output for each matched
+input set.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_npath_mle (
+      data1 = NULL,
+      mode = NULL,
+      pattern = NULL,
+      symbols = NULL,
+      result = NULL,
+      filter = NULL,
+      data2 = NULL,
+      data3 = NULL,
+      data1.partition.column = NULL,
+      data2.partition.column = NULL,
+      data3.partition.column = NULL,
+      data1.order.column = NULL,
+      data2.order.column = NULL,
+      data3.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data1</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input table.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data1.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;data1&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data1.order.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Order By columns for &quot;data1&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>mode</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the pattern-matching mode:
+</p>
+
+<ol>
+<li><p> OVERLAPPING: The function finds every occurrence of the pattern in
+the partition, regardless of  whether it is part of a previously
+found match. Therefore, one row can match multiple symbols in a
+given matched pattern.
+</p>
+</li>
+<li><p> NONOVERLAPPING: The function begins the next pattern search at the
+row that follows the last  pattern match. This is the default
+behavior of many commonly used pattern matching utilities, including
+the UNIX grep utility.<br /></p>
+</li></ol>
+
+<p>Permitted Values: OVERLAPPING, NONOVERLAPPING<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>pattern</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the pattern for which the function searches. You compose
+pattern with the symbols that you define in the symbols argument,
+operators, and parentheses. tbl_teradata describes the simplest
+patterns, which you can combine to form more complex patterns. When
+patterns have multiple operators, the function applies them in order
+of precedence, and applies operators of equal precedence from left to
+right. To force the function to evaluate a subpattern first, enclose
+it in parentheses. To specify that a subpattern must appear a specific
+number of times, use the &quot;Range-Matching Feature&quot;.<br />
+</p>
+<p>The basic pattern operators in decreasing order of precedence:<br />
+&quot;pattern&quot;, &quot;pattern.&quot;, &quot;pattern?&quot;, &quot;pattern*&quot;, &quot;pattern+&quot;,
+&quot;pattern1.pattern2&quot;, &quot;pattern1|pattern2&quot;<br />
+To force the function to evaluate a subpattern first, enclose it in parentheses.<br />
+Example:
+^A.(B|C)+.D?.X*.A$<br />
+The preceding pattern definition matches any set of rows
+whose first row starts with the definition of symbol A,
+followed by a non-empty sequence of rows, each of which
+meets the definition of either symbol B or C, optionally
+followed by one row that meets the definition of symbol D,
+followed by any number of rows that meet the definition of
+symbol X, and ending with a row that ends with the definition of symbol A.<br />
+You can use parentheses to define precedence rules. Parentheses are recommended for
+clarity, even where not strictly required.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>symbols</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the symbols that appear in the values of the pattern and
+result arguments. <br />
+Example : col_expr = symbol_predicate AS symbol<br />
+The col_expr is an expression whose value is a column name,
+symbol is any valid identifier, and symbol_predicate is a SQL predicate
+(often a column name).<br />
+For example, the symbols argument for analyzing website visits might
+look like this: <br />
+symbols <br />
+(
+pagetype = &quot;homepage&quot; AS H, <br />
+pagetype &lt;&gt; &quot;homepage&quot; AND  pagetype &lt;&gt; &quot;checkout&quot; AS PP,<br />
+pagetype = &quot;checkout&quot; AS CO <br />
+)<br />
+The symbol is case-insensitive, however a symbol of one or two
+uppercase letters is easy to identify in patterns.<br />
+If col_expr represents a column that appears in multiple input
+tbl_teradata, then you must qualify the ambiguous column name with its
+input tbl_teradata name.<br />
+For example: <br />
+symbols<br />
+(
+weblog.pagetype = &quot;homepage&quot; AS H, <br />
+weblog.pagetype = &quot;thankyou&quot; AS T, <br />
+ads.adname = &quot;xmaspromo&quot; AS X, <br />
+ads.adname = &quot;realtorpromo&quot; AS R <br />
+) <br />
+The mapping from teradataml DataFrame name to its corresponding SQL name is as shown below:<br />
+* data1: input<br />
+* data2: input1<br />
+* data3: input2<br />
+You can create symbol predicates that compare a row to a previous
+or subsequent row, using a LAG or LEAD operator.<br />
+LAG Expression Syntax:<br />
+ current_expr operator LAG (previous_expr, lag_rows [, default]) |
+LAG (previous_expr, lag_rows [, default]) operator current_expr <br />
+LAG and LEAD Expression Rules:<br />
+A symbol definition can have multiple LAG and LEAD expressions,
+A symbol definition that has a LAG or LEAD expression cannot have
+an OR operator.<br />
+If a symbol definition has a LAG or LEAD expression and the input
+is not a table, you must create an alias of the input query.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>result</code></td>
+<td>
+
+<p>Required Argument.<br />
+Defines the output columns. The col_expr is an expression whose value
+is a column name; it specifies the values to retrieve from the
+matched rows. The function applies aggregate function to these
+values.<br />
+Supported aggregate functions:
+SQL aggregate functions are [AVG, COUNT, MAX, MIN, SUM].
+ML Engine nPath sequence aggregate functions.
+The function evaluates this argument once for every matched pattern
+in the partition (that is, it outputs one row for each pattern match).<br />
+Note:
+For col_expr representing a column that appears in multiple input
+tbl_teradata, you must qualify the ambiguous column name with the SQL
+name corresponding to its tbl_teradata. Please see the
+description of the &quot;symbols&quot; parameter for the mapping from
+tbl_teradata name to the SQL name.<br />
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>filter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies filters to impose on the matched rows. The function
+combines the filter expressions using the AND operator.<br />
+The filter_expression syntax is:
+symbol_expression comparison_operator symbol_expression
+The two symbol expressions must be type-compatible.<br />
+The symbol_expression syntax is:<br />
+ FIRST | LAST (column_with_expression OF [ANY](symbol[,...]))<br />
+The column_with_expression cannot contain the operator AND or OR, and
+all its columns must come from the same input. If the function has
+multiple inputs, then column_with_expression and symbol must come
+from the same input.<br />
+The comparison_operator can be &lt;, &gt;, &lt;=, &gt;=, =, &lt;&gt;.<br />
+Note:
+For column_with_expression representing a column that appears in
+multiple input tbl_teradata, you must qualify the ambiguous column name with
+the SQL name corresponding to its tbl_teradata name. Please see
+the description of the &quot;symbols&quot; parameter for the mapping from
+tbl_teradata name to the SQL name.
+Types: character OR vector of characters
+</p>
+</td></tr>
+<tr valign="top"><td><code>data2</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies additional input tbl_teradata.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data2.partition.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Partition By columns for &quot;data2&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data2.order.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;data2&quot; is specified.<br />
+Specifies Order By columns for &quot;data2&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data3</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies additional input tbl_teradata.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data3.partition.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Partition By columns for &quot;data3&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data3.order.column</code></td>
+<td>
+
+<p>Optional Argument. Required if &quot;data3&quot; is specified.<br />
+Specifies Order By columns for &quot;data3&quot;.<br />
+Values to this argument can be provided as a vector, if multiple
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_npath_mle&quot; which is a named
+list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+
+    # Load data
+    loadExampleData("npath_example1", "bank_web_clicks2")
+    loadExampleData("npath_example2", "aggregate_clicks","link2")
+
+    # Create object(s) of class "tbl_teradata".
+    aggregate_clicks &lt;- tbl(con, "aggregate_clicks")
+    tblQuery &lt;- "SELECT customer_id, session_id, datestamp, page FROM bank_web_clicks2"
+    bank_web_clicks2 &lt;- tbl(con, sql(tblQuery))
+    link2 &lt;- tbl(con,"link2")
+
+    # Example 1 - LAG Expression Rules.
+    npath_out1 &lt;- td_npath_mle(
+                       data1=bank_web_clicks2,
+                       data1.partition.column = c("customer_id", "session_id"),
+                       data1.order.column = "datestamp",
+                       mode = "nonoverlapping",
+                       pattern = "(DUP|A)*",
+                       symbols = c("true AS A",
+                                   "page = LAG (page,1) AS DUP"),
+                       result = c("FIRST (customer_id OF any (A)) AS customer_id",
+                                  "FIRST (session_id OF A) AS session_id",
+                                  "FIRST (datestamp OF A) AS first_date",
+                                  "LAST (datestamp OF ANY(A,DUP)) AS last_date",
+                                  "ACCUMULATE (page OF A) AS page_path",
+                                  "ACCUMULATE (page of DUP) AS dup_path")
+                       )
+
+    # Example 2 - NPath Range-Matching Example.
+    # Find Data for Sessions That Checked Out 3-6 Products.
+    npath_out2 &lt;- td_npath_mle(
+             data1=aggregate_clicks,
+             data1.partition.column = "sessionid",
+             data1.order.column = "clicktime",
+             mode = "nonoverlapping",
+             pattern = "H+.D*.C{3,6}.D",
+             symbols = c("'true' AS X",
+                         "pagetype = 'home' AS H",
+                         "pagetype='checkout' AS C",
+                         "pagetype&lt;&gt;'home' AND pagetype&lt;&gt;'checkout' AS D"),
+             result = c("FIRST (sessionid OF C) AS sessionid",
+                        "max_choose (productprice, productname OF C) AS most_expensive_product",
+                        "MAX (productprice OF C) AS max_price",
+                        "min_choose (productprice, productname of C) AS least_expensive_product",
+                        "MIN (productprice OF C) AS min_price")
+              )
+
+    # Example 3 - NPath Greedy Pattern Matching Example
+    npath_out3 &lt;- td_npath_mle(
+                   data1=link2,
+                   data1.partition.column = "userid",
+                   data1.order.column = "startdate",
+                   mode = "nonoverlapping",
+                   pattern = "CEO.ENGR.OTHER*",
+                   symbols = c("title1 like '%software eng%' AS ENGR",
+                               "true AS OTHER",
+                               "title1 like 'chief exec officer' AS CEO"),
+                   result = c("accumulate(title1 OF ANY(ENGR,OTHER,CEO)) AS job_transition_path")
+                   )
+
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

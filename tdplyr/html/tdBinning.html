@@ -1,0 +1,479 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Binning</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for tdBinning {tdplyr}"><tr><td>tdBinning {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Binning<br /></h2>
+
+<h3>Description</h3>
+
+<p><code>tdBinning()</code> allows user to perform bin coding to replaces continuous
+numeric column with a categorical one to produce ordinal values (for example,
+numeric categorical values where order is meaningful). Binning uses the
+same techniques used in Histogram analysis, allowing you to choose between:
+</p>
+
+<ol>
+<li><p> equal-width bins
+</p>
+</li>
+<li><p> equal-width bins with a user-specified minimum and maximum range
+</p>
+</li>
+<li><p> bins with a user-specified width
+</p>
+</li>
+<li><p> evenly distributed bins
+</p>
+</li>
+<li><p> bins with user-specified boundaries
+</p>
+</li></ol>
+
+<p>If the minimum and maximum are specified, all values less than the minimum
+are put into bin 0, while all values greater than the maximum are put into
+bin N+1. The same is true when the boundary option is specified.<br />
+<br />
+<code>tdBinning()</code> supports numeric and date type columns. If date values are
+entered, the keyword DATE must precede the date value, and can not be
+enclosed in single quotes.<br />
+Note:<br />
+</p>
+
+<ul>
+<li><p> Output of this function is passed to &quot;bins&quot; argument of
+<code>td_transform_valib()</code>.<br />
+</p>
+</li></ul>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+tdBinning(columns, datatype=NULL, style="bins",
+          value=10, lbound=NULL, ubound=NULL,
+          fillna=NULL, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies name(s) of column(s) containing the input and
+output column names, where key is the name of the column to
+perform transformation on and value contains the name of the
+transformed  output column. When only key is specified then
+output column name is
+the name of input column.<br />
+Types: character OR list of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>datatype</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the name of the intended datatype of the output
+column.<br />
+Intended data types for the output column can be specified
+using the permitted strings below:
+</p>
+
+<table summary="Rd table">
+<tr>
+ <td style="text-align: left;">
+------------------------------------ </td><td style="text-align: left;"> ---------------------------------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+<b>If intended SQL Data Type is</b> </td><td style="text-align: left;"> <b>Permitted Value to be passed is</b></td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+------------------------------------ </td><td style="text-align: left;"> ---------------------------------------</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+bigint </td><td style="text-align: left;"> bigint</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+byteint </td><td style="text-align: left;"> byteint</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+char(n) </td><td style="text-align: left;"> char,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+date </td><td style="text-align: left;"> date</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+decimal(m,n) </td><td style="text-align: left;"> decimal,m,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+float </td><td style="text-align: left;"> float</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+integer </td><td style="text-align: left;"> integer</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+number(<code>*</code>) </td><td style="text-align: left;"> number</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+number(n) </td><td style="text-align: left;"> number,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+number(<code>*</code>,n) </td><td style="text-align: left;"> number,<code>*</code>,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+number(n,n) </td><td style="text-align: left;"> number,n,n</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+smallint </td><td style="text-align: left;"> smallint</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+time(p) </td><td style="text-align: left;"> time,p</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+timestamp(p) </td><td style="text-align: left;"> timestamp,p</td>
+</tr>
+<tr>
+ <td style="text-align: left;">
+varchar(n) </td><td style="text-align: left;"> varchar,n
+</td>
+</tr>
+
+</table>
+
+<p>Notes:
+</p>
+
+<ol>
+<li><p> Argument is ignored if &quot;columns&quot; argument is not used.
+</p>
+</li>
+<li><p> char without a size is not supported.
+</p>
+</li>
+<li><p> number(<code>*</code>) does not include the * in its datatype
+format.
+</p>
+</li></ol>
+
+<p>Examples:
+</p>
+
+<ol>
+<li><p> If intended datatype for the output column is 'bigint',
+then pass string 'bigint' to the argument as shown below:<br />
+<code>datatype="bigint"</code>
+</p>
+</li>
+<li><p> If intended datatype for the output column is
+'decimal(3,5)', then pass string 'decimal,3,5' to the
+argument as shown below:<br />
+<code>datatype="decimal,3,5"</code>
+</p>
+</li></ol>
+
+<p>Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>style</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the bin style to use.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> 'bins': This style allows user to specify equal-width bins
+without any boundaries. Argument &quot;values&quot; must be used when this
+style of binning is used.
+</p>
+</li>
+<li><p> 'binswithboundaries': This style allows user to specify
+equal-width bins with minimum and maximum range. Arguments
+&quot;values&quot;, &quot;lbound&quot; and &quot;ubound&quot; must be used when this style of
+binning is used. All values less than the minimum are put in to
+bin 0, while all values greater than the maximum are put into
+bin N+1.
+</p>
+</li>
+<li><p> 'boundaries': This style allows user to specify bins with
+boundaries. To specify boundaries one should use keyword
+arguments as:<br />
+b1 &ndash;&gt; To specify first boundary.<br />
+b2 &ndash;&gt; To specify second boundary.<br />
+b3 &ndash;&gt; To specify third boundary.<br />
+...<br />
+bN &ndash;&gt; To specify Nth boundary.<br />
+All values less than the first boundary value are put into bin 0,
+while all values greater than the last boundary value are put
+into bin N+1.<br />
+See &quot;...&quot; description below for more details on how these
+arguments must be used.
+</p>
+</li>
+<li><p> 'quantiles': This style allows user to specify
+evenly-distributed bins. Argument &quot;values&quot; must be used when
+this style of binning is used.
+</p>
+</li>
+<li><p> 'width': This style allows user to specify bins with
+widths. Argument &quot;values&quot; must be used when this style of
+binning is used.
+</p>
+</li></ol>
+
+<p>Default Value: 'bins'<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the value to be used for Bincode transformations.<br />
+When bin style is:
+</p>
+
+<ol>
+<li><p> 'bins' or 'binswithboundaries' argument specifies the
+number of bins.
+</p>
+</li>
+<li><p> 'quantiles' argument specifies the number of quantiles.
+</p>
+</li>
+<li><p> 'width' argument specifies the bin width.
+</p>
+</li></ol>
+
+<p>Note:
+</p>
+
+<ul>
+<li><p> Ignored when style is 'boundaries'.
+</p>
+</li></ul>
+
+<p>Default Value: 10<br />
+Types: integer</p>
+</td></tr>
+<tr valign="top"><td><code>lbound</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the minimum boundary value for 'binswithboundaries'
+style.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Ignored when style is not 'binswithboundaries'.
+</p>
+</li>
+<li><p> If date values are entered, the keyword 'DATE' must
+precede the date value, and can not be enclosed in single
+quotes.<br />
+For example,<br />
+<code>value='DATE 1987-06-09'</code>
+</p>
+</li></ol>
+
+<p>Types: integer, numeric, character</p>
+</td></tr>
+<tr valign="top"><td><code>ubound</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the maximum boundary value for 'binswithboundaries'
+style.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Ignored when style is not 'binswithboundaries'.
+</p>
+</li>
+<li><p> If date values are entered, the keyword 'DATE' must
+precede the date value, and do not enclose in single quotes.<br />
+For example,<br />
+<code>value='DATE 1987-06-09'</code>
+</p>
+</li></ol>
+
+<p>Types: integer, numeric, character</p>
+</td></tr>
+<tr valign="top"><td><code>fillna</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether the null replacement/missing value treatment
+should be performed with binning or not. Output of
+<code>tdFillNa()</code> can be passed to this argument.<br />
+Note:
+</p>
+
+<ul>
+<li><p> If the tdFillNa object is created with its arguments
+&quot;columns&quot;, and &quot;datatype&quot;, then values passed in
+<code>tdFillNa()</code> arguments are ignored. Only nullstyle
+information is captured from the same.
+</p>
+</li></ul>
+
+<p>Types: tdFillNa</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Optional Argument. Required if style is 'boundaries'.<br />
+Specifies the keyword arguments to provide the boundaries required
+for binning with bin style 'boundaries'.<br />
+To specify boundaries one should use keyword arguments as:<br />
+b1 &ndash;&gt; To specify first boundary.<br />
+b2 &ndash;&gt; To specify second boundary.<br />
+b3 &ndash;&gt; To specify third boundary.<br />
+...<br />
+bN &ndash;&gt; To specify Nth boundary.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> When keyword arguments are used, make sure to specify
+boundaries in sequence, i.e., b1, b2, b3, ..<br />
+In case a sequential keyword argument is missing an error is
+raised.
+</p>
+</li>
+<li><p> Keyword arguments specified for the boundaries must start
+with 'b'.
+</p>
+</li>
+<li><p> First boundary must always be specified with &quot;b1&quot; argument.
+</p>
+</li></ol>
+
+<p>Types: integer, numeric, character</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>An object of tdBinning class.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+Notes:
+# 1. To run any transformation, user needs to use td_transform_valib()
+#    function.
+# 2. To do so set option 'val.install.location' to the database name where
+#    Vantage analytic library functions are installed.
+# 3. Datasets used in these examples can be loaded using Vantage Analytic
+#    Library installer.
+
+# Get the current context/connection
+con &lt;- td_get_context()$connection
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Create object(s) of class "tbl_teradata".
+ibm_stock &lt;- tbl(con, "ibm_stock")
+ibm_stock
+
+# Example 1: Binning is carried out with 'bins' style, i.e. equal-width
+#            binning, with 5 number of bins. Null replacement is also
+#            combined with binning. "key.columns" argument must be used
+#            with td_transform_valib() function, when null
+#            replacement is being done.
+#            Perform the binning transformation using
+#            td_transform_valib() function from Vantage Analytic
+#            Library.
+
+# Create tdFillNa object.
+fn &lt;- tdFillNa(style="literal", value=0)
+
+# Create tdBinning object.
+bins &lt;- tdBinning(style="bins", value=5, columns="stockprice", fillna=fn)
+
+# Perform the binning transformation using td_transform_valib() function.
+obj &lt;- td_transform_valib(data=ibm_stock, bins=bins, key.columns="id")
+obj$result
+
+# Example 2: Binning is carried out with multiple styles.
+#            Perform the binning transformation using
+#            td_transform_valib() function from Vantage Analytic
+#            Library.
+# 'binswithboundaries' style:
+#     Equal-width bins with a user-specified minimum and maximum range on
+#     'period' column. Resultant output return the value with the same
+#     column name. Number of bins created are 5.
+
+# Create tdBinning object.
+bins_1 &lt;- tdBinning(style="binswithboundaries", value=5,
+                    lbound="DATE 1962-01-01",
+                    ubound="DATE 1962-06-01",
+                    columns="period")
+
+# 'boundaries' style:
+#     Bins created with user specified boundaries on 'period' column.
+#     Resultant column is names as 'period2'. Three boundaries are
+#     specified with arguments "b1", "b2" and "b3".
+#     When using this style, keyword argument names must start with
+#     'b' and they should be in sequence b1, b2, ..., bN.
+
+# Create tdBinning object.
+bins_2 &lt;- tdBinning(style="boundaries", b1="DATE 1962-01-01",
+                    b2="DATE 1962-06-01", b3="DATE 1962-12-31",
+                    columns=list("period"="period2"))
+
+# Perform the binning transformation using td_transform_valib() function.
+obj &lt;- td_transform_valib(data=ibm_stock, bins=c(bins_1, bins_2))
+obj$result
+
+# Example 3: Binning is carried out with multiple styles 'quantiles' and
+#            'width'.
+#            Perform the binning transformation using
+#            td_transform_valib() function from Vantage Analytic
+#            Library.
+# 'quantiles' style:
+#     Evenly distributed bins on 'stockprice' column. Resultant output
+#     return the column with name 'stockprice_q'. Number of quantiles
+#     considered here are 4.
+
+# Create tdBinning object.
+bins_1 &lt;- tdBinning(style="quantiles", value=4,
+                    columns=list("stockprice"="stockprice_q"))
+
+# 'width' style:
+#     Bins with user specified width on 'stockprice' column.
+#     Resultant output returns the column with name 'stockprice_w'.
+#     Width considered for binning is 5.
+
+# Create tdBinning object.
+bins_2 &lt;- tdBinning(style="width", value=5,
+                    columns=list("stockprice"="stockprice_w"))
+
+# Perform the binning transformation using td_transform_valib() function.
+obj &lt;- td_transform_valib(data=ibm_stock, bins=c(bins_1, bins_2))
+obj$result
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

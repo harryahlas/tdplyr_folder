@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Selects one or more samples of rows</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_sample {tdplyr}"><tr><td>td_sample {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Selects one or more samples of rows</h2>
+
+<h3>Description</h3>
+
+<p>This function reduces the number of rows to be considered for further processing by returning
+one or more samples of rows. Sampling can be done in either of the three ways mentioned below:
+</p>
+
+<ol>
+<li><p> Specifying list of numbers (number of rows in each sample)
+</p>
+</li>
+<li><p> Specifying list of fractions (proportion of the total number of rows in each sample)
+</p>
+</li>
+<li><p> Specifying list of numbers/fractions based on conditions (stratified sampling)
+</p>
+</li></ol>
+
+<p>Stratified random sampling is a sampling method that divides a heterogeneous population of
+interest into homogeneous subgroups, or strata, and then takes a random sample from each of
+those subgroups. The arguments 'when_then' and 'case_else' help in stratified sampling.<br />
+Usage notes for the arguments 'n', 'case_else' and each 'then' element in the argument
+'when_then':
+</p>
+
+<ol>
+<li><p> No more than 16 samples can be requested per count or fraction list i.e. the arguments
+cannot take a list of elements with more than 16 samples.
+</p>
+</li>
+<li><p> Sum of elements in the list containing fraction values should not be greater than 1 and
+each value should be greater than 0.
+</p>
+</li>
+<li><p> If the list contains a float value greater than 1, e.g. <code>c(3, 2.4)</code>, then the floor
+value is considered for sampling i.e. first sample contains 3 rows and second sample contains 2 rows.
+</p>
+</li></ol>
+
+<p>Note :
+</p>
+
+<ol>
+<li><p> A new column 'sampleid' is added to the sampled data to determine the sample set each row
+belongs to in the sample. If the parent tbl object already has the column 'sampleid',
+this column is removed in the sampled data. This case occurs when multiple or consecutive
+sample operations are performed. To retain the 'sampleid' columns across multiple
+<code>td_sample</code> operations, the column must be renamed using <code>mutate</code> function.
+</p>
+</li>
+<li><p> If the number of samples requested exceed the number of rows available, the sample
+size is reduced to the number of remaining rows when the argument 'with.replacement' is set to
+FALSE.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_sample(
+  df = NULL,
+  n = NULL,
+  with.replacement = FALSE,
+  randomize = FALSE,
+  when_then = NULL,
+  case_else = c()
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>df</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the teradata_tbl object from which rows are sampled.</p>
+</td></tr>
+<tr valign="top"><td><code>n</code></td>
+<td>
+<p>Optional Argument.<br />
+Required if the argument 'when_then' is not specified.<br />
+Specifies the number of rows or proportion of rows to be sampled.<br />
+Types: numeric OR vector of numerics<br />
+Examples:
+</p>
+<ol>
+<li> <p><code>c(1, 2)</code> - to get 2 samples, one containing 1 row and the other
+containing 2 rows<br />
+</p>
+</li>
+<li> <p><code>2</code> - to get one sample containing two rows
+</p>
+</li>
+<li> <p><code>c(0.3, 0.5)</code> -  to get 2 samples, one containing 30% of rows and the other
+containing 50% of rows of all samples</p>
+</li></ol>
+</td></tr>
+<tr valign="top"><td><code>with.replacement</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies if sampling should be done with replacement or not.<br />
+If this argument is FALSE, sampling is done without replacement.<br />
+Default value : FALSE.<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>randomize</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether rows are sampled randomly across AMPs (RANDOMIZED
+ALLOCATION) or proportionate to the number of qualified rows per AMP
+(PROPORTIONAL ALLOCATION). If this argument is FALSE, sampling is done
+proportionate to the number of qualified rows per AMP.<br />
+Note : The proportional allocation option does not provide a simple random
+sample of the entire population. It provides a random sample stratified
+by AMPs, but it is much faster, especially for very large samples.<br />
+Default value : FALSE.<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>when_then</code></td>
+<td>
+<p>Optional Argument.<br />
+Required when the argument 'n' is not specified.<br />
+Specifies the string conditions ('when' element) and the number of samples
+('then' element) required to generate sample rows for each 'when' condition.
+<br />
+Default value : NULL <br />
+Types : Named list of numbers OR named list of vector of numbers.<br />
+Example: Suppose sampling is to be performed on a teradata_tbl object having
+columns 'col1' and 'col2'.<br />
+<code>when_then &lt;- list("col1 &lt; 20" = 2, "col2 &lt;&gt; 'value'" = c(1, 3),
+"col1 = 30" = c(2, 1))</code><br />
+The equivalent when - then clauses for this example argument is:<br />
+</p>
+
+<ol>
+<li> <p><code>WHEN col1 &lt; 20 THEN 2</code> </p>
+</li>
+<li> <p><code>WHEN col2 &lt;&gt; 'value' THEN 1, 3</code>
+</p>
+</li>
+<li> <p><code>WHEN col1 = 30 THEN 2, 1</code>
+</p>
+</li></ol>
+</td></tr>
+<tr valign="top"><td><code>case_else</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the number of samples to be sampled from rows where none of the
+conditions in 'when_then' are met.<br />
+Default value : c() <br />
+Types : numeric OR vector of numerics<br />
+Examples : The equivalent else clause for the argument value:
+</p>
+
+<ol>
+<li> <p><code>c(1,2)</code> is <code>ELSE 1, 2</code>
+</p>
+</li>
+<li> <p><code>2</code> is <code>ELSE 2</code>
+</p>
+</li>
+<li> <p><code>c(0.3, 0.5)</code> is <code>ELSE 0.3, 0.5</code>
+</p>
+</li></ol>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A 'tbl' object containing the sampled data.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>sample</code>, <code>td_sampling</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Creates the table "antiselect_input" if it is not present already.
+loadExampleData("antiselect_example", "antiselect_input")
+
+# Creates a teradata_tbl object.
+df &lt;- tbl(con, "antiselect_input") # Table contain 7 rows in total.
+
+# Example 1: Get two samples of 3 rows and 2 rows each.
+td_sample(df = df, n = c(3,2))
+
+# Example 2: Get a sample of 3 rows. Note that all the rows have sampleid = 1.
+td_sample(df = df, n = 3)
+
+# Example 3: Get 50% of total rows. Here, it is 50% of 7 rows.
+td_sample(df = df, n = 0.5)
+
+# Example 4: Get 10 rows from a tbl object of 7 rows using with.replacement = TRUE.
+#            'randomize = TRUE' will ensure sampling is done across AMPs in large datasets.
+td_sample(df = df, n = 10, with.replacement = TRUE, randomize = TRUE)
+
+# Example 5: Get 5 rows which satisfy the condition 'orderid &lt; 300' from a tbl object.
+#            Here, only three rows are returned as the total number of rows which satisfy this
+#            condition is 3. If with.replacement = TRUE is specified, then 5 rows will be
+#            returned.
+td_sample(df, when_then = list("orderid &lt; 300" = 5))
+
+# Example 6: Get 4 rows (1 row in first sample and 3 rows in second sample) which satisfy the
+#            condition 'orderid &lt; 300' from a tbl object.
+#            Here, only 2 rows have sampleid = 2 as the total number of rows which satisfy
+#            this condition is 3. If with.replacement = TRUE is specified, then 3 rows having
+#            sampleid = 2 will be returned.
+td_sample(df, when_then = list("orderid &lt; 300" = c(1,3)))
+
+# Example 7: Using stratified sampling with multiple conditions : 4 rows (1 row in first sample
+#            and 3 rows in second sample) when orderid &lt; 300 and 2 rows when priority != "high".
+td_sample(df, when_then = list("orderid &lt; 300" = c(1,3), "priority &lt;&gt; 'high'" = 2))
+
+# Example 8: Using 'case_else' argument for stratified sampling : 2 rows when orderid &lt; 300 and
+#            3 rows from the remaining rows (rows which doesn't satisfy orderid &lt; 300).
+td_sample(df, when_then = list("orderid &lt; 300" = 2), case_else = 3)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

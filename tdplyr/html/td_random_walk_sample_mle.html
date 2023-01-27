@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: RandomWalkSample</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_random_walk_sample_mle {tdplyr}"><tr><td>td_random_walk_sample_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+RandomWalkSample
+</h2>
+
+<h3>Description</h3>
+
+<p>The RandomWalkSample function takes an input graph (which is typically large)
+and outputs a sample graph.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_random_walk_sample_mle (
+      vertices.data = NULL,
+      edges.data = NULL,
+      target.key = NULL,
+      sample.rate = 0.15,
+      flyback.rate = 0.15,
+      seed = 1000,
+      accumulate = NULL,
+      vertices.data.sequence.column = NULL,
+      edges.data.sequence.column = NULL,
+      vertices.data.partition.column = NULL,
+      edges.data.partition.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>vertices.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the vertex data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>vertices.data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;vertices.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>edges.data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the edge data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>edges.data.partition.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies Partition By columns for &quot;edges.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>target.key</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the names of the columns in &quot;edges.data&quot; that identify the target
+vertex of an edge. This set of columns must have the same schema as
+&quot;vertices.data.partition.column&quot; and &quot;edges.data.partition.column&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>sample.rate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the sampling rate. This value must be in the range (0, 1.0).<br />
+Default Value: 0.15<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>flyback.rate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the chance, when visiting a vertex, of flying back to the
+starting vertex. This value must be in the range (0, 1.0).<br />
+Default Value: 0.15<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the seed used to generate a series of random numbers for
+&quot;sample.rate&quot;, &quot;flyback.rate&quot;, and any random number used internally.
+Specifying this value along with &quot;vertices.data.sequence.column&quot; and
+&quot;edges.data.sequence.column&quot; guarantees that the function result is
+repeatable on a given Vantage system.<br />
+Default Value: 1000<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of columns in &quot;vertices.data&quot; to copy to the
+&quot;output.vertex.table&quot; output tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>vertices.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;vertices.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>edges.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;edges.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_random_walk_sample_mle&quot; which 
+is a named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> output.vertex.table</p>
+</li>
+<li> 
+<p>output.edge.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection.
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("randomwalksample_example", "citvertices_2", "citedges_2")
+    
+    # Create object(s) of class "tbl_teradata".
+    citvertices_2 &lt;- tbl(con, "citvertices_2")
+    citedges_2 &lt;- tbl(con, "citedges_2")
+    
+    # Example 1 - This function takes an input graph (which is typically large) and outputs
+    # a sample graph that preserves graph properties as well as possible.
+    td_random_walk_sample_mle_out &lt;- td_random_walk_sample_mle(vertices.data = citvertices_2,
+                                                      vertices.data.partition.column = c("id"),
+                                                      edges.data = citedges_2,
+                                                      edges.data.partition.column = c("from_id"),
+                                                      target.key = c("to_id"),
+                                                      sample.rate = 0.15,
+                                                      flyback.rate = 0.15,
+                                                      seed = 1000
+                                                      )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

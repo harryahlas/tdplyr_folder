@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TextTokenizer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_text_tokenizer_mle {tdplyr}"><tr><td>td_text_tokenizer_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+TextTokenizer
+</h2>
+
+<h3>Description</h3>
+
+<p>The TextTokenizer function extracts English, Chinese, or Japanese 
+tokens from text. Examples of tokens are words, punctuation marks, and 
+numbers. Tokenization is the first step of many types of text analysis.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_text_tokenizer_mle (
+      data = NULL,
+      dict.data = NULL,
+      text.column = NULL,
+      language = "en",
+      model = NULL,
+      output.delimiter = "/",
+      output.byword = FALSE,
+      user.dictionary = NULL,
+      accumulate = NULL,
+      data.sequence.column = NULL,
+      dict.data.sequence.column = NULL,
+      data.order.column = NULL,
+      dict.data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the text to be scanned.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>dict.data</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the tbl_teradata containing the dictionary for segementing words.
+</p>
+</td></tr>
+<tr valign="top"><td><code>dict.data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;dict.data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+text to tokenize.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>language</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the language of the text in the text column: en (English), 
+zh_CN (Simplified Chinese), zh_TW (Traditional Chinese), jp (Japanese)<br />
+Default Value: &quot;en&quot;<br />
+Permitted Values: en, zh_CN, zh_TW, jp<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>model</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of model file that the function uses for 
+tokenizing. The model must be a conditional random-fields model and 
+model file must already be installed on the Vantage. If you omit 
+this argument, or if model file is not installed on the Vantage, 
+then the function uses white spaces to separate English words and an 
+embedded dictionary to tokenize Chinese text.<br />
+Note: If you speciify the &quot;language&quot; argument as 'jp', 
+the function ignores this argument.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the delimiter for separating tokens in the output.<br />
+Default Value: &quot;/&quot; (i.e., forward slash)<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.byword</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to output one token in each row. Function outputs one line 
+of text in each row, when this argument is set to TRUE.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>user.dictionary</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the user dictionary to use to correct results 
+specified by the model. If you specify both this argument and &quot;dict.data&quot;
+argument, then the function uses the union of &quot;user.dictionary&quot; and 
+&quot;dict.data&quot; as its dictionary.<br />
+Note: If the function finds more than one matched term, it selects 
+the longest term for the first match.<br />
+The format of both the arguments &quot;dict.data&quot; and &quot;user.dictionary&quot; is different
+for different languages.
+</p>
+
+<ul>
+<li><p> If the language is Chinese or English, then the text column contains one 
+dictionary word on each line.
+</p>
+</li>
+<li><p> If the language is Japanese, then the dictionary entry consists of the following
+comma-separated words:
+</p>
+
+<ol>
+<li><p> word : The original word
+</p>
+</li>
+<li><p> tokenized_word : The tokenized form of the word
+</p>
+</li>
+<li><p> reading : The reading of the word in Katakana
+</p>
+</li>
+<li><p> pos : The part-of-speech of the word
+</p>
+</li></ol>
+
+</li></ul>
+
+<p>Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input tbl_teradata columns to copy to the 
+output tbl_teradata.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>dict.data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;dict.data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_text_tokenizer_mle&quot; which is 
+a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("texttokenizer_example", "complaints")
+    
+    # Create object(s) of class "tbl_teradata".
+    complaints &lt;- tbl(con, "complaints")
+    
+    # Example 1 - English Tokenization
+    td_text_tokenizer_out &lt;- td_text_tokenizer_mle(data = complaints,
+                                               text.column = "text_data",
+                                               language = "en",
+                                               output.delimiter = " ",
+                                               output.byword = TRUE,
+                                               accumulate = c("doc_id")
+                                               )
+    
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

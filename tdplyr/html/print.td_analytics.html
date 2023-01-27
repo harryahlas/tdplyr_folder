@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Printing tdplyr Analytic Function Objects</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for print.td_analytics {tdplyr}"><tr><td>print.td_analytics {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Printing tdplyr Analytic Function Objects</h2>
+
+<h3>Description</h3>
+
+<p>Print an object of class &quot;td_analytics&quot;.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S3 method for class 'td_analytics'
+print(x, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies a tdplyr analytic function object of class &quot;td_analytics&quot; to print.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Optional Arguments.<br />
+Specifies further optional arguments to the <code>print</code> method.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function will automatically be dispatched when the generic function
+<code>print</code> is invoked to print a specified input object of class &quot;td_analytics&quot;.<br />
+It calls <code>print</code> on the elements of class &quot;tbl_teradata&quot; from the specified
+input object.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Load example data.
+loadExampleData("glm_example", "admissions_train")
+
+# Create object of class "tbl_teradata" to use as input.
+admissions_train &lt;- tbl(con, "admissions_train")
+
+# Create the GLM model.
+td_glm_out &lt;- td_glm_mle(formula = (admitted ~ stats + masters + gpa + programming),
+                         family = "LOGISTIC",
+                         linkfunction = "LOGIT",
+                         data = admissions_train,
+                         weights = "1",
+                         threshold = 0.01,
+                         maxit = 25,
+                         step = FALSE,
+                         intercept = TRUE
+)
+
+# Print the result which is an object of class "td_analytics".
+print(td_glm_out)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

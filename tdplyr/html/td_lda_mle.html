@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: LDATrainer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_lda_mle {tdplyr}"><tr><td>td_lda_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+LDATrainer
+</h2>
+
+<h3>Description</h3>
+
+<p>The LDATrainer function uses training data and parameters to build a 
+topic model, using an unsupervised method to estimate the correlation 
+between the topics and words according to the topic number and other parameters. 
+Optionally, the function generates the topic distributions for each training document. 
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_lda_mle (
+      data = NULL,
+      topic.num = NULL,
+      docid.column = NULL,
+      word.column = NULL,
+      alpha = 0.1,
+      eta = 0.1,
+      count.column = NULL,
+      maxiter = 50,
+      convergence.delta = 1.0E-4,
+      seed = NULL,
+      out.topicnum = "all",
+      out.topicwordnum = "none",
+      initmodeltaskcount = NULL,
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata that contains the new documents.
+</p>
+</td></tr>
+<tr valign="top"><td><code>topic.num</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the number of topics for all the documents in the input 
+table, an integer value in the range [2, 1000], both lower and upper bounds 
+inclusive.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>docid.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the document 
+identifiers.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>word.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column that contains the words
+(one word in each row).<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>alpha</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a hyperparameter of the model, the prior smooth parameter
+for the topic distribution over documents. As &quot;alpha&quot; decreases, fewer
+topics are associated with each document. <br />
+Default Value: 0.1<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>eta</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a hyperparameter of the model, the prior smooth parameter 
+for the word distribution over topics. As &quot;eta&quot; decreases, fewer words 
+are associated with each topic.<br />
+Default Value: 0.1<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>count.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the input column that contains the count of
+the corresponding word in the row.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>maxiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of iterations to perform if the model 
+does not converge, a positive integer value. <br />
+Default Value: 50<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>convergence.delta</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the convergence delta of log perplexity, a NUMERIC value in 
+the range (0.0, 1.0), both lower and upper bounds exclusive.<br />
+Default Value: 1.0E-4<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the seed with which to initialize the model, a numeric 
+value. Given the same seed, cluster configuration, and input tbl_teradata, 
+the function generates the same model. By default, the function 
+initializes the model randomly.<br />
+Types: numeric
+</p>
+</td></tr>
+<tr valign="top"><td><code>out.topicnum</code></td>
+<td>
+
+<p>Specifies the number of top-weighted topics and their weights to 
+include in the output tbl_teradata for each training document. The 
+value &quot;out.topicnum&quot; must be a positive integer enclosed in quotes or &quot;all&quot;.<br />
+The value &quot;all&quot; specifies all topics and their weights.<br />
+Default Value: &quot;all&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>out.topicwordnum</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of top topic words and their topic identifiers 
+to include in the output tbl_teradata for each training document. The 
+value &quot;out.topicwordnum&quot; must be a positive integer enclosed in quotes or &quot;all&quot; or &quot;none&quot;.<br />
+The value &quot;all&quot; specifies all topic words and their topic identifiers.<br />
+The value &quot;none&quot; specifies no topic words or topic identifiers.<br />
+Default Value: &quot;none&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>initmodeltaskcount</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the number of vWorkers that are adopted to generate 
+initalized model. It must be a positive integer value.<br />
+By default, all the available vWorkers are used to initialize the model.<br />
+Note: This argument is supported when tdplyr is connected to Vantage 1.1.1
+or later versions.<br />
+Types: integer
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_lda_mle&quot; which is a named list 
+containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using following names:</p>
+<ol>
+<li><p> model.table</p>
+</li>
+<li> 
+<p>doc.distribution.data</p>
+</li>
+<li><p> output</p>
+</li></ol>
+<p>.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("lda_example", "complaints_traintoken")
+    
+    # Create object(s) of class "tbl_teradata".
+    complaints_traintoken &lt;- tbl(con, "complaints_traintoken")
+    
+    # Example 1 - This function uses training data and parameters from 'complaints_traintoken'
+    # tbl_teradata to build a topic model.
+    td_lda_out &lt;- td_lda_mle(data = complaints_traintoken,
+                             topic.num = 5,
+                             docid.column = "doc_id",
+                             word.column = "token",
+                             count.column = "frequency",
+                             maxiter = 30,
+                             convergence.delta = 1e-3,
+                             seed = 2
+                            )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

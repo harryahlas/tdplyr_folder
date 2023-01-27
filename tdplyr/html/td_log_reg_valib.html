@@ -1,0 +1,565 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Logistic Regression</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_log_reg_valib {tdplyr}"><tr><td>td_log_reg_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Logistic Regression</h2>
+
+<h3>Description</h3>
+
+<p>Logistic Regression is one of the most widely used types of statistical analysis.
+In Logistic Regression, a set of independent variables (in this case, columns) is
+processed to predict the value of a dependent variable (column) that assumes two
+values referred to as response (1) and non-response (0). The user can specify which
+value of the dependent variable to treat as the response, and all other values
+assumed by the dependent variable are treated as non-repsonse. The result is not,
+however, a continuous numeric variable as seen in Linear Regression, but rather a
+probability between 0 and 1 that the response value is assumed by the dependent
+variable.<br />
+<br />
+There are many types of analysis that lend themselves to the use of Logistic Regression,
+and when scoring a model, benefit from the estimation of a probability rather than
+a fixed value. For example, when predicting who should be targeted for a marketing
+campaign, the scored customers can be ordered by the predicted probability from most
+to least likely, and the top n values taken from the customer list.<br />
+Some of the key features of Logistic Regression are outlined below.
+</p>
+
+<ol>
+<li><p> The Teradata table operator CALCMATRIX is used to build an ESSCP matrix for
+purposes of validating the input data, such as by checking for constant values.
+Also, to avoid rebuilding this matrix every time the algorithm is run, the
+user may run the Matrix Analysis separately, saving an ESSCP matrix in a
+tbl_teradata that can then be input to Logistic Regression. Refer &quot;matrix.data&quot;
+argument.
+</p>
+</li>
+<li><p> One or more group by columns can optionally be specified so that an input
+matrix is built for each combination of group by column values, and subsequently
+a separate Logistic Regression model is built for each matrix. To achieve this,
+the names of the group by columns are passed to CALCMATRIX as parameters, so it
+includes them as columns in the matrix data it creates. Refer &quot;group.columns&quot;
+argument.
+</p>
+</li>
+<li><p> The stepwise feature for Logistic Regression is a technique for selecting the
+independent variables in a logistic model. It consists of different methods of
+'trying' variables and adding or removing them from a model through a series of
+forward and backward steps described in the parameter section.
+</p>
+</li>
+<li><p> A Statistics data is available, displaying the mean and standard deviation of
+each model variable. Refer to the &quot;stats.output&quot; argument.
+</p>
+</li>
+<li><p> A Success data is available, displaying counts of predicted versus actual values
+of the dependent variable in the logistic model.
+</p>
+</li>
+<li><p> A Multi-Threshold Success Table is available. Refer &quot;threshold.output&quot; argument.
+</p>
+</li>
+<li><p> A Lift Table, such as would be used to build a Lift Chart, is available.
+Refer &quot;lift.output&quot; argument.
+</p>
+</li>
+<li><p> A Near Dependency Report is available to identify two or more columns that may
+be collinear.
+</p>
+</li>
+<li><p> The algorithm is partially scalable because the size of each input matrix depends
+only on the number of independent variables (columns) and not on the size of the
+input data. The calculations performed on the client workstation however are not
+scalable when group by columns are used, because each model is built serially
+based on each matrix in the matrix data.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+td_log_reg_valib(data, columns, response.column, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to build a logistic regression model from.
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the column(s) representing the independent
+variables used in building a logistic regression model. Occasionally,
+it can also accept permitted strings to specify all columns, or all
+numeric columns.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> Name(s) of the column(s) in &quot;data&quot;.
+</p>
+</li>
+<li><p> Pre-defined strings:
+</p>
+
+<ol>
+<li><p> 'all' - all columns
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>response.column</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of the column that represents the dependent
+variable being predicted.<br />
+Types: character</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_log_reg_valib&quot;
+which is a named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator
+using names:
+</p>
+
+<ol>
+<li><p> model
+</p>
+</li>
+<li><p> statistical.measures
+</p>
+</li>
+<li><p> xml.reports
+</p>
+</li></ol>
+
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>backward</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to take backward steps or not. Backward steps, 
+i.e., removing variables from a model, use the P-value of the 
+T-statistic, i.e., the ratio of a B-coefficient to its standard 
+error. The variable (column) with the largest P-value is removed 
+if the P-value exceeds the criterion to remove.<br />
+Types: logical
+</p>
+
+
+
+<h4>backward.only</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use only backward technique or not. This 
+technique is similar to the backward technique, except that a 
+forward step is not performed. It starts with all independent 
+variables in the model. Backward steps are executed until no 
+more are possible.<br />
+Types: logical
+</p>
+
+
+
+<h4>exclude.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) to exclude from the
+analysis, if a column specifier such as 'all', 'allnumeric'
+is used in the &quot;columns&quot; argument. By default, when the 
+&quot;exclude.columns&quot; argument is used, dependent variable and 
+group by columns, if any, are automatically excluded as 
+input columns and do not need to be included as 
+&quot;exclude.columns&quot;.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>cond.ind.threshold</h4>
+
+<p>Optional Argument.<br />
+Specifies the condition index threshold value to use 
+while generating near dependency report. This is used 
+when &quot;near.dep.report&quot; is set to TRUE.<br />
+Default Value: 30<br />
+Types: integer
+</p>
+
+
+
+<h4>constant</h4>
+
+<p>Optional Argument.<br />
+Specifies whether the logistic model includes a constant term 
+or not. When set to TRUE, model includes a constant term.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+
+
+
+<h4>convergence</h4>
+
+<p>Optional Argument.<br />
+Specifies the convergence criterion such that the algorithm 
+stops iterating when the change in log likelihood function 
+falls below this value.<br />
+Default Value: 0.001<br />
+Types: numeric
+</p>
+
+
+
+<h4>entrance.criterion</h4>
+
+<p>Optional Argument.<br />
+Specifies the criterion to enter a variable into the model. 
+The W-statistic chi-square P-value must be less than this 
+value for a variable to be added.<br />
+Default Value: 0.05<br />
+Types: numeric
+</p>
+
+
+
+<h4>forward</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use forward technique or not. When set to TRUE, 
+in this technique, starting with no independent variables in the model, 
+a forward step is performed, adding the &quot;best&quot; choice, followed by a 
+backward step, removing the worst choice. Refer to the &quot;stepwise&quot; 
+argument for a description of the steps in this technique.<br />
+Types: logical
+</p>
+
+
+
+<h4>forward.only</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use only forward technique or not. This 
+technique is similar to the forward technique, except that a 
+backward step is not performed.<br />
+Types: logical
+</p>
+
+
+
+<h4>group.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) dividing the input into 
+partitions, one for each combination of values in the group by 
+columns. For each partition or combination of values a separate 
+logistic model and XML report is built.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>lift.output</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to build a lift chart or not and add it in the 
+functions output string. It splits up the computed probability 
+values into deciles with the usual counts and percentages to 
+demonstrate what happens when more and more rows of ordered 
+probabilities are accumulated.<br />
+Types: logical
+</p>
+
+
+
+<h4>matrix.data</h4>
+
+<p>Optional Argument.<br />
+Specifies the input matrix data to use for the analysis. Instead 
+of internally building a matrix with the <code>td_matrix_valib()</code> each 
+time this analysis is performed, the user may build an ESSCP Matrix 
+once with the Matrix Analysis using <code>td_matrix_valib()</code>. The matrix 
+can subsequently be read from this data instead of re-building it 
+each time. If this is specified, the columns specified with the 
+&quot;columns&quot; argument should be a subset of the columns in this matrix 
+and can be specified in any order. The columns must however all be 
+present in the matrix. Further, if group by columns are specified 
+in the matrix, these same group by columns must be specified in 
+this analysis.<br />
+Types: tbl_teradata
+</p>
+
+
+
+<h4>max.iter</h4>
+
+<p>Optional Argument.<br />
+Specifies the maximum number of attempts to converge on a solution.<br />
+Default Value: 100<br />
+Types: integer
+</p>
+
+
+
+<h4>mem.size</h4>
+
+<p>Optional Argument.<br />
+Specifies the memory size in megabytes to allocate for in-memory 
+Logistic Regression. If there is too much data to fit in this amount 
+of memory or is set to 0 or argument is not specified, normal SQL 
+processing is performed.<br />
+Types: integer
+</p>
+
+
+
+<h4>near.dep.report</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to produce an XML report showing columns 
+that may be collinear as part of the output or not. The report 
+is included in the XML output only if collinearity is detected.<br />
+Two threshold arguments are available for this report, 
+&quot;cond.ind.threshold&quot; and &quot;variance.prop.threshold&quot;.<br />
+Types: logical
+</p>
+
+
+
+<h4>remove.criterion</h4>
+
+<p>Optional Argument.<br />
+Specifies the criterion to remove a variable from the model. 
+The T-Statistic P-value must be greater than this value for a 
+variable to be removed.<br />
+Default Value: 0.05<br />
+Types: numeric
+</p>
+
+
+
+<h4>response.value</h4>
+
+<p>Optional Argument.<br />
+Specifies the value assumed by the dependent column that is to 
+be treated as the response value.<br />
+Types: character
+</p>
+
+
+
+<h4>sample</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to use sample of the data to be read into memory for 
+processing, if the memory size available is less than the amount of 
+data to process. When set to TRUE, a sample of data is read.<br />
+Types: logical
+</p>
+
+
+
+<h4>stats.output</h4>
+
+<p>Optional Argument.<br />
+Specifies whether an optional data quality report should be 
+delivered in the function's XML output string or not, which 
+includes the mean and standard deviation of each model variable, 
+derived from an ESSCP matrix.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>stepwise</h4>
+
+<p>Optional Argument.<br />
+Specifies whether to perform a stepwise procedure or not.<br />
+Forward steps, i.e., adding variables to a model, add the variable 
+with the smallest chi-square P-value connected to its special 
+W-statistic, provided the P-value is less than the criterion to 
+enter.<br />
+Backward steps, i.e., removing variables from a model, use the 
+P-value of the T-statistic, i.e., the ratio of a B-coefficient to 
+its standard error. The variable (column) with the largest P-value 
+is removed if the P-value exceeds the criterion to remove.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>success.output</h4>
+
+<p>Optional Argument.<br />
+Specifies whether an optional success report should be delivered 
+in the function's XML output string or not, which includes the 
+displaying counts of predicted versus actual values of the 
+dependent variable of the logistic regression model. This report 
+is similar to the Decision Tree Confusion Matrix, but the success 
+report only includes two values of the dependent variable, namely
+response versus non-response.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>start.threshold</h4>
+
+<p>Optional Argument.<br />
+Specifies the beginning threshold value utilized in the 
+Multi-Threshold Success output.<br />
+Types: numeric
+</p>
+
+
+
+<h4>end.threshold</h4>
+
+<p>Optional Argument.<br />
+Specifies the ending threshold value utilized in the 
+Multi-Threshold Success output.<br />
+Types: numeric
+</p>
+
+
+
+<h4>increment.threshold</h4>
+
+<p>Optional Argument.<br />
+Specifies the difference in threshold values between 
+adjacent rows in the Multi-Threshold Success output.<br />
+Types: numeric
+</p>
+
+
+
+<h4>threshold.output</h4>
+
+<p>Optional Argument.<br />
+Specifies whether the Multi-Threshold Success output should 
+be produced or not and included in the XML output string in 
+the result. This report can be thought of as a table where 
+each row is a Prediction Success Table, and each row has a 
+different threshold value as generated by the &quot;start.threshold&quot;, 
+&quot;end.threshold&quot;, and &quot;increment.threshold&quot; arguments. What 
+is meant by a threshold here is the value above which the 
+predicted probability indicates a response.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+
+
+
+<h4>variance.prop.threshold</h4>
+
+<p>Optional Argument.<br />
+Specifies the variance proportion threshold value to 
+use while generating near dependency report. This is 
+used when &quot;near.dep.report&quot; is set to TRUE.<br />
+Default Value: 0.5<br />
+Types: numeric
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set option 'val.install.location' to
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Shows the Near Dependency Report is requested with related options.
+obj &lt;- td_log_reg_valib(data=df, 
+                        columns=c("age", "years_with_bank", "income"), 
+                        response.column="nbr_children", 
+                        response.value=1,
+                        cond.ind.threshold=3,
+                        variance.prop.threshold=0.3)
+
+# Print the results.
+print(obj$model)
+print(obj$statistical.measures)
+print(obj$xml.reports)
+
+# Example 2: Shows that 2 group by columns are requested. The output contains 1 row 
+#            for each combination of group by column values. 
+obj &lt;- td_log_reg_valib(data=df, 
+                        columns=c("age", "years_with_bank", "income"), 
+                        response.column="nbr_children", 
+                        group.columns=c("gender", "marital_status"))
+
+# Print the results.
+print(obj$model)
+print(obj$statistical.measures)
+print(obj$xml.reports)
+
+# Example 3: Shows how a pre-built matrix can be used for generating logistic regression model.
+# Generate the ESSCP matrix.
+mat_obj &lt;- td_matrix_valib(data=df,
+                           columns=c("income", "age", "years_with_bank", "nbr_children"),
+                           type="esscp")
+
+# Print the results.
+print(mat_obj$result)
+
+# Use the generated matrix in building logistic regression model.
+obj &lt;- td_log_reg_valib(data=df,
+                        columns=c("age", "years_with_bank", "income"),
+                        response.column="nbr_children",
+                        response.value=1,
+                        matrix.data=mat_obj$result)
+
+# Print the results.
+print(obj$model)
+print(obj$statistical.measures)
+print(obj$xml.reports)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

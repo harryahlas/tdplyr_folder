@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: PathAnalyzer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_path_analyzer_mle {tdplyr}"><tr><td>td_path_analyzer_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+PathAnalyzer
+</h2>
+
+<h3>Description</h3>
+
+<p>The PathAnalyzer function:
+</p>
+
+<ol>
+<li><p> Inputs a set of paths to the PathGenerator function 
+PathGenerator (<code><a href="td_path_generator_mle.html">td_path_generator_mle</a></code>) function.
+</p>
+</li>
+<li><p> Inputs the PathGenerator output to the PathSummarizer function 
+PathSummarizer (<code><a href="td_path_summarizer_mle.html">td_path_summarizer_mle</a></code>).
+</p>
+</li>
+<li><p> Inputs the PathSummarizer output to the PathStart function 
+PathStart (<code><a href="td_path_start_mle.html">td_path_start_mle</a></code>), which outputs, for each parent, 
+all children and the number of times that the user traveled each child.
+</p>
+</li></ol>
+
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_path_analyzer_mle (
+      data = NULL,
+      seq.column = NULL,
+      count.column = NULL,
+      hash = FALSE,
+      delimiter = ",",
+      data.sequence.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies either the input tbl_teradata that contains the paths
+to analyze, or the output of the <code><a href="td_npath_sqle.html">td_npath_sqle</a></code> function.<br />
+Each path is a string of alphanumeric symbols that represents an ordered sequence of page 
+views (or actions). Typically each symbol is a code that represents a 
+unique page view.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>seq.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+paths.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>count.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the input tbl_teradata column that contains the 
+number of times a path was traveled.<br />
+Note: If this argument is not specified, a column &quot;cnt&quot; is auto-generated
+with the number of unique paths in the &quot;seq.column&quot; column.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>hash</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to include the hash code of the output column node.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the single-character delimiter that separates symbols in 
+the path string.<br /> 
+Note: Do not use any of the following characters as delimiter (they cause the function 
+to fail):<br />
+Asterisk (*), Plus (+), Left parenthesis ((), Right 
+parenthesis ()), Single quotation mark ('),
+Escaped single quotation mark (\'), Backslash (\).<br />
+Default Value: &quot;,&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_path_analyzer_mle&quot; which is a 
+named list containing objects of class &quot;tbl_teradata&quot;.<br />
+Named list members can be referenced directly with the &quot;$&quot; operator 
+using the following names:</p>
+<ol>
+<li><p> output.table</p>
+</li>
+<li><p> output</p>
+</li></ol>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("pathgenerator_example", "clickstream1")
+    
+    # Create object(s) of class "tbl_teradata".
+    clickstream1 &lt;- tbl(con, "clickstream1")
+    
+    # Example 1 - Use the click stream data to run path analysis functions
+    td_path_analyzer_mle_out1 &lt;- td_path_analyzer_mle(data = clickstream1,
+                                                     seq.column = "path",
+                                                     count.column = "cnt"
+                                                     )
+    # Example 2 - Exclude count.column argument, and the function generates the count column
+    td_path_analyzer_mle_out2 &lt;- td_path_analyzer_mle(data = clickstream1,
+                                                     seq.column = "path"
+                                                     )
+
+    # Example 3 - Use the output of NPath td_npath_sqle() function as an input.
+    loadExampleData("npath_example1", "bank_web_clicks2")
+    
+   # Create object(s) of class "tbl_teradata".
+    bank_web_clicks2 &lt;- tbl(con, "bank_web_clicks2")
+    
+    # Execute npath function.
+    td_npath_out &lt;- td_npath_sqle(
+                       data1=bank_web_clicks2,
+                       data1.partition.column = c("customer_id", "session_id"),
+                       data1.order.column = "datestamp",
+                       mode = "nonoverlapping",
+                       pattern = "A*",
+                       symbols = c("true AS A"),
+                       result = c("ACCUMULATE (page OF A) AS page_path")
+                       );
+
+    # This takes the td_npath_out object as input and the count column gets auto-generated
+    td_path_analyzer_mle_out3 &lt;- td_path_analyzer_mle(data = td_npath_out,
+                                                     seq.column = "page_path"
+                                                     )
+     
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

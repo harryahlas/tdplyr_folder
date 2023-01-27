@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Text Parser</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_text_parser_mle {tdplyr}"><tr><td>td_text_parser_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Text Parser
+</h2>
+
+<h3>Description</h3>
+
+<p>The Text Parser function tokenizes an input stream of words, optionally stems them 
+(reduces them to their root forms), and then outputs them. 
+The function can either output all words in one row or output each word in its own 
+row with (optionally) the number of times that the word appears.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_text_parser_mle (
+      data = NULL,
+      text.column = NULL,
+      to.lower.case = TRUE,
+      stemming = FALSE,
+      delimiter = "[ \\t\\f\\r\\n]+",
+      total.words.num = FALSE,
+      punctuation = "[.,!?]",
+      accumulate = NULL,
+      token.column = "token",
+      frequency.column = "frequency",
+      total.column = "total_count",
+      remove.stop.words = FALSE,
+      position.column = "location",
+      list.positions = FALSE,
+      output.by.word = TRUE,
+      stemming.exceptions = NULL,
+      stop.words = NULL,
+      data.sequence.column = NULL,
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata that contains the text to be tokenized.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>text.column</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the name of the input column whose contents are to be 
+tokenized.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>to.lower.case</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to convert input text to lowercase.<br />
+Note: The function ignores this argument if &quot;stemming&quot; argument is set to TRUE.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>stemming</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to stem the tokens, i.e., whether to apply the 
+Porter2 stemming algorithm to each token to reduce it to its root 
+form. Before stemming, the function converts the input text to 
+lowercase and applies the &quot;remove.stop.words&quot; argument.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>delimiter</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a regular expression that represents the word delimiter.<br />
+Default Value: &quot;[ \\t\\f\\r\\n]+&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>total.words.num</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to output a column that contains the total number 
+of words in the input document.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>punctuation</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies a regular expression that represents the punctuation 
+characters to remove from the input text. With &quot;stemming&quot; argument set to TRUE, 
+the recommended value is &quot;[\\[.,?!:;~()\\]]+&quot;.<br />
+Default Value: &quot;[.,!?]&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>accumulate</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the names of the input columns to copy to the output tbl_teradata. 
+By default, the function copies all input columns to the output 
+tbl_teradata.<br />
+Note: Column specified in this argument can not be the same as the one specified 
+in &quot;token.column&quot; or &quot;total.column&quot; argument.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>token.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the output column that contains the tokens.<br /> 
+Default Value: &quot;token&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>frequency.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the output column that contains the frequency 
+of each token.<br />
+Default Value: &quot;frequency&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>total.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the output column that contains the total 
+number of words in the input document.<br /> 
+Default Value: &quot;total_count&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>remove.stop.words</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to remove stop words from the input text before 
+parsing.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>position.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the name of the output column that contains the position of 
+a word within a document.<br />
+Default Value: &quot;location&quot;<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>list.positions</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to output the position of a word in list form. 
+If FALSE, the function outputs a row for each occurrence of the 
+word.<br />
+Note: The function ignores this argument if the &quot;output.by.word&quot; 
+argument is set to FALSE.<br />
+Default Value: FALSE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>output.by.word</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies whether to output each token of each input document in its 
+own row in the output tbl_teradata. If FALSE, the function outputs each 
+tokenized input document in one row of the output tbl_teradata.<br />
+Default Value: TRUE<br />
+Types: logical
+</p>
+</td></tr>
+<tr valign="top"><td><code>stemming.exceptions</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the location of the file that contains the stemming 
+exceptions. A stemming exception is a word followed by its stemmed 
+form. The word and its stemmed form are separated by white space. 
+Each stemming exception is on its own line in the file. 
+For example:<br />
+bias bias<br />
+news news<br />
+goods goods<br />
+lying lie<br />
+ugly ugli<br />
+sky sky<br />
+early earli<br /> 
+The words &quot;lying&quot;, &quot;ugly&quot;, and &quot;early&quot; are to become &quot;lie&quot;, 
+&quot;ugli&quot;, and &quot;earli&quot;, respectively. The other words are not to change.<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>stop.words</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the location of the file that contains the stop words 
+(words to ignore when parsing text). Each stop word is on its own 
+line in the file.
+For example:<br />
+a<br />
+an<br />
+the<br />
+and<br />
+this<br />
+with<br />
+but<br />
+will<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_text_parser_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("textparser_example", "complaints", "complaints_mini")
+    
+    # Create object(s) of class "tbl_teradata".
+    complaints &lt;- tbl(con, "complaints")
+    complaints_mini &lt;- tbl(con, "complaints_mini")
+    
+    # Example 1 - This examples parses the text in the column 'text_data' without any
+    # stemming and removes stop words mentioned in 'stopwords.txt' file, which is
+    # preinstalled on Vantage.
+    td_text_parser_out1 &lt;- td_text_parser_mle(data = complaints,
+                             text.column = "text_data",
+                             to.lower.case = TRUE,
+                             stemming = FALSE,
+                             punctuation = "\\[.,?\\!\\]",
+                             accumulate = c("doc_id","category"),
+                             remove.stop.words = TRUE,
+                             list.positions = TRUE,
+                             output.by.word = TRUE,
+                             stop.words = "stopwords.txt"
+                             )
+    
+    # Example 2 - This examples parses the text in the column 'text_data' using Porter2 
+    # stemming algorithm with stemming exceptions specified in 'stemmingexception.txt' 
+    # file, which is preinstalled on Vantage.
+    td_text_parser_out2 &lt;- td_text_parser_mle(data = complaints_mini,
+                             text.column = "text_data",
+                             to.lower.case = TRUE,
+                             stemming = TRUE,
+                             punctuation = "\\[.,?\\!\\]",
+                             accumulate = c("doc_id","category"),
+                             output.by.word = FALSE,
+                             stemming.exceptions = "stemmingexception.txt"
+                             )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

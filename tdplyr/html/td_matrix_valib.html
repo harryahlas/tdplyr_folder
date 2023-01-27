@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Matrix Building</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_matrix_valib {tdplyr}"><tr><td>td_matrix_valib {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Matrix Building</h2>
+
+<h3>Description</h3>
+
+<p>Matrix builds an extended sum-of-squares-and-cross-products (ESSCP) matrix or
+other derived matrix type from an object of type tbl_teradata. Matrix does this with
+the help of Teradata CALCMATRIX table operator provided in Teradata Vantage.
+The purpose of building a matrix depends on the type of matrix built.<br />
+For example, when a correlation matrix is built, view it to determine the
+correlations or relationships between the various columns in the matrix.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_matrix_valib(data, columns, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the input data to build matrix from.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>columns</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name(s) of the column(s) used in building one or
+more matrices. Occasionally, it can also accept permitted strings
+to specify all columns, or all numeric columns.<br />
+Note:<br />
+</p>
+<pre>
+  Do not use the following column names, as these are reserved
+  for use by the CALCMATRIX table operator:\cr
+    'rownum', 'rowname', 'c', or 's'.\cr
+</pre>
+<p>Permitted Values:
+</p>
+
+<ol>
+<li><p> Name(s) of the columns in &quot;data&quot;.
+</p>
+</li>
+<li><p> Pre-defined strings:
+</p>
+
+<ol>
+<li><p> 'all' - all columns
+</p>
+</li>
+<li><p> 'allnumeric' - all numeric columns
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Types: character OR vector of Strings (character)</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Specifies other arguments supported by the function as described in the 
+'<b>Other Arguments</b>' section.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_matrix_valib&quot; 
+which is a named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Other Arguments</h3>
+
+
+
+<h4>exclude.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) to exclude from the 
+analysis, if a column specifier such as 'all', 'allnumeric' 
+is used in the &quot;columns&quot; argument.<br />
+For convenience, when the &quot;exclude_columns&quot; argument is used, 
+dependent variable and group by columns, if any, are automatically 
+excluded as input columns and do not need to be included in 
+this argument.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>group.columns</h4>
+
+<p>Optional Argument.<br />
+Specifies the name(s) of the column(s) in input tbl_teradata 
+to build a separate matrix for each combination. If 
+specified, group by columns divide the input into parts, one 
+for each combination of values in the group by columns. For each 
+combination of values, a separate matrix is built, though they 
+are all stored in the same output.<br />
+Note:<br />
+Do not use the following column names, as these are reserved
+for use by the CALCMATRIX table operator:<br />
+'rownum', 'rowname', 'c', or 's'.<br />
+Types: character OR vector of Strings (character)
+</p>
+
+
+
+<h4>matrix.output</h4>
+
+<p>Optional Argument.<br />
+Specifies the type of matrix output. Matrix output can either be 
+returned as COLUMNS in an output tbl_teradata or as VARBYTE values, 
+one per column, in a reduced output tbl_teradata.<br />
+Permitted Values: 'columns', 'varbyte'<br />
+Default Value: 'columns'<br />
+Types: character
+</p>
+
+
+
+<h4>type</h4>
+
+<p>Optional Argument.<br />
+Specifies the type of matrix to build.<br />
+Permitted Values:
+</p>
+
+<ol>
+<li><p> 'SSCP' - sum-of-squares-and-cross-products matrix
+</p>
+</li>
+<li><p> 'ESSCP' - Extended-sum-of-squares-and-cross-products matrix
+</p>
+</li>
+<li><p> 'CSSCP' - Corrected-sum-of-squares-and-cross-products matrix
+</p>
+</li>
+<li><p> 'COV' - Covariance matrix
+</p>
+</li>
+<li><p> 'COR' - Correlation matrix
+</p>
+</li></ol>
+
+<p>Default Value: 'ESSCP'<br />
+Types: character
+</p>
+
+
+
+<h4>handle.nulls</h4>
+
+<p>Optional Argument.<br />
+Specifies a way to treat null values in selected columns. 
+When set to IGNORE, the row that contains the NULL value in 
+a selected column is omitted from processing. When set to ZERO, 
+the NULL value is replaced with zero (0) in calculations.<br />
+Permitted Values: 'IGNORE', 'ZERO'<br />
+Default Value: 'IGNORE'<br />
+Types: character
+</p>
+
+
+
+<h4>filter</h4>
+
+<p>Optional Argument.<br />
+Specifies the clause to filter rows selected for building the matrix.<br />
+For example,<br />
+filter = &quot;cust_id &gt; 0&quot;<br />
+Types: character
+</p>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Notes:
+#   1. To execute Vantage Analytic Library functions, set options 'val.install.location' to 
+#      the database name where Vantage analytic library functions are installed.
+#   2. Datasets used in these examples can be loaded using Vantage Analytic Library installer.
+
+# Set the option 'val.install.location'.
+options(val.install.location = "SYSLIB")
+
+# Get remote data source connection.
+con &lt;- td_get_context()$connection
+
+# Create an object of class "tbl_teradata".
+df &lt;- tbl(con, "customer")
+print(df)
+
+# Example 1: Build a 3-by-3 ESSCP matrix on input columns 'age', 'years_with_bank', 
+#            and 'nbr_children'.
+obj &lt;- td_matrix_valib(data=df, columns=c("age", "years_with_bank", "nbr_children"))
+# Print the results.
+print(obj$result)
+
+# Example 2: Build a 3-by-3 CSSCP matrix on input columns 'age', 'years_with_bank', 
+#            and 'nbr_children' with null handling, where NULLs are replaced with zero.
+obj &lt;- td_matrix_valib(data=df, columns=c("age", "years_with_bank", "nbr_children"), 
+                       handle.nulls="zero", type="CSSCP")
+# Print the results.
+print(obj$result)
+
+# Example 3: Build a 3-by-3 COR matrix by limiting the input data by filtering rows.
+#            Matrix is built on input columns 'age', 'years_with_bank', and 'nbr_children'.
+obj &lt;- td_matrix_valib(data=df, columns=c("age", "years_with_bank", "nbr_children"),
+                       filter="nbr_children &gt; 1", type="COR")
+# Print the results.
+print(obj$result)
+
+# Example 4: Build two 3-by-3 COV matrices by grouping data on "gender" column.
+obj &lt;- td_matrix_valib(data=df, columns=c("age", "years_with_bank", "nbr_children"),
+                       group.columns="gender", type="COV")
+# Print the results.
+print(obj$result)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

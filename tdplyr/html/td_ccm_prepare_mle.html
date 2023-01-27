@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: CCMPrepare</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_ccm_prepare_mle {tdplyr}"><tr><td>td_ccm_prepare_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+CCMPrepare
+</h2>
+
+<h3>Description</h3>
+
+<p>The CCMPrepare function prepares an input tbl_teradata for the CCM
+function by adding a partition column, &quot;ccm_id&quot;, and partitioning
+the data. Using the CCMPrepare function is optional. However,
+partitioning the data, instead of having all sequences on one
+vworker, may increase the speed of the CCM (<code>td_ccm_mle</code>) 
+function for large data sets consisting of multiple sequences.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_ccm_prepare_mle (
+      data = NULL,
+      data.partition.column = "1",
+      data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the input data.<br />
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.partition.column</code></td>
+<td>
+
+<p>Optional Argument<br />
+Specifies Partition By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for partition.<br />
+Default Value: &quot;1&quot;<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_ccm_prepare_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using the name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data.
+    loadExampleData("ccmprepare_example", "ccmprepare_input")
+
+    # The ccmprepare_input tbl_teradata is a collection of nine
+    # time series consisting of 10 values for each of three variables
+    # (expenditure, income, and investment).
+    ccmprepare_input &lt;- tbl(con, "ccmprepare_input")
+
+    # Prepare the given input for CCM.
+    td_ccm_prepare_out &lt;- td_ccm_prepare_mle(data = ccmprepare_input,
+                                         data.partition.column = "id"
+                                        )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

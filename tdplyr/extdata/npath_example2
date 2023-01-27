@@ -1,0 +1,4 @@
+--loadByTypes--
+aggregate_clicks::int,int,varchar(20),varchar(20),timestamp,varchar(20),real
+--loadByTypes--
+link2::int,varchar(20),date format 'YYYY-MM-DD',date format 'YYYY-MM-DD'

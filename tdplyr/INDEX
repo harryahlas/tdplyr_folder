@@ -1,0 +1,295 @@
+NativeDriver            Teradata Native Driver
+NativeDriver-class      Teradata Native Driver Class
+Script                  Creates and initializes an object of
+                        "ScriptTableOperator" class.
+copy_to.Teradata        Copy a local dataframe to a remote data source
+dbConnect,NativeDriver-method
+                        Connect to Teradata Vantage using the Teradata
+                        SQL driver for R
+db_analyze.Teradata     Analyze the table
+db_compute.Teradata     Creates a Table
+db_save_query.Teradata
+                        Creates a Table
+group_by_time           Group by Time for PTI and non-PTI tables
+loadExampleData         Loading example data for tdplyr functions
+predict                 tdplyr: Model Predictions
+print.td_analytics      Printing tdplyr Analytic Function Objects
+show_query.td_analytics_valib
+                        Get SQL query
+sql-translation         SQL Translation Extensions
+sql_query_save.Teradata
+                        Builds a create table query from a SQL
+sql_table_analyze.Teradata
+                        Creates query to analyze the table
+summarise.tbl_teradata
+                        Summarise a grouped or ungrouped column
+tdBinning               Binning
+tdDerive                Derive
+tdFillNa                FillNa
+tdLabelEncoder          Label Encoding
+tdMinMaxScalar          Rescale values using MinMaxScalar
+tdOneHotEncoder         One Hot Encoder
+tdRetain                Retain
+tdSigmoid               Sigmoid
+tdZScore                Rescale Values using ZScore
+td_adaboost_mle         AdaBoost
+td_adaboost_predict_mle
+                        AdaBoostPredict
+td_adaptive_histogram_valib
+                        Descriptive Statistics Function:
+                        AdaptiveHistogram
+td_antiselect_mle       Antiselect
+td_antiselect_sqle      Antiselect
+td_arima_mle            Arima
+td_arima_predict_mle    ARIMAPredict
+td_association_valib    Association Rules
+td_attribution_mle      Attribution
+td_attribution_sqle     Attribution
+td_binomial_test_valib
+                        Binomial Tests
+td_burst_mle            Burst
+td_ccm_mle              CCM
+td_ccm_prepare_mle      CCMPrepare
+td_cfilter_mle          CFilter
+td_changepoint_detection_mle
+                        ChangePointDetection
+td_changepoint_detection_rt_mle
+                        RealTimeChangePointDetection
+td_chi_square_test_valib
+                        Tests Based on Contingency Tables
+td_cleanup_sandbox_env
+                        Cleanup Sandbox Environment
+td_confusion_matrix_mle
+                        ConfusionMatrix
+td_copy_files_from_container
+                        Copy files from container
+td_cox_hazard_ratio_mle
+                        CoxHazardRatio
+td_cox_survival_mle     CoxSurvival
+td_coxph_mle            CoxPH
+td_create_context       Create a Context to run analytic functions on
+                        Teradata Vantage
+td_cumulative_mov_avg_mle
+                        CumulativeMovAvg
+td_decision_forest_evaluator_mle
+                        DecisionForestEvaluator
+td_decision_forest_mle
+                        DecisionForest
+td_decision_forest_predict_mle
+                        DecisionForestPredict
+td_decision_forest_predict_sqle
+                        DecisionForestPredict
+td_decision_tree_evaluator_valib
+                        Gain Ratio Decision Tree Evaluator
+td_decision_tree_mle    DecisionTree
+td_decision_tree_predict_mle
+                        DecisionTreePredict
+td_decision_tree_predict_sqle
+                        DecisionTreePredict
+td_decision_tree_predict_valib
+                        Gain Ratio Decision Tree Predict
+td_decision_tree_valib
+                        Gain Ratio Decision Tree
+td_delete_model         td_delete_model
+td_describe_model       td_describe_model
+td_dtw_mle              DTW
+td_dwt2d_mle            DWT2D
+td_dwt_mle              DWT
+td_execute_script       Execute user script
+td_execute_script.ScriptTableOperator
+                        Execute script using Script Table Operator.
+td_explore_valib        Descriptive Statistics Function: Explore
+td_exponential_mov_avg_mle
+                        ExponentialMovAvg
+td_fastexport           FastExport to extract data
+td_fastload             Copy a local dataframe to a remote data source
+                        using fastload protocol
+td_fpgrowth_mle         FPGrowth
+td_frequency_valib      Descriptive Statistics Function: Frequency
+td_get_context          Get the current context
+td_glm_mle              GLM
+td_glm_predict_mle      GLMPredict
+td_glm_predict_sqle     GLMPredict
+td_glml1l2_mle          GLML1L2
+td_glml1l2_predict_mle
+                        GLML1L2Predict
+td_histogram_mle        Histogram
+td_histogram_valib      Descriptive Statistics Function: Histogram
+td_hmm_decoder_mle      HMMDecoder
+td_hmm_evaluator_mle    HMMEvaluator
+td_hmm_supervised_mle   HMMSupervisedLearner
+td_hmm_unsupervised_mle
+                        HMMUnsupervisedLearner
+td_idwt2d_mle           IDWT2D
+td_idwt_mle             IDWT
+td_install_file         Install or replace file in Vantage
+td_kmeans_mle           KMeans
+td_kmeans_predict_valib
+                        K-Means Clustering Predict.
+td_kmeans_valib         K-Means Clustering.
+td_knn_mle              KNN
+td_knn_recommender_mle
+                        KNNRecommenderTrain
+td_knn_recommender_predict_mle
+                        KNNRecommenderPredict
+td_ks_test_valib        Kolmogorov-Smirnoff Tests
+td_lar_mle              LAR
+td_lar_predict_mle      LARPredict
+td_lda_inference_mle    LDAInference
+td_lda_mle              LDATrainer
+td_lda_topic_summary_mle
+                        LDATopicSummary
+td_levenshtein_distance_mle
+                        Levenshtein Distance (LDist)
+td_lin_reg_evaluator_valib
+                        Linear Regression Evaluator
+td_lin_reg_mle          Linear Regression
+td_lin_reg_predict_valib
+                        Linear Regression Predict
+td_lin_reg_valib        Linear Regression
+td_linreg_predict_mle   LinearRegressionPredict
+td_list_models          td_list_models
+td_log_reg_evaluator_valib
+                        Logistic Regression Evaluator
+td_log_reg_predict_valib
+                        Logistic Regression Predict
+td_log_reg_valib        Logistic Regression
+td_matrix_valib         Matrix Building
+td_minhash_mle          MinHash
+td_modularity_mle       Modularity
+td_moving_average_sqle
+                        MovingAverage
+td_naivebayes_mle       NaiveBayes
+td_naivebayes_predict_mle
+                        NaiveBayesPredict
+td_naivebayes_predict_sqle
+                        NaiveBayesPredict
+td_naivebayes_textclassifier_mle
+                        NaiveBayesTextClassifierTrainer
+td_naivebayes_textclassifier_predict_mle
+                        NaiveBayesTextClassifierPredict
+td_naivebayes_textclassifier_predict_sqle
+                        NaiveBayesTextClassifierPredict
+td_namedentity_finder_evaluator_mle
+                        NamedEntityFinderEvaluator
+td_namedentity_finder_mle
+                        NamedEntityFinder
+td_namedentity_finder_trainer_mle
+                        TrainNamedEntityFinder
+td_ngramsplitter_mle    nGrams
+td_ngramsplitter_sqle   NGramSplitter
+td_npath_mle            Pattern Matching with nPath.
+td_npath_sqle           Pattern Matching with Teradata nPath
+td_nrow                 Number of rows in a data.frame or a tibble
+                        object
+td_ntree_mle            NTree
+td_overlap_valib        Overlap
+td_pack_mle             Pack
+td_pack_sqle            Pack
+td_page_rank_mle        PageRank
+td_parametric_test_valib
+                        Parametric Tests
+td_path_analyzer_mle    PathAnalyzer
+td_path_generator_mle   PathGenerator
+td_path_start_mle       PathStart
+td_path_summarizer_mle
+                        PathSummarizer
+td_pca_evaluator_valib
+                        Factor Analysis Evaluator
+td_pca_predict_valib    Factor Analysis Scoring
+td_pca_valib            Factor Analysis
+td_pivot_mle            Pivot
+td_pmml_predict_sqle    PMMLPredict
+td_pos_tagger_mle       POSTagger
+td_publish_model        td_publish_model
+td_random_sample_mle    RandomSample
+td_random_walk_sample_mle
+                        RandomWalkSample
+td_rank_test_valib      Rank Test
+td_remove_context       Remove the current context and close the
+                        corresponding connection to Teradata Vantage
+td_remove_file          Remove file from Vantage
+td_retrieve_model       td_retrieve_model
+td_sample               Selects one or more samples of rows
+td_sampling_mle         Sample
+td_save_model           td_save_model
+td_sax_mle              SAX
+td_scale_by_partition_mle
+                        ScaleByPartition
+td_scale_map_mle        ScaleMap
+td_scale_mle            Scale
+td_scale_summary_mle    ScaleSummary
+td_sentence_extractor_mle
+                        SentenceExtractor
+td_sentiment_evaluator_mle
+                        EvaluateSentimentExtractor
+td_sentiment_extractor_mle
+                        ExtractSentiment
+td_sentiment_trainer_mle
+                        TrainSentimentExtractor
+td_series_splitter_mle
+                        SeriesSplitter
+td_sessionize_mle       Sessionize
+td_sessionize_sqle      Sessionize
+td_set_context          Initialize a context to perform analytic
+                        functions on Teradata Vantage
+td_set_data             Set data
+td_set_data.ScriptTableOperator
+                        Set data
+td_setup_sandbox_env    Setup Sandbox Environment
+td_setup_test_env       *_(Deprecated)_* Setup test environment
+td_simple_mov_avg_mle   SimpleMovAvg
+td_statistics_valib     Descriptive Statistics Function: Statistics
+td_string_similarity_mle
+                        StringSimilarity
+td_string_similarity_sqle
+                        StringSimilarity
+td_svm_dense_mle        DenseSVMTrainer
+td_svm_dense_predict_mle
+                        SVMDensePredict
+td_svm_dense_summary_mle
+                        DenseSVMModelPrinter
+td_svm_sparse_mle       SVMSparse
+td_svm_sparse_predict_mle
+                        SVMSparsePredict
+td_svm_sparse_predict_sqle
+                        SparseSVMPredictor
+td_svm_sparse_summary_mle
+                        SVMSparseSummary
+td_test_script          Test user script
+td_test_script.ScriptTableOperator
+                        Test user script
+td_text_analyzer_valib
+                        Descriptive Statistics Function: Text Field
+                        Analyzer
+td_text_chunker_mle     TextChunker
+td_text_classifier_evaluator_mle
+                        TextClassifierEvaluator
+td_text_classifier_mle
+                        TextClassifier
+td_text_classifier_trainer_mle
+                        TextClassifierTrainer
+td_text_morph_mle       TextMorph
+td_text_parser_mle      Text Parser
+td_text_tagger_mle      TextTagging
+td_text_tokenizer_mle   TextTokenizer
+td_tf_mle               TF
+td_tfidf_mle            TF IDF
+td_to_csv               Export data to CSV file.
+td_transform_valib      Transformation
+td_unpack_mle           Unpack
+td_unpack_sqle          Unpack
+td_unpivot_mle          Unpivot
+td_values_valib         Descriptive Statistics Function: Values
+td_varmax_mle           VARMAX
+td_vector_distance_mle
+                        VectorDistance
+td_weighted_mov_avg_mle
+                        WeightedMovAvg
+td_xgboost_mle          XGBoost
+td_xgboost_predict_mle
+                        XGBoostPredict
+td_xml_to_html_report_valib
+                        Transform Vantage Analytic Library XML reports
+                        to HTML reports.
+tdplyr-package          tdplyr: dplyr for Teradata Vantage

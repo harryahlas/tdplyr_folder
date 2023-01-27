@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: ScaleMap</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_scale_map_mle {tdplyr}"><tr><td>td_scale_map_mle {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+ScaleMap
+</h2>
+
+<h3>Description</h3>
+
+<p>The ScaleMap function is designed for internal use only; its output is not 
+intended for human interpretation. The ScaleMap function calculates and 
+outputs statistical information for a data set at the vworker level. 
+The output of the ScaleMap function is intended to be input to the functions 
+Scale (<code>td_scale_mle</code>, which calculates scaled values for the data set) 
+and ScaleSummary (<code>td_scale_summary_mle</code>, which calculates global statistics for
+the data set).
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+  td_scale_map_mle (
+    data = NULL,
+    input.columns = NULL,
+    miss.value = "KEEP",
+    data.sequence.column = NULL,
+    data.order.column = NULL
+  )
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata for scale function.
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.order.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies Order By columns for &quot;data&quot;.<br />
+Values to this argument can be provided as a vector, if multiple 
+columns are used for ordering.
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>input.columns</code></td>
+<td>
+
+<p>Required Argument.<br />
+Specifies the input tbl_teradata columns that contain the attribute 
+values of the samples. The attribute values must be numeric values 
+between -1e308 and 1e308. If a value is outside this range, the 
+function treats it as infinity.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+<tr valign="top"><td><code>miss.value</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies how the <code>td_scale_mle</code>, <code>td_scale_map_mle</code>, and 
+<code>td_scale_by_partition_mle</code> functions process NULL values 
+in input. NULL values are processed as follows:
+</p>
+
+<ol>
+<li><p> KEEP : Keep NULL values.
+</p>
+</li>
+<li><p> OMIT : Ignore any row that has a NULL value.
+</p>
+</li>
+<li><p> ZERO : Replace each NULL value with zero.
+</p>
+</li>
+<li><p> LOCATION : Replace each NULL value with its location value.
+</p>
+</li></ol>
+<p><br />
+Default Value: &quot;KEEP&quot;<br />
+Permitted Values: KEEP, OMIT, ZERO, LOCATION<br />
+Types: character
+</p>
+</td></tr>
+<tr valign="top"><td><code>data.sequence.column</code></td>
+<td>
+
+<p>Optional Argument.<br />
+Specifies the vector of column(s) that uniquely identifies each row 
+of the input argument &quot;data&quot;. The argument is used to ensure 
+deterministic results for functions which produce results that vary 
+from run to run.<br />
+Types: character OR vector of Strings (character)
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns an object of class &quot;td_scale_map_mle&quot; which is a 
+named list containing object of class &quot;tbl_teradata&quot;.<br />
+Named list member can be referenced directly with the &quot;$&quot; operator 
+using name: result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+  
+    # Get the current context/connection
+    con &lt;- td_get_context()$connection
+    
+    # Load example data about houses.
+    loadExampleData("scalemap_example", "scale_housing")
+
+    # Create object(s) of class "tbl_teradata".
+    scale_housing &lt;- tbl(con, "scale_housing")
+
+    # Example 1 - This example calculates and outputs statistical information.
+    td_scale_map_out &lt;- td_scale_map_mle(data = scale_housing,
+                                         input.columns = colnames(scale_housing)[2:7],
+                                         miss.value = "omit"
+                                         )
+  
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>

@@ -1,0 +1,2 @@
+--loadByTypes--
+sessionize_table::integer, integer, Integer, varchar(1024), timestamp

@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Export data to CSV file.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for td_to_csv {tdplyr}"><tr><td>td_to_csv {tdplyr}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Export data to CSV file.</h2>
+
+<h3>Description</h3>
+
+<p>The <code>td_to_csv</code> function exports data from Teradata Vantage to CSV file 
+with or without FastExport protocol.<br />
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+td_to_csv(
+  df,
+  csv.file.name,
+  use.fastexport = NA,
+  num.rows = 9999,
+  all.rows = FALSE,
+  catch.errors.warnings = TRUE,
+  ...
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>df</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the tbl_teradata containing the data to be extracted.<br />
+Types: tbl_teradata</p>
+</td></tr>
+<tr valign="top"><td><code>csv.file.name</code></td>
+<td>
+<p>Required Argument.<br />
+Specifies the name of CSV file to export the data into.<br />
+The file will get created if not present and will be
+overwritten if present.<br />
+Types: str</p>
+</td></tr>
+<tr valign="top"><td><code>use.fastexport</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether FastExport protocol should be used or not while
+exporting data.
+When set to TRUE, data is exported using FastExport
+protocol.
+When set to NA, the approach is decided based on the number of rows
+to be exported.<br />
+Notes:
+</p>
+
+<ol>
+<li><p> Teradata recommends to use FastExport when number of rows
+in R dataframe are at least 100,000. To extract
+lesser rows, ignore this option and go with regular
+approach. FastExport opens multiple data transfer connections
+to the database.
+</p>
+</li>
+<li><p> FastExport does not support all Teradata Database data types.
+For example, tables with BLOB and CLOB type columns cannot
+be extracted.
+</p>
+</li>
+<li><p> FastExport cannot be used to extract data from a
+volatile or temporary table.
+</p>
+</li>
+<li><p> For best efficiency, do not use groupby() and
+sort() with FastExport.
+</p>
+</li></ol>
+
+<p>For additional information about fastexport protocol through teradatasql
+driver, please refer the FastExport section of
+<a href="https://github.com/Teradata/r-driver#FastExport">terdatasql driver documentation</a>.<br />
+Default Value: FALSE<br />
+Types: bool</p>
+</td></tr>
+<tr valign="top"><td><code>num.rows</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies the number of rows to export.<br />
+Note:
+</p>
+
+<ol>
+<li><p> This argument is ignored if &quot;all.rows&quot; is set to TRUE.
+</p>
+</li></ol>
+
+<p>Default Value: 99999<br />
+Types: int</p>
+</td></tr>
+<tr valign="top"><td><code>all.rows</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether all rows should be exported to 
+CSV or not.<br />
+Default Value: FALSE<br />
+Types: bool</p>
+</td></tr>
+<tr valign="top"><td><code>catch.errors.warnings</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies whether to catch errors and warnings
+(if any) raised by FastExport protocol while
+converting tbl_teradata to R dataframe.<br />
+Default Value: TRUE<br />
+Types: logical</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Optional Argument.<br />
+Specifies additional arguments required for future enhancements.<br /></p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Function returns a named list containing the following objects:<br />
+</p>
+
+<ol>
+<li><p> errors (only if &quot;catch.errors.warnings&quot; is set to TRUE):
+</p>
+
+<ol>
+<li><p> If there are no errors, this contains NULL.
+</p>
+</li>
+<li><p> If there are errors, this contains a R dataframe containing
+the errors.
+</p>
+</li></ol>
+
+</li>
+<li><p> warnings (only if &quot;catch.errors.warnings&quot; is set to TRUE):
+</p>
+
+<ol>
+<li><p> If there are no warnings, this contains NULL.
+</p>
+</li>
+<li><p> If there are errors, this contains a R dataframe containing
+the warnings.
+</p>
+</li></ol>
+
+</li></ol>
+
+<p>Named list member can be referenced directly with the &quot;$&quot; operator.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code>td_fastload</code> <code>td_fastexport</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+# Note: Connection must be established before running td_to_csv().
+
+# Load the required tables.
+loadExampleData("time_series_example", "ocean_buoys_seq")
+
+# Create object(s) of class "tbl_teradata".
+df_seq &lt;- tbl(con, "ocean_buoys_seq")
+
+# Example 1: Export the data in a csv file along with the errors and warnings, if any,
+#            while extracting the data.
+val &lt;- td_to_csv(df = df1,
+                 csv.file.name = 'test.csv')
+
+# Example 2: Export the data without errors and warnings.
+val &lt;- td_to_csv(df = df1,
+                 csv.file.name = 'test.csv',
+                 catch.errors.warnings = FALSE)
+
+# Example 3: Export the data in a csv file, with all.rows set to TRUE and 
+#            catch errors and warnings, if any.
+val &lt;- td_to_csv(df = df1,
+                 csv.file.name = 'test.csv',
+                 all.rows = TRUE,
+                 catch.errors.warnings = TRUE)
+
+# Example 4: Export the data in a csv file using the specified 
+#            field.quote.char and field.separator.
+td_to_csv(df = df_seq,
+          csv.file.name ="test.csv",
+          field.separator=";",
+          field.quote.char="'",
+          catch.errors.warnings = FALSE)
+
+# Example 5: Export the data in a csv file using use.fastexport = TRUE.
+td_to_csv(df = df_seq,
+          csv.file.name ="test.csv",
+          use.fastexport=TRUE,
+          open.sessions = 4,
+          catch.errors.warnings = FALSE)
+
+# Example 6: Export the data in a csv file using num.rows = 10500.
+td_to_csv(df = df_seq,
+          csv.file.name ="test.csv",
+          num.rows = 10500,
+          catch.errors.warnings = FALSE)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>tdplyr</em> version 17.00.00.02 <a href="00Index.html">Index</a>]</div>
+</body></html>
