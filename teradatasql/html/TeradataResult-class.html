@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TeradataResult class</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for TeradataResult-class {teradatasql}"><tr><td>TeradataResult-class {teradatasql}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>TeradataResult class</h2>
+
+<h3>Description</h3>
+
+<p>TeradataResult class
+</p>
+<p>Bind values to prepared statement parameter markers
+<code>dbBind(res, params, ...)</code>
+</p>
+<p>Close the result
+<code>dbClearResult(res, ...)</code>
+</p>
+<p>Obtain result column metadata
+<code>dbColumnInfo(res, ...)</code>
+</p>
+<p>Fetch rows
+<code>dbFetch(res, n = -1, ...)</code>
+An attempt to fetch from a closed result set raises an error.
+</p>
+<p>Obtain the number of rows fetched
+<code>dbGetRowCount(res, ...)</code>
+</p>
+<p>Obtain the number of rows affected by the SQL statement
+<code>dbGetRowsAffected(res, ...)</code>
+</p>
+<p>Obtain the SQL request text
+<code>dbGetStatement(res, ...)</code>
+</p>
+<p>Determine whether the entire result has been fetched
+<code>dbHasCompleted(res, ...)</code>
+</p>
+<p>Determine whether the result is usable
+<code>dbIsValid(dbObj, ...)</code>
+</p>
+<p>Advances to the next result set.
+<code>dbNextResult(res, ...)</code>
+</p>
+<p>Sets the fetched row count for testing.
+<code>setFetchedRowCount(res, ...)</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'TeradataResult'
+dbBind(res, params, ...)
+
+## S4 method for signature 'TeradataResult'
+dbClearResult(res, ...)
+
+## S4 method for signature 'TeradataResult'
+dbColumnInfo(res, ...)
+
+## S4 method for signature 'TeradataResult'
+dbFetch(res, n = -1, ...)
+
+## S4 method for signature 'TeradataResult'
+dbGetRowCount(res, ...)
+
+## S4 method for signature 'TeradataResult'
+dbGetRowsAffected(res, ...)
+
+## S4 method for signature 'TeradataResult'
+dbGetStatement(res, ...)
+
+## S4 method for signature 'TeradataResult'
+dbHasCompleted(res, ...)
+
+## S4 method for signature 'TeradataResult'
+dbIsValid(dbObj, ...)
+
+## S4 method for signature 'TeradataResult'
+dbNextResult(res, ...)
+
+## S4 method for signature 'TeradataResult'
+setFetchedRowCount(res, u, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>res</code></td>
+<td>
+<p>A TeradataResult object</p>
+</td></tr>
+<tr valign="top"><td><code>params</code></td>
+<td>
+<p>Parameter values to bind</p>
+</td></tr>
+<tr valign="top"><td><code>n</code></td>
+<td>
+<p>Maximum number of rows to fetch. Specify n = -1 or n = Inf to fetch all remaining rows.
+If the n argument is not an atomic whole number greater or equal to -1 or Inf, an error is raised.</p>
+</td></tr>
+<tr valign="top"><td><code>dbObj</code></td>
+<td>
+<p>A TeradataResult object</p>
+</td></tr>
+<tr valign="top"><td><code>u</code></td>
+<td>
+<p>The fetched row count</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>The TeradataResult invisibly
+</p>
+<p><code>TRUE</code> invisibly
+</p>
+<p>A data frame with columns <code>name</code> (type <code>character</code>), <code>Sclass</code> (R data type), <code>type</code> (type <code>character</code>),
+<code>len</code> (type <code>integer</code>), precision (type <code>integer</code>), scale (type <code>integer</code>), nullOK (type <code>logical</code>).
+The data frame contains one row for each result column.
+</p>
+<p>A data frame with columns and rows corresponding to result set columns and rows.
+If the SQL statement returned an empty result set, the data frame will have fully-typed columns but zero rows.
+If the SQL statement did not return a result set, the data frame will have zero columns and zero rows.
+The column types of the returned data frame depend on the data returned:
+integer for 32-bit integer values
+bit64::as.integer64() for 64-bit integer values
+numeric for numbers with a fractional component
+character for text
+raw for blobs
+as.Date() for dates
+hms::as_hms() for times
+as.POSIXct() for timestamps
+NA for SQL NULL values
+</p>
+<p>The number of rows fetched so far
+</p>
+<p>The number of rows affected by the SQL statement
+</p>
+<p>The SQL request text
+</p>
+<p><code>TRUE</code> if all rows have been fetched, <code>FALSE</code> otherwise
+</p>
+<p><code>TRUE</code> to indicate that the result is usable, <code>FALSE</code> otherwise
+</p>
+<p><code>TRUE</code> if there are more result sets; otherwise <code>FALSE</code>
+</p>
+<p><code>TRUE</code> invisibly
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>teradatasql</em> version 17.20.0.24 <a href="00Index.html">Index</a>]</div>
+</body></html>

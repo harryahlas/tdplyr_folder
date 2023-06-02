@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Teradata SQL Driver for R</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for TeradataDriver-class {teradatasql}"><tr><td>TeradataDriver-class {teradatasql}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Teradata SQL Driver for R</h2>
+
+<h3>Description</h3>
+
+<p><code>teradatasql::TeradataDriver()</code>
+</p>
+<p><code>dbConnect(drv, sConnectParams, ...)</code>
+</p>
+<p><code>dbDataType(dbObj, obj, ...)</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+TeradataDriver()
+
+## S4 method for signature 'TeradataDriver'
+dbConnect(drv, jsonstr = NA, ...)
+
+## S4 method for signature 'TeradataDriver'
+dbDataType(dbObj, obj, ...)
+
+## S4 method for signature 'TeradataDriver'
+dbGetInfo(dbObj, ...)
+
+## S4 method for signature 'TeradataDriver'
+dbIsValid(dbObj, ...)
+
+## S4 method for signature 'TeradataDriver'
+getRandomBytes(drv, nByteCount, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>drv</code></td>
+<td>
+<p>A TeradataDriver object</p>
+</td></tr>
+<tr valign="top"><td><code>jsonstr</code></td>
+<td>
+<p>A character string in JSON format specifying the connection parameters</p>
+</td></tr>
+<tr valign="top"><td><code>dbObj</code></td>
+<td>
+<p>A TeradataDriver object</p>
+</td></tr>
+<tr valign="top"><td><code>obj</code></td>
+<td>
+<p>An R object whose SQL type we want to determine</p>
+</td></tr>
+<tr valign="top"><td><code>nByteCount</code></td>
+<td>
+<p>The number of random bytes to obtain</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>A TeradataDriver object
+</p>
+<p>A TeradataConnection object
+</p>
+<p>A string giving the SQL data type for the R object
+</p>
+<p>A named list
+</p>
+<p><code>TRUE</code> to indicate that the driver is usable
+</p>
+<p>The specified number of random raw bytes
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>teradatasql</em> version 17.20.0.24 <a href="00Index.html">Index</a>]</div>
+</body></html>

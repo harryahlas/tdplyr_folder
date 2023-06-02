@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: TeradataConnection class</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for TeradataConnection-class {teradatasql}"><tr><td>TeradataConnection-class {teradatasql}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>TeradataConnection class</h2>
+
+<h3>Description</h3>
+
+<p>TeradataConnection class
+</p>
+<p>Insert rows into an existing table
+<code>dbAppendTable(conn, name, value, row.names = NULL, ...)</code>
+</p>
+<p>Begin a transaction
+<code>dbBegin(conn, ...)</code>
+</p>
+<p>Commit the current transaction
+<code>dbCommit(conn, ...)</code>
+</p>
+<p>Determine the SQL data type of an R object
+<code>dbDataType(dbObj, obj, ...)</code>
+</p>
+<p>Close the connection
+<code>dbDisconnect(conn, ...)</code>
+</p>
+<p>Execute a SQL request
+<code>dbExecute(conn, statement, ...)</code>
+</p>
+<p>Determine whether a table exists
+<code>dbExistsTable(conn, name, ...)</code>
+</p>
+<p>Obtain metadata from the connection
+<code>dbGetInfo(dbObj, ...)</code>
+</p>
+<p>Execute a query
+<code>dbGetQuery(conn, statement, ...)</code>
+</p>
+<p>Determine whether the connection is usable
+<code>dbIsValid(dbObj, ...)</code>
+</p>
+<p>Obtain a table's column names
+<code>dbListFields(conn, name, ...)</code>
+</p>
+<p>Obtain the list of databases, tables, and views in the system
+<code>dbListObjects(conn, prefix, ...)</code>
+</p>
+<p>Obtain the list of tables and views in the current database
+<code>dbListTables(conn, ...)</code>
+</p>
+<p>Drop a table
+<code>dbRemoveTable(conn, name, ...)</code>
+</p>
+<p>Rollback the current transaction
+<code>dbRollback(conn, ...)</code>
+</p>
+<p>Prepare or execute a query
+<code>dbSendQuery(conn, statement, ...)</code>
+</p>
+<p>Prepare or execute a SQL request
+<code>dbSendStatement(conn, statement, ...)</code>
+</p>
+<p>Copy data frame to table
+<code>dbWriteTable(conn, name, value, ...)</code>
+</p>
+<p>Compose SQL request to create a table
+<code>sqlCreateTable(con, table, fields, ...)</code>
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+## S4 method for signature 'TeradataConnection'
+dbAppendTable(conn, name, value, ..., row.names = NULL)
+
+## S4 method for signature 'TeradataConnection'
+dbBegin(conn, ...)
+
+## S4 method for signature 'TeradataConnection'
+dbCommit(conn, ...)
+
+## S4 method for signature 'TeradataConnection'
+dbDataType(dbObj, obj, ...)
+
+## S4 method for signature 'TeradataConnection'
+dbDisconnect(conn, ...)
+
+## S4 method for signature 'TeradataConnection,character'
+dbExecute(conn, statement, params = NULL, immediate = TRUE, ...)
+
+## S4 method for signature 'TeradataConnection,character'
+dbExistsTable(conn, name, ...)
+
+## S4 method for signature 'TeradataConnection,Id'
+dbExistsTable(conn, name, ...)
+
+## S4 method for signature 'TeradataConnection'
+dbGetInfo(dbObj, ...)
+
+## S4 method for signature 'TeradataConnection,character'
+dbGetQuery(conn, statement, n = -1, params = NULL, immediate = TRUE, ...)
+
+## S4 method for signature 'TeradataConnection'
+dbIsValid(dbObj, ...)
+
+## S4 method for signature 'TeradataConnection,character'
+dbListFields(conn, name, ...)
+
+## S4 method for signature 'TeradataConnection,Id'
+dbListFields(conn, name, ...)
+
+## S4 method for signature 'TeradataConnection'
+dbListObjects(conn, prefix = NULL, ...)
+
+## S4 method for signature 'TeradataConnection'
+dbListTables(conn, ...)
+
+## S4 method for signature 'TeradataConnection,character'
+dbRemoveTable(conn, name, fail_if_missing = TRUE, ...)
+
+## S4 method for signature 'TeradataConnection,Id'
+dbRemoveTable(conn, name, fail_if_missing = TRUE, ...)
+
+## S4 method for signature 'TeradataConnection'
+dbRollback(conn, ...)
+
+## S4 method for signature 'TeradataConnection,character'
+dbSendQuery(conn, statement, params = NULL, immediate = NA, ...)
+
+## S4 method for signature 'TeradataConnection,character'
+dbSendStatement(conn, statement, params = NULL, immediate = NA, ...)
+
+## S4 method for signature 'TeradataConnection,character'
+dbWriteTable(
+  conn,
+  name,
+  value,
+  row.names = FALSE,
+  overwrite = FALSE,
+  append = FALSE,
+  field.types = NULL,
+  temporary = FALSE,
+  ...
+)
+
+## S4 method for signature 'TeradataConnection,Id'
+dbWriteTable(
+  conn,
+  name,
+  value,
+  row.names = FALSE,
+  overwrite = FALSE,
+  append = FALSE,
+  field.types = NULL,
+  temporary = FALSE,
+  ...
+)
+
+## S4 method for signature 'TeradataConnection'
+sqlCreateTable(con, table, fields, row.names = NA, temporary = FALSE, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>conn</code></td>
+<td>
+<p>A TeradataConnection object</p>
+</td></tr>
+<tr valign="top"><td><code>name</code></td>
+<td>
+<p>A character string specifying a table name</p>
+</td></tr>
+<tr valign="top"><td><code>value</code></td>
+<td>
+<p>A data frame</p>
+</td></tr>
+<tr valign="top"><td><code>row.names</code></td>
+<td>
+<p>Either <code>TRUE</code>, <code>FALSE</code>, <code>NA</code> or a string.
+If <code>TRUE</code>, translate row names to a column named &quot;row_names&quot;.
+If <code>FALSE</code>, never translate row names.
+If <code>NA</code>, translate row names only if they are a character vector.</p>
+</td></tr>
+<tr valign="top"><td><code>dbObj</code></td>
+<td>
+<p>A TeradataConnection object</p>
+</td></tr>
+<tr valign="top"><td><code>obj</code></td>
+<td>
+<p>An R object whose SQL type we want to determine</p>
+</td></tr>
+<tr valign="top"><td><code>statement</code></td>
+<td>
+<p>A character string containing the SQL request text</p>
+</td></tr>
+<tr valign="top"><td><code>prefix</code></td>
+<td>
+<p>A database name or <code>NULL</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>temporary</code></td>
+<td>
+<p>If <code>TRUE</code>, compose a SQL request to create a volatile table.</p>
+</td></tr>
+<tr valign="top"><td><code>con</code></td>
+<td>
+<p>A TeradataConnection object</p>
+</td></tr>
+<tr valign="top"><td><code>table</code></td>
+<td>
+<p>A character string specifying a table name</p>
+</td></tr>
+<tr valign="top"><td><code>fields</code></td>
+<td>
+<p>Either a character vector or a data frame
+A named character vector: Names are column names, values are types.
+A data frame: field types are generated using <code><a href="../../DBI/html/dbDataType.html">dbDataType()</a></code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p><code>TRUE</code> invisibly
+</p>
+<p><code>TRUE</code> invisibly
+</p>
+<p>A string giving the SQL data type for the R object
+</p>
+<p><code>TRUE</code> invisibly
+</p>
+<p>A TeradataResult object
+</p>
+<p><code>TRUE</code> if the specified table or view exists, <code>FALSE</code> otherwise
+</p>
+<p>A named list
+</p>
+<p>A TeradataResult object
+</p>
+<p><code>TRUE</code> to indicate that the connection is usable, <code>FALSE</code> otherwise
+</p>
+<p>A character vector of the specified table's column names, in order
+</p>
+<p>A data frame with columns <code>table</code> (type <code>list</code> of <code>Id</code>) and <code>is_prefix</code> (type <code>logical</code>).
+When <code>NULL</code> is specified for <code>prefix</code>, the data frame contains one row for each database, table, and view in the system.
+When a database name is specified for <code>prefix</code>, the data frame contains one row for each table and view in the specified database.
+Data frame rows for each database have <code>is_prefix == TRUE</code>. Data frame rows for each table and view have <code>is_prefix == FALSE</code>.
+</p>
+<p>A character vector of all table names and view names in the current database
+</p>
+<p><code>TRUE</code> invisibly
+</p>
+<p><code>TRUE</code> invisibly
+</p>
+<p>A TeradataResult object
+</p>
+<p>A TeradataResult object
+</p>
+<p><code>TRUE</code> invisibly
+</p>
+<p>A string containing the SQL request text
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>teradatasql</em> version 17.20.0.24 <a href="00Index.html">Index</a>]</div>
+</body></html>
